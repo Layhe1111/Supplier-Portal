@@ -3,13 +3,15 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { MaterialSupplierFormData, Product } from '@/types/supplier';
-import FormInput from '@/components/FormInput';
-import FileUpload from '@/components/FileUpload';
+import ProductModal from '@/components/ProductModal';
 
 export default function ProductManagePage() {
   const router = useRouter();
   const [userData, setUserData] = useState<MaterialSupplierFormData | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editingIndex, setEditingIndex] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     // Check authentication
@@ -38,35 +40,38 @@ export default function ProductManagePage() {
     setProducts(parsedData.products || []);
   }, [router]);
 
-  const addProduct = () => {
-    const newProduct: Product = {
-      id: Date.now().toString(),
-      sku: '',
-      productName: '',
-      category: '',
-      brand: '',
-      series: '',
-      spec: '',
-      material: '',
-      unitPrice: '',
-      moq: '',
-      leadTime: '',
-      model3D: null,
-    };
-    setProducts([...products, newProduct]);
+  const handleAddProduct = () => {
+    setEditingProduct(null);
+    setEditingIndex(undefined);
+    setIsModalOpen(true);
   };
 
-  const updateProduct = (id: string, field: keyof Product, value: any) => {
-    setProducts(
-      products.map((p) => (p.id === id ? { ...p, [field]: value } : p))
-    );
+  const handleEditProduct = (product: Product, index: number) => {
+    setEditingProduct(product);
+    setEditingIndex(index);
+    setIsModalOpen(true);
   };
 
-  const removeProduct = (id: string) => {
-    setProducts(products.filter((p) => p.id !== id));
+  const handleSaveProduct = (product: Product) => {
+    if (editingProduct) {
+      // Edit existing product
+      const updatedProducts = products.map((p) =>
+        p.id === product.id ? product : p
+      );
+      setProducts(updatedProducts);
+    } else {
+      // Add new product
+      setProducts([...products, product]);
+    }
   };
 
-  const handleSave = () => {
+  const handleDeleteProduct = (id: string) => {
+    if (confirm('Are you sure you want to delete this product? / 確定要刪除此產品嗎？')) {
+      setProducts(products.filter((p) => p.id !== id));
+    }
+  };
+
+  const handleSaveAll = () => {
     if (!userData) return;
 
     const updatedData = {
@@ -92,7 +97,7 @@ export default function ProductManagePage() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-light text-gray-900">
             Product Management / 產品管理
@@ -106,7 +111,7 @@ export default function ProductManagePage() {
           <div className="mb-6">
             <button
               type="button"
-              onClick={addProduct}
+              onClick={handleAddProduct}
               className="px-6 py-2.5 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
             >
               + Add Product / 添加產品
@@ -135,140 +140,85 @@ export default function ProductManagePage() {
               </p>
             </div>
           ) : (
-            <div className="space-y-6">
-              {products.map((product, index) => (
-                <div
-                  key={product.id}
-                  className="border border-gray-200 p-6 bg-gray-50"
-                >
-                  <div className="flex items-center justify-between mb-6">
-                    <h4 className="text-base font-medium text-gray-900">
-                      Product #{index + 1} / 產品 #{index + 1}
-                    </h4>
-                    <button
-                      type="button"
-                      onClick={() => removeProduct(product.id)}
-                      className="text-sm text-red-600 hover:text-red-800 font-light"
-                    >
-                      Remove / 刪除
-                    </button>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <FormInput
-                        label="Product Category / 產品類別"
-                        name={`category-${product.id}`}
-                        required
-                        value={product.category}
-                        onChange={(v) => updateProduct(product.id, 'category', v)}
-                        placeholder="e.g., Furniture, Lighting"
-                      />
-
-                      <FormInput
-                        label="Product Brand / 產品品牌"
-                        name={`brand-${product.id}`}
-                        required
-                        value={product.brand}
-                        onChange={(v) => updateProduct(product.id, 'brand', v)}
-                      />
-
-                      <FormInput
-                        label="Product Series / 產品系列"
-                        name={`series-${product.id}`}
-                        required
-                        value={product.series}
-                        onChange={(v) => updateProduct(product.id, 'series', v)}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormInput
-                        label="SKU / SKU編碼"
-                        name={`sku-${product.id}`}
-                        required
-                        value={product.sku}
-                        onChange={(v) => updateProduct(product.id, 'sku', v)}
-                      />
-
-                      <FormInput
-                        label="Product Name / 產品名稱"
-                        name={`productName-${product.id}`}
-                        required
-                        value={product.productName}
-                        onChange={(v) =>
-                          updateProduct(product.id, 'productName', v)
-                        }
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormInput
-                        label="Spec / 規格"
-                        name={`spec-${product.id}`}
-                        required
-                        value={product.spec}
-                        onChange={(v) => updateProduct(product.id, 'spec', v)}
-                        placeholder="e.g., 120cm x 60cm x 75cm"
-                      />
-
-                      <FormInput
-                        label="Material / 材質"
-                        name={`material-${product.id}`}
-                        required
-                        value={product.material}
-                        onChange={(v) =>
-                          updateProduct(product.id, 'material', v)
-                        }
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <FormInput
-                        label="Unit Price (HKD) / 單價"
-                        name={`unitPrice-${product.id}`}
-                        type="number"
-                        required
-                        value={product.unitPrice}
-                        onChange={(v) =>
-                          updateProduct(product.id, 'unitPrice', v)
-                        }
-                      />
-
-                      <FormInput
-                        label="MOQ / 最小起訂量"
-                        name={`moq-${product.id}`}
-                        type="number"
-                        required
-                        value={product.moq}
-                        onChange={(v) => updateProduct(product.id, 'moq', v)}
-                      />
-
-                      <FormInput
-                        label="Lead Time (days) / 交貨周期"
-                        name={`leadTime-${product.id}`}
-                        type="number"
-                        required
-                        value={product.leadTime}
-                        onChange={(v) =>
-                          updateProduct(product.id, 'leadTime', v)
-                        }
-                      />
-                    </div>
-
-                    <div className="mt-4">
-                      <FileUpload
-                        label="3D Model / 3D模型"
-                        name={`model3D-${product.id}`}
-                        accept=".obj,.fbx,.stl,.glb,.gltf"
-                        onChange={(file) =>
-                          updateProduct(product.id, 'model3D', file)
-                        }
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
+                      SKU
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
+                      Product Name / 產品名稱
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
+                      Category / 類別
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
+                      Brand / 品牌
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
+                      Price / 價格
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
+                      MOQ
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
+                      Lead Time / 交期
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
+                      Actions / 操作
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {products.map((product, index) => (
+                    <tr key={product.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {product.sku}
+                      </td>
+                      <td className="px-4 py-4 text-sm text-gray-900">
+                        <div>
+                          <p className="font-medium">{product.productName}</p>
+                          {product.spec && (
+                            <p className="text-xs text-gray-500">{product.spec}</p>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                        {product.category}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                        {product.brand}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                        HKD {parseInt(product.unitPrice).toLocaleString()}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                        {product.moq}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                        {product.leadTime} days
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleEditProduct(product, index)}
+                            className="text-blue-600 hover:text-blue-800 font-light"
+                          >
+                            Edit / 編輯
+                          </button>
+                          <button
+                            onClick={() => handleDeleteProduct(product.id)}
+                            className="text-red-600 hover:text-red-800 font-light"
+                          >
+                            Delete / 刪除
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
 
@@ -278,19 +228,28 @@ export default function ProductManagePage() {
               onClick={handleCancel}
               className="px-6 py-2.5 border border-gray-300 text-sm font-light text-gray-700 hover:bg-gray-50 transition-colors"
             >
-              ← Cancel / 取消
+              ← Back to Dashboard / 返回儀表板
             </button>
 
             <button
               type="button"
-              onClick={handleSave}
+              onClick={handleSaveAll}
               className="px-6 py-2.5 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
             >
-              Save Changes / 保存更改
+              Save All Changes / 保存所有更改
             </button>
           </div>
         </div>
       </div>
+
+      {/* Product Modal */}
+      <ProductModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveProduct}
+        product={editingProduct}
+        productIndex={editingIndex}
+      />
     </div>
   );
 }

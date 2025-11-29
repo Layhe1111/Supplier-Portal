@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { SupplierFormData } from '@/types/supplier';
+import { SupplierFormData, Product, MaterialSupplierFormData } from '@/types/supplier';
+import ProductModal from '@/components/ProductModal';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -10,6 +11,9 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editingIndex, setEditingIndex] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     const isLoggedIn = localStorage.getItem('isLoggedIn');
@@ -36,6 +40,56 @@ export default function DashboardPage() {
 
   const handleEditProfile = () => {
     router.push('/register/supplier');
+  };
+
+  const handleAddProduct = () => {
+    setEditingProduct(null);
+    setEditingIndex(undefined);
+    setIsModalOpen(true);
+  };
+
+  const handleEditProduct = (product: Product, index: number) => {
+    setEditingProduct(product);
+    setEditingIndex(index);
+    setIsModalOpen(true);
+  };
+
+  const handleSaveProduct = (product: Product) => {
+    if (!userData || userData.supplierType !== 'material') return;
+
+    let updatedProducts: Product[];
+    if (editingProduct) {
+      // Edit existing product
+      updatedProducts = userData.products.map((p) =>
+        p.id === product.id ? product : p
+      );
+    } else {
+      // Add new product
+      updatedProducts = [...userData.products, product];
+    }
+
+    const updatedData = {
+      ...userData,
+      products: updatedProducts,
+    };
+
+    localStorage.setItem('supplierData', JSON.stringify(updatedData));
+    setUserData(updatedData as MaterialSupplierFormData);
+  };
+
+  const handleDeleteProduct = (id: string) => {
+    if (!userData || userData.supplierType !== 'material') return;
+
+    if (confirm('Are you sure you want to delete this product? / 確定要刪除此產品嗎？')) {
+      const updatedProducts = userData.products.filter((p) => p.id !== id);
+      const updatedData = {
+        ...userData,
+        products: updatedProducts,
+      };
+
+      localStorage.setItem('supplierData', JSON.stringify(updatedData));
+      setUserData(updatedData as MaterialSupplierFormData);
+    }
   };
 
   // Get products (only for material suppliers)
@@ -165,7 +219,7 @@ export default function DashboardPage() {
 
             <div className="bg-white border border-gray-200 p-6">
               <button
-                onClick={() => router.push('/products/manage')}
+                onClick={handleAddProduct}
                 className="w-full h-full flex flex-col items-center justify-center hover:bg-gray-50 transition-colors group"
               >
                 <div className="w-12 h-12 bg-gray-900 group-hover:bg-gray-800 flex items-center justify-center mb-2">
@@ -228,7 +282,7 @@ export default function DashboardPage() {
                   尚未添加產品
                 </p>
                 <button
-                  onClick={() => router.push('/products/manage')}
+                  onClick={handleAddProduct}
                   className="px-6 py-2.5 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
                 >
                   Add Your First Product / 添加您的第一個產品
@@ -268,10 +322,13 @@ export default function DashboardPage() {
                       <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
                         Lead Time / 交期
                       </th>
+                      <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
+                        Actions / 操作
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredProducts.map((product) => (
+                    {filteredProducts.map((product, index) => (
                       <tr key={product.id} className="hover:bg-gray-50">
                         <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                           {product.sku}
@@ -298,6 +355,22 @@ export default function DashboardPage() {
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                           {product.leadTime} days
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleEditProduct(product, index)}
+                              className="text-blue-600 hover:text-blue-800 font-light"
+                            >
+                              Edit / 編輯
+                            </button>
+                            <button
+                              onClick={() => handleDeleteProduct(product.id)}
+                              className="text-red-600 hover:text-red-800 font-light"
+                            >
+                              Delete / 刪除
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -341,6 +414,17 @@ export default function DashboardPage() {
           </div>
         )}
       </main>
+
+      {/* Product Modal - Only for material suppliers */}
+      {userData?.supplierType === 'material' && (
+        <ProductModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSave={handleSaveProduct}
+          product={editingProduct}
+          productIndex={editingIndex}
+        />
+      )}
     </div>
   );
 }
