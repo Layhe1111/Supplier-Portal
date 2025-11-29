@@ -18,9 +18,20 @@ export default function SupplierRegistrationPage() {
   const [supplierType, setSupplierType] = useState<
     'contractor' | 'designer' | 'material' | null
   >(null);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   // Initialize form data based on supplier type
   const [formData, setFormData] = useState<SupplierFormData | null>(null);
+
+  // Check if user is logged in
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    if (!isLoggedIn) {
+      router.push('/');
+      return;
+    }
+    setIsCheckingAuth(false);
+  }, [router]);
 
   // Initialize form data when supplier type is selected
   useEffect(() => {
@@ -168,6 +179,15 @@ export default function SupplierRegistrationPage() {
     localStorage.removeItem('supplierDraft');
   };
 
+  // Show loading while checking authentication
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <p className="text-gray-600">Loading... / 加載中...</p>
+      </div>
+    );
+  }
+
   // Supplier Type Selection Screen
   if (!supplierType) {
     return (
@@ -228,15 +248,6 @@ export default function SupplierRegistrationPage() {
                   <br />
                   建材與家具供應
                 </p>
-              </button>
-            </div>
-
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <button
-                onClick={() => router.back()}
-                className="px-6 py-2.5 border border-gray-300 text-sm font-light text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                ← Back / 返回
               </button>
             </div>
           </div>

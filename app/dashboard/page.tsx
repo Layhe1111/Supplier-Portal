@@ -2,33 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-
-interface Product {
-  id: string;
-  sku: string;
-  name: string;
-  category: string;
-  brand: string;
-  spec: string;
-  material: string;
-  unitPrice: string;
-  moq: string;
-  leadTime: string;
-  description: string;
-}
-
-interface SupplierData {
-  companyName: string;
-  contactName: string;
-  contactPhone: string;
-  contactEmail: string;
-  businessScope: string;
-  products: Product[];
-}
+import { SupplierFormData } from '@/types/supplier';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [userData, setUserData] = useState<SupplierData | null>(null);
+  const [userData, setUserData] = useState<SupplierFormData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -41,10 +19,13 @@ export default function DashboardPage() {
     }
 
     const data = localStorage.getItem('supplierData');
-    if (data) {
-      setUserData(JSON.parse(data));
+    if (!data) {
+      // User is logged in but hasn't completed registration
+      router.push('/register/supplier');
+      return;
     }
 
+    setUserData(JSON.parse(data));
     setIsLoading(false);
   }, [router]);
 
@@ -57,15 +38,18 @@ export default function DashboardPage() {
     router.push('/register/supplier');
   };
 
+  // Get products (only for material suppliers)
+  const products = userData?.supplierType === 'material' ? userData.products : [];
+
   // Get unique categories
-  const categories = userData?.products
-    ? ['all', ...new Set(userData.products.map(p => p.category))]
+  const categories = products.length > 0
+    ? ['all', ...new Set(products.map(p => p.category))]
     : ['all'];
 
   // Filter products
-  const filteredProducts = userData?.products.filter((product) => {
+  const filteredProducts = products.filter((product) => {
     const matchesSearch =
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.brand.toLowerCase().includes(searchTerm.toLowerCase());
 
@@ -73,7 +57,7 @@ export default function DashboardPage() {
       selectedCategory === 'all' || product.category === selectedCategory;
 
     return matchesSearch && matchesCategory;
-  }) || [];
+  });
 
   if (isLoading) {
     return (
@@ -126,37 +110,42 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Company / 公司</p>
-                <p className="text-base text-gray-900">{userData.companyName}</p>
+                <p className="text-base text-gray-900">{userData.companyLegalName}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Supplier Type / 供應商類型</p>
+                <p className="text-base text-gray-900">
+                  {userData.supplierType === 'contractor' && 'Contractor / 承包商'}
+                  {userData.supplierType === 'designer' && 'Designer / 設計師'}
+                  {userData.supplierType === 'material' && 'Material Supplier / 材料供應商'}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-gray-600 mb-1">Contact / 聯繫人</p>
-                <p className="text-base text-gray-900">{userData.contactName}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Business Scope / 經營範圍</p>
-                <p className="text-base text-gray-900">{userData.businessScope}</p>
+                <p className="text-base text-gray-900">{userData.submitterName}</p>
               </div>
             </div>
           )}
         </div>
 
-        {/* Product Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white border border-gray-200 p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Total Products / 總產品</p>
-                <p className="text-2xl font-light text-gray-900">
-                  {userData?.products.length || 0}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-gray-100 flex items-center justify-center">
-                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                </svg>
+        {/* Product Statistics - Only show for material suppliers */}
+        {userData?.supplierType === 'material' && (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div className="bg-white border border-gray-200 p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Total Products / 總產品</p>
+                  <p className="text-2xl font-light text-gray-900">
+                    {products.length}
+                  </p>
+                </div>
+                <div className="w-12 h-12 bg-gray-100 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  </svg>
+                </div>
               </div>
             </div>
-          </div>
 
           <div className="bg-white border border-gray-200 p-6">
             <div className="flex items-center justify-between">
@@ -206,138 +195,167 @@ export default function DashboardPage() {
             </button>
           </div>
         </div>
+        )}
 
-        {/* Product Management */}
-        <div className="bg-white border border-gray-200 p-8">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-light text-gray-900">
-              Product Catalog / 產品目錄
-            </h3>
-          </div>
-
-          {/* Search and Filter */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div>
-              <input
-                type="text"
-                placeholder="Search products... / 搜索產品..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
-              />
+        {/* Product Management - Only show for material suppliers */}
+        {userData?.supplierType === 'material' && (
+          <div className="bg-white border border-gray-200 p-8">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-light text-gray-900">
+                Product Catalog / 產品目錄
+              </h3>
             </div>
-            <div>
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 bg-white"
-              >
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat === 'all' ? 'All Categories / 所有類別' : cat}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
 
-          {/* Products List */}
-          {!userData || userData.products.length === 0 ? (
-            <div className="text-center py-12 border-2 border-dashed border-gray-300">
-              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            {/* Search and Filter */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div>
+                <input
+                  type="text"
+                  placeholder="Search products... / 搜索產品..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
+                />
+              </div>
+              <div>
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 bg-white"
+                >
+                  {categories.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat === 'all' ? 'All Categories / 所有類別' : cat}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Products List */}
+            {products.length === 0 ? (
+              <div className="text-center py-12 border-2 border-dashed border-gray-300">
+                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+                <p className="mt-4 text-sm text-gray-500 mb-4">
+                  No products added yet
+                  <br />
+                  尚未添加產品
+                </p>
+                <button
+                  onClick={handleEditProfile}
+                  className="px-6 py-2.5 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
+                >
+                  Add Your First Product / 添加您的第一個產品
+                </button>
+              </div>
+            ) : filteredProducts.length === 0 ? (
+              <div className="text-center py-12 border border-gray-300">
+                <p className="text-sm text-gray-500">
+                  No products match your search
+                  <br />
+                  沒有符合搜索條件的產品
+                </p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
+                        SKU
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
+                        Product Name / 產品名稱
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
+                        Category / 類別
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
+                        Brand / 品牌
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
+                        Price / 價格
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
+                        MOQ
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
+                        Lead Time / 交期
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredProducts.map((product) => (
+                      <tr key={product.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {product.sku}
+                        </td>
+                        <td className="px-4 py-4 text-sm text-gray-900">
+                          <div>
+                            <p className="font-medium">{product.productName}</p>
+                            {product.spec && (
+                              <p className="text-xs text-gray-500">{product.spec}</p>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                          {product.category}
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                          {product.brand}
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                          HKD {parseInt(product.unitPrice).toLocaleString()}
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                          {product.moq}
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                          {product.leadTime} days
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {filteredProducts.length > 0 && (
+              <div className="mt-4 text-sm text-gray-600">
+                Showing {filteredProducts.length} of {products.length} products
+                / 顯示 {filteredProducts.length} / {products.length} 個產品
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Info Section for Non-Material Suppliers */}
+        {userData?.supplierType !== 'material' && (
+          <div className="bg-white border border-gray-200 p-8">
+            <div className="text-center py-12">
+              <svg className="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              <p className="mt-4 text-sm text-gray-500 mb-4">
-                No products added yet
+              <h3 className="mt-4 text-lg font-light text-gray-900">
+                {userData?.supplierType === 'contractor' && 'Contractor Dashboard / 承包商儀表板'}
+                {userData?.supplierType === 'designer' && 'Designer Dashboard / 設計師儀表板'}
+              </h3>
+              <p className="mt-2 text-sm text-gray-600">
+                Your profile has been successfully registered.
                 <br />
-                尚未添加產品
+                您的檔案已成功註冊。
               </p>
               <button
                 onClick={handleEditProfile}
-                className="px-6 py-2.5 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
+                className="mt-6 px-6 py-2.5 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
               >
-                Add Your First Product / 添加您的第一個產品
+                Edit Profile / 編輯檔案
               </button>
             </div>
-          ) : filteredProducts.length === 0 ? (
-            <div className="text-center py-12 border border-gray-300">
-              <p className="text-sm text-gray-500">
-                No products match your search
-                <br />
-                沒有符合搜索條件的產品
-              </p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
-                      SKU
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
-                      Product Name / 產品名稱
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
-                      Category / 類別
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
-                      Brand / 品牌
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
-                      Price / 價格
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
-                      MOQ
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
-                      Lead Time / 交期
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredProducts.map((product) => (
-                    <tr key={product.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {product.sku}
-                      </td>
-                      <td className="px-4 py-4 text-sm text-gray-900">
-                        <div>
-                          <p className="font-medium">{product.name}</p>
-                          {product.spec && (
-                            <p className="text-xs text-gray-500">{product.spec}</p>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {product.category}
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {product.brand}
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                        HKD {parseInt(product.unitPrice).toLocaleString()}
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {product.moq}
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {product.leadTime} days
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          {filteredProducts.length > 0 && (
-            <div className="mt-4 text-sm text-gray-600">
-              Showing {filteredProducts.length} of {userData?.products.length} products
-              / 顯示 {filteredProducts.length} / {userData?.products.length} 個產品
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </main>
     </div>
   );

@@ -12,10 +12,19 @@ export default function LoginPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // For now, just store login state and redirect
+    // Store login state
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('userEmail', formData.email);
-    router.push('/dashboard');
+
+    // Check if user has completed supplier registration
+    const supplierData = localStorage.getItem('supplierData');
+    if (supplierData) {
+      // User has completed registration, go to dashboard
+      router.push('/dashboard');
+    } else {
+      // User hasn't completed registration, redirect to registration page
+      router.push('/register/supplier');
+    }
   };
 
   return (
@@ -76,15 +85,6 @@ export default function LoginPage() {
             </button>
           </div>
 
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={() => router.push('/register/supplier')}
-              className="text-sm font-light text-gray-600 hover:text-gray-900"
-            >
-              New Supplier? Register Here / 新供應商？點此註冊
-            </button>
-          </div>
         </form>
       </div>
     </div>
