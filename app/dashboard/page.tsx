@@ -97,7 +97,7 @@ export default function DashboardPage() {
 
   // Get unique categories
   const categories = products.length > 0
-    ? ['all', ...new Set(products.map(p => p.category))]
+    ? ['all', ...Array.from(new Set(products.map(p => p.category)))]
     : ['all'];
 
   // Filter products
