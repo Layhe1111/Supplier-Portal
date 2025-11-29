@@ -130,7 +130,7 @@ export default function DashboardPage() {
 
         {/* Product Statistics - Only show for material suppliers */}
         {userData?.supplierType === 'material' && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="bg-white border border-gray-200 p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -147,54 +147,38 @@ export default function DashboardPage() {
               </div>
             </div>
 
-          <div className="bg-white border border-gray-200 p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Categories / 類別</p>
-                <p className="text-2xl font-light text-gray-900">
-                  {categories.length - 1}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-gray-100 flex items-center justify-center">
-                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white border border-gray-200 p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Status / 狀態</p>
-                <p className="text-lg font-light text-green-600">
-                  Active / 活躍
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-green-100 flex items-center justify-center">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
+            <div className="bg-white border border-gray-200 p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Categories / 類別</p>
+                  <p className="text-2xl font-light text-gray-900">
+                    {categories.length - 1}
+                  </p>
+                </div>
+                <div className="w-12 h-12 bg-gray-100 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                  </svg>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="bg-white border border-gray-200 p-6">
-            <button
-              onClick={handleEditProfile}
-              className="w-full h-full flex flex-col items-center justify-center hover:bg-gray-50 transition-colors group"
-            >
-              <div className="w-12 h-12 bg-gray-900 group-hover:bg-gray-800 flex items-center justify-center mb-2">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-              </div>
-              <p className="text-sm font-light text-gray-900">
-                Add Products / 添加產品
-              </p>
-            </button>
+            <div className="bg-white border border-gray-200 p-6">
+              <button
+                onClick={() => router.push('/products/manage')}
+                className="w-full h-full flex flex-col items-center justify-center hover:bg-gray-50 transition-colors group"
+              >
+                <div className="w-12 h-12 bg-gray-900 group-hover:bg-gray-800 flex items-center justify-center mb-2">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </div>
+                <p className="text-sm font-light text-gray-900">
+                  Add Products / 添加產品
+                </p>
+              </button>
+            </div>
           </div>
-        </div>
         )}
 
         {/* Product Management - Only show for material suppliers */}
@@ -244,7 +228,7 @@ export default function DashboardPage() {
                   尚未添加產品
                 </p>
                 <button
-                  onClick={handleEditProfile}
+                  onClick={() => router.push('/products/manage')}
                   className="px-6 py-2.5 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
                 >
                   Add Your First Product / 添加您的第一個產品
