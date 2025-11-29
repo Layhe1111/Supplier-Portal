@@ -35,9 +35,7 @@ export default function LoginPage() {
             ProjectPilot
           </h1>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Supplier Registration Portal
-            <br />
-            項目引導供應商註冊門戶
+            Supplier Portal 供應商門戶
           </p>
         </div>
 
