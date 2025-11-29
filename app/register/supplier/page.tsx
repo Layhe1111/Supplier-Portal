@@ -19,17 +19,32 @@ export default function SupplierRegistrationPage() {
     'contractor' | 'designer' | 'material' | null
   >(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   // Initialize form data based on supplier type
   const [formData, setFormData] = useState<SupplierFormData | null>(null);
 
-  // Check if user is logged in
+  // Check if user is logged in and load existing data if in edit mode
   useEffect(() => {
     const isLoggedIn = localStorage.getItem('isLoggedIn');
     if (!isLoggedIn) {
       router.push('/');
       return;
     }
+
+    // Check if there's existing supplier data (edit mode)
+    const existingData = localStorage.getItem('supplierData');
+    if (existingData) {
+      try {
+        const parsed = JSON.parse(existingData);
+        setSupplierType(parsed.supplierType);
+        setFormData(parsed);
+        setIsEditMode(true);
+      } catch (error) {
+        console.error('Failed to load existing data:', error);
+      }
+    }
+
     setIsCheckingAuth(false);
   }, [router]);
 
@@ -266,13 +281,23 @@ export default function SupplierRegistrationPage() {
       <div className="max-w-5xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-light text-gray-900">
-            {supplierType === 'contractor' && 'Contractor Registration / 承包商註冊'}
-            {supplierType === 'designer' && 'Designer Registration / 設計師註冊'}
-            {supplierType === 'material' &&
-              'Material/Furniture Supplier Registration / 材料家具供應商註冊'}
+            {isEditMode ? (
+              <>
+                {supplierType === 'contractor' && 'Edit Contractor Profile / 編輯承包商檔案'}
+                {supplierType === 'designer' && 'Edit Designer Profile / 編輯設計師檔案'}
+                {supplierType === 'material' && 'Edit Material Supplier Profile / 編輯材料供應商檔案'}
+              </>
+            ) : (
+              <>
+                {supplierType === 'contractor' && 'Contractor Registration / 承包商註冊'}
+                {supplierType === 'designer' && 'Designer Registration / 設計師註冊'}
+                {supplierType === 'material' &&
+                  'Material/Furniture Supplier Registration / 材料家具供應商註冊'}
+              </>
+            )}
           </h1>
           <p className="mt-2 text-sm text-gray-600">
-            Complete your registration form / 完成您的註冊表格
+            {isEditMode ? 'Update your profile information / 更新您的檔案信息' : 'Complete your registration form / 完成您的註冊表格'}
           </p>
         </div>
 
@@ -304,15 +329,17 @@ export default function SupplierRegistrationPage() {
 
           {/* Form Actions */}
           <div className="flex items-center justify-between pt-6 border-t border-gray-200 mt-6">
-            <button
-              type="button"
-              onClick={handleReset}
-              className="px-6 py-2.5 border border-gray-300 text-sm font-light text-gray-700 hover:bg-gray-50 transition-colors"
-            >
-              ← Change Type / 更改類型
-            </button>
+            {!isEditMode && (
+              <button
+                type="button"
+                onClick={handleReset}
+                className="px-6 py-2.5 border border-gray-300 text-sm font-light text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                ← Change Type / 更改類型
+              </button>
+            )}
 
-            <div className="flex gap-4">
+            <div className={`flex gap-4 ${isEditMode ? 'ml-auto' : ''}`}>
               <button
                 type="button"
                 onClick={() => {
@@ -332,7 +359,7 @@ export default function SupplierRegistrationPage() {
                 }
                 className="px-6 py-2.5 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
               >
-                Submit / 提交
+                {isEditMode ? 'Update / 更新' : 'Submit / 提交'}
               </button>
             </div>
           </div>
