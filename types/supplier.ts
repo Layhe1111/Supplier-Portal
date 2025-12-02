@@ -14,6 +14,27 @@ export interface Product {
   model3D: File | null;
 }
 
+// Project Manager Interface
+export interface ProjectManager {
+  id: string;
+  name: string;
+  languages: string;
+  mainProject: string;
+  year: string;
+  address: string;
+  area: string;
+  cv: File | null;
+}
+
+// Insurance Interface
+export interface Insurance {
+  id: string;
+  type: string;
+  provider: string;
+  expiryDate: string;
+  file: File | null;
+}
+
 // Common Requirements for all suppliers
 export interface CommonRequirements {
   // Document Upload
@@ -56,6 +77,23 @@ export interface ContractorFormData extends CommonRequirements {
   annualConstructionCapacity: string;
   maxConcurrentProjects: string;
   largestProjectValue: string;
+
+  // Section 5: Personnel
+  projectManagers: ProjectManager[];
+  organizationChart: File | null;
+  hasSafetyOfficer: 'yes' | 'no' | '';
+  numberOfSafetyOfficers: string;
+  hasConstructionManager: 'yes' | 'no' | '';
+  numberOfConstructionManagers: string;
+
+  // Section 6: Compliance and Governance
+  insurances: Insurance[];
+  hasEnvironmentalHealthSafety: 'yes' | 'no' | '';
+  environmentalHealthSafetyFile: File | null;
+  hasIncidentsPast3Years: 'yes' | 'no' | '';
+  incidentsFile: File | null;
+  hasLitigationPast3Years: 'yes' | 'no' | '';
+  litigationFile: File | null;
 }
 
 // Designer Form Data

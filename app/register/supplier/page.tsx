@@ -82,6 +82,25 @@ export default function SupplierRegistrationPage() {
           annualConstructionCapacity: '',
           maxConcurrentProjects: '',
           largestProjectValue: '',
+          projectManagers: [],
+          organizationChart: null,
+          hasSafetyOfficer: '',
+          numberOfSafetyOfficers: '',
+          hasConstructionManager: '',
+          numberOfConstructionManagers: '',
+          insurances: [{
+            id: Date.now().toString(),
+            type: '',
+            provider: '',
+            expiryDate: '',
+            file: null,
+          }],
+          hasEnvironmentalHealthSafety: '',
+          environmentalHealthSafetyFile: null,
+          hasIncidentsPast3Years: '',
+          incidentsFile: null,
+          hasLitigationPast3Years: '',
+          litigationFile: null,
         };
         setFormData(contractorData);
       } else if (supplierType === 'designer') {
