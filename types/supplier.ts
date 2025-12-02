@@ -35,6 +35,25 @@ export interface Insurance {
   file: File | null;
 }
 
+// Designer Project Interface
+export interface DesignerProject {
+  id: string;
+  projectName: string;
+  year: string;
+  address: string;
+  area: string;
+  photos: File[];
+}
+
+// Designer Personnel Interface
+export interface Designer {
+  id: string;
+  name: string;
+  experience: string;
+  cv: File | null;
+  projects: DesignerProject[];
+}
+
 // Common Requirements for all suppliers
 export interface CommonRequirements {
   // Document Upload
@@ -108,13 +127,45 @@ export interface DesignerFormData extends CommonRequirements {
   officeAddress: string;
   designQualificationLevel: string;
   designTeamSize: string;
-  leadDesignerExperience: string;
   feeStructure: string[]; // ['byArea', 'byProject', 'other']
 
   // Section 2: Design Specialization
   designStyles: string[]; // ['modernMinimalist', 'chinese', 'european', etc.]
+  projectTypes: string[]; // ['residential', 'commercial', 'office', etc.]
   bimCapability: 'yes' | 'no' | '';
-  mainSoftware: string;
+  mainSoftware: string[];
+
+  // Section 3: Personnel Information
+  designers: Designer[];
+  organizationChart: File | null;
+
+  // Section 4: Design & Build Capability
+  canDoDesignBuild: 'yes' | 'no' | '';
+
+  // D&B Contractor Information (same as ContractorFormData)
+  dbConstructionGrade: string;
+  dbLicenseNumber: string;
+  dbCertificateUpload: File | null;
+  dbSafetyProductionLicense: 'yes' | 'no' | '';
+  dbIsocertifications: string[];
+  dbOtherCertifications: string;
+  dbProjectTypes: string[];
+  dbAnnualConstructionCapacity: string;
+  dbMaxConcurrentProjects: string;
+  dbLargestProjectValue: string;
+  dbProjectManagers: ProjectManager[];
+  dbOrganizationChart: File | null;
+  dbHasSafetyOfficer: 'yes' | 'no' | '';
+  dbNumberOfSafetyOfficers: string;
+  dbHasConstructionManager: 'yes' | 'no' | '';
+  dbNumberOfConstructionManagers: string;
+  dbInsurances: Insurance[];
+  dbHasEnvironmentalHealthSafety: 'yes' | 'no' | '';
+  dbEnvironmentalHealthSafetyFile: File | null;
+  dbHasIncidentsPast3Years: 'yes' | 'no' | '';
+  dbIncidentsFile: File | null;
+  dbHasLitigationPast3Years: 'yes' | 'no' | '';
+  dbLitigationFile: File | null;
 }
 
 // Material/Furniture Supplier Form Data
