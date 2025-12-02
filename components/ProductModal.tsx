@@ -30,6 +30,10 @@ export default function ProductModal({
     unitPrice: '',
     moq: '',
     leadTime: '',
+    currentStock: '',
+    photos: [],
+    specificationFile: null,
+    specificationLink: '',
     model3D: null,
   });
 
@@ -49,6 +53,10 @@ export default function ProductModal({
         unitPrice: '',
         moq: '',
         leadTime: '',
+        currentStock: '',
+        photos: [],
+        specificationFile: null,
+        specificationLink: '',
         model3D: null,
       });
     }
@@ -121,8 +129,7 @@ export default function ProductModal({
               <FormInput
                 label="Product Series / 產品系列"
                 name="series"
-                required
-                value={formData.series}
+                value={formData.series || ''}
                 onChange={(v) => updateField('series', v)}
               />
             </div>
@@ -131,8 +138,7 @@ export default function ProductModal({
               <FormInput
                 label="SKU / SKU編碼"
                 name="sku"
-                required
-                value={formData.sku}
+                value={formData.sku || ''}
                 onChange={(v) => updateField('sku', v)}
               />
 
@@ -147,7 +153,7 @@ export default function ProductModal({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormInput
-                label="Spec / 規格"
+                label="Size / 規格"
                 name="spec"
                 required
                 value={formData.spec}
@@ -158,8 +164,7 @@ export default function ProductModal({
               <FormInput
                 label="Material / 材質"
                 name="material"
-                required
-                value={formData.material}
+                value={formData.material || ''}
                 onChange={(v) => updateField('material', v)}
               />
             </div>
@@ -191,6 +196,88 @@ export default function ProductModal({
                 value={formData.leadTime}
                 onChange={(v) => updateField('leadTime', v)}
               />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <FormInput
+                label="Current Stock / 現有庫存"
+                name="currentStock"
+                type="number"
+                value={formData.currentStock || ''}
+                onChange={(v) => updateField('currentStock', v)}
+                placeholder=""
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-light text-gray-700 mb-2">
+                Product Photos / 產品照片
+                <span className="text-xs text-gray-500 ml-2">
+                  (Max 9 photos / 最多9張)
+                </span>
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={(e) => {
+                  const files = Array.from(e.target.files || []);
+                  if (files.length > 9) {
+                    alert('Maximum 9 photos allowed / 最多只能上傳9張照片');
+                    return;
+                  }
+                  updateField('photos', files);
+                }}
+                className="w-full px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+              />
+              {formData.photos && formData.photos.length > 0 && (
+                <p className="text-xs text-gray-500 mt-1">
+                  {formData.photos.length} photo(s) selected / 已選擇 {formData.photos.length} 張照片
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-light text-gray-700 mb-2">
+                Product Specification / 產品規格書
+              </label>
+
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">
+                    Upload PDF / 上傳PDF文件
+                  </label>
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0] || null;
+                      updateField('specificationFile', file);
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+                  />
+                  {formData.specificationFile && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      {formData.specificationFile.name}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">
+                    Or enter link / 或輸入鏈接
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.specificationLink || ''}
+                    onChange={(e) =>
+                      updateField('specificationLink', e.target.value)
+                    }
+                    placeholder="https://..."
+                    className="w-full px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+                  />
+                </div>
+              </div>
             </div>
 
             <div>

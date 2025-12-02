@@ -1,16 +1,20 @@
 // Common Product Interface
 export interface Product {
   id: string;
-  sku: string;
+  sku?: string; // Changed to optional
   productName: string;
   category: string;
   brand: string;
-  series: string;
+  series?: string; // Changed to optional
   spec: string;
-  material: string;
+  material?: string; // Changed to optional
   unitPrice: string;
   moq: string;
   leadTime: string;
+  currentStock?: string; // New field: current inventory
+  photos?: File[]; // New field: product photos (max 9)
+  specificationFile?: File | null; // New field: specification PDF
+  specificationLink?: string; // New field: specification URL
   model3D: File | null;
 }
 
@@ -178,9 +182,8 @@ export interface MaterialSupplierFormData extends CommonRequirements {
   registeredCapital: string;
   officeAddress: string;
   companyType: string[]; // ['manufacturer', 'agent', 'distributor']
-  representedBrands: string;
-  warehouseAddress: string;
-  storageCapacity: string;
+  representedBrands: string[];
+  warehouses: { address: string; capacity: string }[];
 
   // Section 2: Product Management System
   products: Product[];
@@ -189,6 +192,7 @@ export interface MaterialSupplierFormData extends CommonRequirements {
   sampleProvided: 'yes' | 'no' | '';
   sampleCost: 'free' | 'charged' | '';
   sampleDeliveryTime: string;
+  freeShippingToHK: 'yes' | 'no' | '';
 }
 
 // Union type for all supplier form data

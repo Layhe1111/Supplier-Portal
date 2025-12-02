@@ -45,12 +45,6 @@ export default function DesignerQuestionnaire({
     { value: 'other', label: 'Other 其他' },
   ];
 
-  const isoOptions = [
-    { value: '9001', label: 'ISO 9001' },
-    { value: '14001', label: 'ISO 14001' },
-    { value: '45001', label: 'ISO 45001' },
-  ];
-
   // Initialize designers array if undefined (for backward compatibility with old data)
   if (!data.designers) {
     onChange('designers', []);
@@ -258,7 +252,6 @@ export default function DesignerQuestionnaire({
           <FormInput
             label="Design Qualification Level / 設計資質等級"
             name="designQualificationLevel"
-            required
             value={data.designQualificationLevel}
             onChange={(v) => onChange('designQualificationLevel', v)}
           />

@@ -23,6 +23,52 @@ export default function MaterialSupplierQuestionnaire({
     { value: 'distributor', label: 'Distributor 經銷商' },
   ];
 
+  // Initialize representedBrands if it's a string (for backward compatibility)
+  if (typeof data.representedBrands === 'string') {
+    onChange('representedBrands', data.representedBrands ? [data.representedBrands] : ['']);
+  } else if (!data.representedBrands || data.representedBrands.length === 0) {
+    onChange('representedBrands', ['']);
+  }
+
+  // Brand management functions
+  const addBrand = () => {
+    onChange('representedBrands', [...(data.representedBrands || ['']), '']);
+  };
+
+  const updateBrand = (index: number, value: string) => {
+    const updated = [...(data.representedBrands || [''])];
+    updated[index] = value;
+    onChange('representedBrands', updated);
+  };
+
+  const removeBrand = (index: number) => {
+    const updated = (data.representedBrands || ['']).filter((_, i) => i !== index);
+    // Ensure at least one brand field remains
+    onChange('representedBrands', updated.length > 0 ? updated : ['']);
+  };
+
+  // Initialize warehouses if undefined or in old format (for backward compatibility)
+  if (!data.warehouses || data.warehouses.length === 0) {
+    onChange('warehouses', [{ address: '', capacity: '' }]);
+  }
+
+  // Warehouse management functions
+  const addWarehouse = () => {
+    onChange('warehouses', [...(data.warehouses || []), { address: '', capacity: '' }]);
+  };
+
+  const updateWarehouse = (index: number, field: 'address' | 'capacity', value: string) => {
+    const updated = [...(data.warehouses || [])];
+    updated[index] = { ...updated[index], [field]: value };
+    onChange('warehouses', updated);
+  };
+
+  const removeWarehouse = (index: number) => {
+    const updated = (data.warehouses || []).filter((_, i) => i !== index);
+    // Ensure at least one warehouse field remains
+    onChange('warehouses', updated.length > 0 ? updated : [{ address: '', capacity: '' }]);
+  };
+
   const addProduct = () => {
     const newProduct: Product = {
       id: Date.now().toString(),
@@ -36,6 +82,10 @@ export default function MaterialSupplierQuestionnaire({
       unitPrice: '',
       moq: '',
       leadTime: '',
+      currentStock: '',
+      photos: [],
+      specificationFile: null,
+      specificationLink: '',
       model3D: null,
     };
     onChange('products', [...data.products, newProduct]);
@@ -104,32 +154,118 @@ export default function MaterialSupplierQuestionnaire({
           options={companyTypeOptions}
         />
 
-        <FormInput
-          label="Represented Brands / 代理品牌"
-          name="representedBrands"
-          value={data.representedBrands}
-          onChange={(v) => onChange('representedBrands', v)}
-          placeholder="e.g., Brand A, Brand B, Brand C"
-        />
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-sm font-light text-gray-700">
+              Represented Brands / 代理品牌
+              <span className="text-xs text-gray-500 ml-2">
+                (At least one required / 至少填一個)
+              </span>
+            </label>
+            <button
+              type="button"
+              onClick={addBrand}
+              className="px-3 py-1 bg-gray-900 text-white text-xs font-light hover:bg-gray-800 transition-colors"
+            >
+              + Add Brand / 添加品牌
+            </button>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormInput
-            label="Warehouse Address / 倉庫地址"
-            name="warehouseAddress"
-            required
-            value={data.warehouseAddress}
-            onChange={(v) => onChange('warehouseAddress', v)}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4 justify-items-start">
+            {(data.representedBrands || ['']).map((brand, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={brand}
+                  onChange={(e) => updateBrand(index, e.target.value)}
+                  placeholder="e.g., Brand A"
+                  required={index === 0}
+                  className="w-[240px] px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+                />
+                {(data.representedBrands || ['']).length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeBrand(index)}
+                    className="text-red-500 hover:text-red-700 text-sm font-medium"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
 
-          <FormInput
-            label="Storage Capacity / 庫存容量 (sqft)"
-            name="storageCapacity"
-            type="number"
-            required
-            value={data.storageCapacity}
-            onChange={(v) => onChange('storageCapacity', v)}
-            placeholder="e.g., 10000"
-          />
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="text-sm font-medium text-gray-900">
+              Warehouse Information / 倉庫信息
+              <span className="text-red-500 ml-1">*</span>
+              <span className="text-xs text-gray-500 ml-2 font-light">
+                (At least one warehouse required / 至少填一個倉庫)
+              </span>
+            </h4>
+            <button
+              type="button"
+              onClick={addWarehouse}
+              className="px-4 py-2 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
+            >
+              + Add Warehouse / 添加倉庫
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            {(data.warehouses || [{ address: '', capacity: '' }]).map((warehouse, index) => (
+              <div key={index} className="border border-gray-200 p-4 bg-gray-50 rounded">
+                <div className="flex items-center justify-between mb-3">
+                  <h5 className="text-sm font-medium text-gray-700">
+                    Warehouse #{index + 1} / 倉庫 #{index + 1}
+                  </h5>
+                  {(data.warehouses || []).length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeWarehouse(index)}
+                      className="text-red-500 hover:text-red-700 text-sm font-medium"
+                    >
+                      Remove / 刪除
+                    </button>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-light text-gray-700 mb-1">
+                      Warehouse Address / 倉庫地址
+                      <span className="text-red-500 ml-1">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={warehouse.address}
+                      onChange={(e) => updateWarehouse(index, 'address', e.target.value)}
+                      placeholder="Enter warehouse address"
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-light text-gray-700 mb-1">
+                      Storage Capacity / 庫存容量 (sqft)
+                      <span className="text-red-500 ml-1">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      value={warehouse.capacity}
+                      onChange={(e) => updateWarehouse(index, 'capacity', e.target.value)}
+                      placeholder="e.g., 10000"
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </FormSection>
 
@@ -220,8 +356,7 @@ export default function MaterialSupplierQuestionnaire({
                     <FormInput
                       label="Product Series / 產品系列"
                       name={`series-${product.id}`}
-                      required
-                      value={product.series}
+                      value={product.series || ''}
                       onChange={(v) => updateProduct(product.id, 'series', v)}
                     />
                   </div>
@@ -234,8 +369,7 @@ export default function MaterialSupplierQuestionnaire({
                       <FormInput
                         label="SKU / SKU編碼"
                         name={`sku-${product.id}`}
-                        required
-                        value={product.sku}
+                        value={product.sku || ''}
                         onChange={(v) => updateProduct(product.id, 'sku', v)}
                       />
 
@@ -252,7 +386,7 @@ export default function MaterialSupplierQuestionnaire({
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                       <FormInput
-                        label="Spec / 規格"
+                        label="size / 規格"
                         name={`spec-${product.id}`}
                         required
                         value={product.spec}
@@ -263,8 +397,7 @@ export default function MaterialSupplierQuestionnaire({
                       <FormInput
                         label="Material / 材質"
                         name={`material-${product.id}`}
-                        required
-                        value={product.material}
+                        value={product.material || ''}
                         onChange={(v) =>
                           updateProduct(product.id, 'material', v)
                         }
@@ -302,6 +435,90 @@ export default function MaterialSupplierQuestionnaire({
                           updateProduct(product.id, 'leadTime', v)
                         }
                       />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                      <FormInput
+                        label="Current Stock / 現有庫存"
+                        name={`currentStock-${product.id}`}
+                        type="number"
+                        value={product.currentStock || ''}
+                        onChange={(v) =>
+                          updateProduct(product.id, 'currentStock', v)
+                        }
+                        placeholder=""
+                      />
+                    </div>
+
+                    <div className="mt-4">
+                      <label className="block text-sm font-light text-gray-700 mb-2">
+                        Product Photos / 產品照片
+                        <span className="text-xs text-gray-500 ml-2">
+                          (Max 9 photos / 最多9張)
+                        </span>
+                      </label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={(e) => {
+                          const files = Array.from(e.target.files || []);
+                          if (files.length > 9) {
+                            alert('Maximum 9 photos allowed / 最多只能上傳9張照片');
+                            return;
+                          }
+                          updateProduct(product.id, 'photos', files);
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+                      />
+                      {product.photos && product.photos.length > 0 && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          {product.photos.length} photo(s) selected / 已選擇 {product.photos.length} 張照片
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="mt-4">
+                      <label className="block text-sm font-light text-gray-700 mb-2">
+                        Product Specification / 產品規格書
+                      </label>
+
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-xs text-gray-600 mb-1">
+                            Upload PDF / 上傳PDF文件
+                          </label>
+                          <input
+                            type="file"
+                            accept=".pdf"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0] || null;
+                              updateProduct(product.id, 'specificationFile', file);
+                            }}
+                            className="w-full px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+                          />
+                          {product.specificationFile && (
+                            <p className="text-xs text-gray-500 mt-1">
+                              {product.specificationFile.name}
+                            </p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label className="block text-xs text-gray-600 mb-1">
+                            Or enter link / 或輸入鏈接
+                          </label>
+                          <input
+                            type="url"
+                            value={product.specificationLink || ''}
+                            onChange={(e) =>
+                              updateProduct(product.id, 'specificationLink', e.target.value)
+                            }
+                            placeholder="https://..."
+                            className="w-full px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+                          />
+                        </div>
+                      </div>
                     </div>
 
                     <div className="mt-4">
@@ -365,6 +582,19 @@ export default function MaterialSupplierQuestionnaire({
                 value={data.sampleDeliveryTime}
                 onChange={(v) => onChange('sampleDeliveryTime', v)}
                 placeholder="e.g., 7"
+              />
+
+              <FormSelect
+                label="Free Shipping to Hong Kong / 是否免費邮寄到香港"
+                name="freeShippingToHK"
+                type="radio"
+                required
+                value={data.freeShippingToHK}
+                onChange={(v) => onChange('freeShippingToHK', v as 'yes' | 'no')}
+                options={[
+                  { value: 'yes', label: 'Yes 是' },
+                  { value: 'no', label: 'No 否' },
+                ]}
               />
             </>
           )}

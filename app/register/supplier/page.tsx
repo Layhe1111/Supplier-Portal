@@ -162,13 +162,13 @@ export default function SupplierRegistrationPage() {
           registeredCapital: '',
           officeAddress: '',
           companyType: [],
-          representedBrands: '',
-          warehouseAddress: '',
-          storageCapacity: '',
+          representedBrands: [''],
+          warehouses: [{ address: '', capacity: '' }],
           products: [],
           sampleProvided: '',
           sampleCost: '',
           sampleDeliveryTime: '',
+          freeShippingToHK: '',
         };
         setFormData(materialData);
       }
