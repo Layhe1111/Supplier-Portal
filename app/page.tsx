@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 export default function LoginPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    email: '',
+    emailOrPhone: '',
     password: '',
   });
 
@@ -14,7 +14,7 @@ export default function LoginPage() {
     e.preventDefault();
     // Store login state
     localStorage.setItem('isLoggedIn', 'true');
-    localStorage.setItem('userEmail', formData.email);
+    localStorage.setItem('userIdentifier', formData.emailOrPhone);
 
     // Check if user has completed supplier registration
     const supplierData = localStorage.getItem('supplierData');
@@ -42,18 +42,18 @@ export default function LoginPage() {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-light text-gray-700 mb-1">
-                Email / 電郵
+              <label htmlFor="emailOrPhone" className="block text-sm font-light text-gray-700 mb-1">
+                Email or Phone / 電郵或電話
               </label>
               <input
-                id="email"
-                name="email"
-                type="email"
+                id="emailOrPhone"
+                name="emailOrPhone"
+                type="text"
                 required
                 className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 sm:text-sm"
-                placeholder="your@email.com"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="your@email.com or +852 1234 5678"
+                value={formData.emailOrPhone}
+                onChange={(e) => setFormData({ ...formData, emailOrPhone: e.target.value })}
               />
             </div>
 

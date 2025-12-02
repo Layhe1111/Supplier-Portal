@@ -50,6 +50,7 @@ export interface CommonRequirements {
   submitterName: string;
   submitterPosition: string;
   submitterPhone: string;
+  submitterEmail: string;
   submissionDate: string;
 }
 

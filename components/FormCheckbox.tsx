@@ -3,6 +3,7 @@ interface FormCheckboxProps {
   name: string;
   checked: boolean;
   onChange: (checked: boolean) => void;
+  required?: boolean;
   className?: string;
 }
 
@@ -11,6 +12,7 @@ export default function FormCheckbox({
   name,
   checked,
   onChange,
+  required = false,
   className = '',
 }: FormCheckboxProps) {
   return (
@@ -25,6 +27,7 @@ export default function FormCheckbox({
       />
       <label htmlFor={name} className="ml-2 block text-sm font-light text-gray-700">
         {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
       </label>
     </div>
   );

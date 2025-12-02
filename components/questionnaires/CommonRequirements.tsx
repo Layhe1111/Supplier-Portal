@@ -48,6 +48,7 @@ export default function CommonRequirements({
             name="guaranteeInfoTrue"
             checked={data.guaranteeInfoTrue}
             onChange={(v) => onChange('guaranteeInfoTrue', v)}
+            required
           />
 
           <FormCheckbox
@@ -55,6 +56,7 @@ export default function CommonRequirements({
             name="acceptQualitySupervision"
             checked={data.acceptQualitySupervision}
             onChange={(v) => onChange('acceptQualitySupervision', v)}
+            required
           />
 
           <FormCheckbox
@@ -62,6 +64,7 @@ export default function CommonRequirements({
             name="agreeInfoSharing"
             checked={data.agreeInfoSharing}
             onChange={(v) => onChange('agreeInfoSharing', v)}
+            required
           />
         </div>
       </FormSection>
@@ -70,7 +73,7 @@ export default function CommonRequirements({
       <FormSection title="Submitter Information / 提交人信息">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormInput
-            label="Submitter Name / 提交人"
+            label="Contact Person / 联系人"
             name="submitterName"
             required
             value={data.submitterName}
@@ -96,6 +99,17 @@ export default function CommonRequirements({
             onChange={(v) => onChange('submitterPhone', v)}
           />
 
+          <FormInput
+            label="Email / 邮箱"
+            name="submitterEmail"
+            type="email"
+            required
+            value={data.submitterEmail}
+            onChange={(v) => onChange('submitterEmail', v)}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormInput
             label="Submission Date / 提交日期"
             name="submissionDate"
