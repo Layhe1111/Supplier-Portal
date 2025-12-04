@@ -3,7 +3,8 @@ import FormSection from '../FormSection';
 import FormInput from '../FormInput';
 import FormSelect from '../FormSelect';
 import FileUpload from '../FileUpload';
-import { ContractorFormData, ProjectManager } from '@/types/supplier';
+import MultiImageUpload from '../MultiImageUpload';
+import { ContractorFormData, ProjectManager, DesignerProject } from '@/types/supplier';
 
 interface ContractorQuestionnaireProps {
   data: ContractorFormData;
@@ -33,6 +34,38 @@ export default function ContractorQuestionnaire({
     { value: '14001', label: 'ISO 14001' },
     { value: '45001', label: 'ISO 45001' },
   ];
+
+  // Project Highlights management functions
+  const addProjectHighlight = () => {
+    const newProject: DesignerProject = {
+      id: Date.now().toString(),
+      projectName: '',
+      year: '',
+      address: '',
+      area: '',
+      renovationType: '',
+      photos: [],
+    };
+    onChange('projectHighlights', [...(data.projectHighlights || []), newProject]);
+  };
+
+  const updateProjectHighlight = (
+    projectId: string,
+    field: keyof DesignerProject,
+    value: any
+  ) => {
+    const updatedProjects = (data.projectHighlights || []).map((project) =>
+      project.id === projectId ? { ...project, [field]: value } : project
+    );
+    onChange('projectHighlights', updatedProjects);
+  };
+
+  const removeProjectHighlight = (projectId: string) => {
+    const updatedProjects = (data.projectHighlights || []).filter(
+      (project) => project.id !== projectId
+    );
+    onChange('projectHighlights', updatedProjects);
+  };
 
   return (
     <>
@@ -77,12 +110,50 @@ export default function ContractorQuestionnaire({
           />
 
           <FormInput
-            label="Office Address / 辦公地址"
-            name="officeAddress"
+            label="Country / 國家和地区"
+            name="country"
             required
-            value={data.officeAddress}
-            onChange={(v) => onChange('officeAddress', v)}
+            value={data.country}
+            onChange={(v) => onChange('country', v)}
+            placeholder="e.g., Hong Kong"
           />
+        </div>
+
+        <FormInput
+          label="Office Address / 辦公地址"
+          name="officeAddress"
+          required
+          value={data.officeAddress}
+          onChange={(v) => onChange('officeAddress', v)}
+        />
+
+        <div className="mt-6">
+          <h4 className="text-sm font-medium text-gray-900 mb-3">
+            Company Supplementary Information / 公司補充信息
+          </h4>
+          <p className="text-xs text-gray-500 mb-4">
+            You can upload a PDF file or provide a link to your company's supplementary information.
+            <br />
+            您可以上傳PDF文件或提供公司補充信息的鏈接。
+          </p>
+
+          <div className="space-y-4">
+            <FileUpload
+              label="Upload PDF / 上傳PDF文件"
+              name="companySupplementFile"
+              accept=".pdf"
+              onChange={(file) => onChange('companySupplementFile', file)}
+            />
+
+            <FormInput
+              label="Or enter link / 或輸入鏈接"
+              name="companySupplementLink"
+              type="url"
+              value={data.companySupplementLink}
+              onChange={(v) => onChange('companySupplementLink', v)}
+              placeholder="https://..."
+            />
+          </div>
         </div>
       </FormSection>
 
@@ -93,13 +164,39 @@ export default function ContractorQuestionnaire({
             Business Licenses / 資質等級
           </h4>
           <div className="space-y-4">
-            <FormInput
-              label="Construction Grade / 施工資質等級"
-              name="constructionGrade"
-              required
-              value={data.constructionGrade}
-              onChange={(v) => onChange('constructionGrade', v)}
-            />
+            <div>
+              <label className="block text-sm font-light text-gray-700 mb-2">
+                Construction Grade / 施工資質等級 <span className="text-red-500">*</span>
+              </label>
+              <div className="grid grid-cols-2 gap-4">
+                <select
+                  value={data.constructionGrade === 'RGBC' ? 'RGBC' : 'Others'}
+                  onChange={(e) => {
+                    if (e.target.value === 'RGBC') {
+                      onChange('constructionGrade', 'RGBC');
+                    } else {
+                      onChange('constructionGrade', '');
+                    }
+                  }}
+                  required
+                  className="appearance-none relative block w-full px-3 py-2 border border-gray-300 text-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 sm:text-sm h-[42px]"
+                >
+                  <option value="RGBC">RGBC</option>
+                  <option value="Others">Others 其他</option>
+                </select>
+                {data.constructionGrade !== 'RGBC' && (
+                  <input
+                    type="text"
+                    name="constructionGradeCustom"
+                    required
+                    value={data.constructionGrade === 'RGBC' ? '' : data.constructionGrade}
+                    onChange={(e) => onChange('constructionGrade', e.target.value)}
+                    placeholder="Enter construction grade..."
+                    className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 sm:text-sm"
+                  />
+                )}
+              </div>
+            </div>
 
             <FormInput
               label="License Number / 資質證書編號"
@@ -174,6 +271,127 @@ export default function ContractorQuestionnaire({
             onChange={(v) => onChange('projectTypes', v as string[])}
             options={projectTypeOptions}
           />
+        </div>
+
+        {/* Project Highlights Section */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="text-sm font-medium text-gray-900">
+              Project Highlights / 亮點項目
+              <span className="text-red-500 ml-1">*</span>
+            </h4>
+            <button
+              type="button"
+              onClick={addProjectHighlight}
+              className="px-4 py-2 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
+            >
+              + Add Project / 添加項目
+            </button>
+          </div>
+
+          {(!data.projectHighlights || data.projectHighlights.length === 0) ? (
+            <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded">
+              <p className="text-gray-500 text-sm">
+                No projects added yet. Click "Add Project" to add project highlights.
+                <br />
+                尚未添加項目。點擊"添加項目"按鈕添加亮點項目。
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {(data.projectHighlights || []).map((project, index) => (
+                <div
+                  key={project.id}
+                  className="border border-gray-200 p-6 bg-gray-50 rounded"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h5 className="text-sm font-medium text-gray-900">
+                      Project {index + 1} / 項目 {index + 1}
+                    </h5>
+                    <button
+                      type="button"
+                      onClick={() => removeProjectHighlight(project.id)}
+                      className="text-red-500 hover:text-red-700 text-sm font-medium"
+                    >
+                      Remove / 刪除
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    <FormInput
+                      label="Project Name / 項目名稱"
+                      name={`project-name-${project.id}`}
+                      required
+                      value={project.projectName}
+                      onChange={(v) =>
+                        updateProjectHighlight(project.id, 'projectName', v)
+                      }
+                    />
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <FormInput
+                        label="Year / 年份"
+                        name={`project-year-${project.id}`}
+                        required
+                        value={project.year}
+                        onChange={(v) =>
+                          updateProjectHighlight(project.id, 'year', v)
+                        }
+                        placeholder="e.g., 2024"
+                      />
+
+                      <FormInput
+                        label="Area / 面積"
+                        name={`project-area-${project.id}`}
+                        required
+                        value={project.area}
+                        onChange={(v) =>
+                          updateProjectHighlight(project.id, 'area', v)
+                        }
+                        placeholder="e.g., 1500 sq ft"
+                      />
+
+                      <FormInput
+                        label="Building Name / 地址"
+                        name={`project-address-${project.id}`}
+                        required
+                        value={project.address}
+                        onChange={(v) =>
+                          updateProjectHighlight(project.id, 'address', v)
+                        }
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormSelect
+                        label="Renovation Type / 是否重新裝修？"
+                        name={`project-renovation-${project.id}`}
+                        type="radio"
+                        required
+                        value={project.renovationType}
+                        onChange={(v) =>
+                          updateProjectHighlight(project.id, 'renovationType', v)
+                        }
+                        options={[
+                          { value: 'newFitout', label: 'New Fitout 新裝修' },
+                          { value: 'remodel', label: 'Remodel 改造翻新' },
+                        ]}
+                      />
+
+                      <MultiImageUpload
+                        label="Project Photos / 項目照片"
+                        name={`project-photos-${project.id}`}
+                        maxFiles={9}
+                        onChange={(files) =>
+                          updateProjectHighlight(project.id, 'photos', files)
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div>
@@ -298,7 +516,7 @@ export default function ContractorQuestionnaire({
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormInput
-                      label="Address / 地址"
+                      label="Building Name / 地址"
                       name={`pm-address-${index}`}
                       required
                       value={pm.address}
@@ -325,7 +543,7 @@ export default function ContractorQuestionnaire({
                   </div>
 
                   <FileUpload
-                    label="Project Manager CV / 項目經理簡歷 (Optional)"
+                    label="Project Manager CV / 項目經理簡歷"
                     name={`pm-cv-${index}`}
                     accept=".pdf,.doc,.docx"
                     onChange={(file) => {
@@ -502,7 +720,7 @@ export default function ContractorQuestionnaire({
                   </div>
 
                   <FileUpload
-                    label="Insurance Certificate / 保險證明 (Optional)"
+                    label="Insurance Certificate / 保險證明"
                     name={`insurance-file-${index}`}
                     accept=".pdf,.jpg,.jpeg,.png"
                     onChange={(file) => {
@@ -551,7 +769,7 @@ export default function ContractorQuestionnaire({
           {data.hasEnvironmentalHealthSafety === 'yes' && (
             <div className="mt-4">
               <FileUpload
-                label="Environmental Health and Safety Document / 環境健康安全文件 (Optional)"
+                label="Environmental Health and Safety Document / 環境健康安全文件"
                 name="environmentalHealthSafetyFile"
                 accept=".pdf"
                 onChange={(file) => onChange('environmentalHealthSafetyFile', file)}

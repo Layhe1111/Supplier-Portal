@@ -81,6 +81,7 @@ export default function MaterialSupplierQuestionnaire({
       material: '',
       unitPrice: '',
       moq: '',
+      origin: '',
       leadTime: '',
       currentStock: '',
       photos: [],
@@ -135,13 +136,24 @@ export default function MaterialSupplierQuestionnaire({
           />
         </div>
 
-        <FormInput
-          label="Office Address / 辦公地址"
-          name="officeAddress"
-          required
-          value={data.officeAddress}
-          onChange={(v) => onChange('officeAddress', v)}
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormInput
+            label="Country / 國家和地区"
+            name="country"
+            required
+            value={data.country}
+            onChange={(v) => onChange('country', v)}
+            placeholder="e.g., Hong Kong"
+          />
+
+          <FormInput
+            label="Office Address / 辦公地址"
+            name="officeAddress"
+            required
+            value={data.officeAddress}
+            onChange={(v) => onChange('officeAddress', v)}
+          />
+        </div>
 
         <FormSelect
           label="Company Type / 公司類型"
@@ -265,6 +277,35 @@ export default function MaterialSupplierQuestionnaire({
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <h4 className="text-sm font-medium text-gray-900 mb-3">
+            Company Supplementary Information / 公司補充信息
+          </h4>
+          <p className="text-xs text-gray-500 mb-4">
+            You can upload a PDF file or provide a link to your company's supplementary information.
+            <br />
+            您可以上傳PDF文件或提供公司補充信息的鏈接。
+          </p>
+
+          <div className="space-y-4">
+            <FileUpload
+              label="Upload PDF / 上傳PDF文件"
+              name="companySupplementFile"
+              accept=".pdf"
+              onChange={(file) => onChange('companySupplementFile', file)}
+            />
+
+            <FormInput
+              label="Or enter link / 或輸入鏈接"
+              name="companySupplementLink"
+              type="url"
+              value={data.companySupplementLink}
+              onChange={(v) => onChange('companySupplementLink', v)}
+              placeholder="https://..."
+            />
           </div>
         </div>
       </FormSection>
@@ -426,6 +467,18 @@ export default function MaterialSupplierQuestionnaire({
                       />
 
                       <FormInput
+                        label="Origin / 產地"
+                        name={`origin-${product.id}`}
+                        required
+                        value={product.origin || ''}
+                        onChange={(v) =>
+                          updateProduct(product.id, 'origin', v)
+                        }
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                      <FormInput
                         label="Lead Time (days) / 交貨周期"
                         name={`leadTime-${product.id}`}
                         type="number"
@@ -435,9 +488,7 @@ export default function MaterialSupplierQuestionnaire({
                           updateProduct(product.id, 'leadTime', v)
                         }
                       />
-                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                       <FormInput
                         label="Current Stock / 現有庫存"
                         name={`currentStock-${product.id}`}
@@ -575,7 +626,7 @@ export default function MaterialSupplierQuestionnaire({
               />
 
               <FormInput
-                label="Sample Delivery Time / 樣品寄送時間 (days)"
+                label="Sample Delivery Time to HK/ 樣品到香港寄送時間 (days)"
                 name="sampleDeliveryTime"
                 type="number"
                 required

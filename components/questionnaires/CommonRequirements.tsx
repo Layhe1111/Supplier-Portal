@@ -70,7 +70,7 @@ export default function CommonRequirements({
       </FormSection>
 
       {/* Submitter Information */}
-      <FormSection title="Submitter Information / 提交人信息">
+      <FormSection title="Contact Information / 联系人信息">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormInput
             label="Contact Person / 联系人"

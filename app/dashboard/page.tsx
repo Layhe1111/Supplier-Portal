@@ -131,7 +131,7 @@ export default function DashboardPage() {
   const filteredProducts = products.filter((product) => {
     const matchesSearch =
       product.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (product.sku?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
       product.brand.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesCategory =

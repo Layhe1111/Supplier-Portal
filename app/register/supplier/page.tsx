@@ -72,7 +72,10 @@ export default function SupplierRegistrationPage() {
           yearEstablished: '',
           registeredCapital: '',
           numberOfEmployees: '',
+          country: '',
           officeAddress: '',
+          companySupplementFile: null,
+          companySupplementLink: '',
           constructionGrade: '',
           licenseNumber: '',
           certificateUpload: null,
@@ -80,6 +83,7 @@ export default function SupplierRegistrationPage() {
           isocertifications: [],
           otherCertifications: '',
           projectTypes: [],
+          projectHighlights: [],
           annualConstructionCapacity: '',
           maxConcurrentProjects: '',
           largestProjectValue: '',
@@ -111,10 +115,13 @@ export default function SupplierRegistrationPage() {
           companyLegalName: '',
           yearEstablished: '',
           registeredCapital: '',
+          country: '',
           officeAddress: '',
-          designQualificationLevel: '',
+          designAwards: [''],
           designTeamSize: '',
           feeStructure: [],
+          companySupplementFile: null,
+          companySupplementLink: '',
           designStyles: [],
           projectTypes: [],
           bimCapability: '',
@@ -160,10 +167,13 @@ export default function SupplierRegistrationPage() {
           companyLegalName: '',
           yearEstablished: '',
           registeredCapital: '',
+          country: '',
           officeAddress: '',
           companyType: [],
           representedBrands: [''],
           warehouses: [{ address: '', capacity: '' }],
+          companySupplementFile: null,
+          companySupplementLink: '',
           products: [],
           sampleProvided: '',
           sampleCost: '',
@@ -395,7 +405,7 @@ export default function SupplierRegistrationPage() {
               <button
                 type="button"
                 onClick={() => {
-                  alert('Draft saved automatically / 草稿自動保存');
+                  router.push('/dashboard');
                 }}
                 className="px-6 py-2.5 border border-gray-300 text-sm font-light text-gray-700 hover:bg-gray-50 transition-colors"
               >

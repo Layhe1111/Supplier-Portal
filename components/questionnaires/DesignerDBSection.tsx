@@ -254,7 +254,7 @@ export default function DesignerDBSection({
                       />
 
                       <FormInput
-                        label="Address / 地址"
+                        label="Building Name / 地址"
                         name={`db-pm-address-${pm.id}`}
                         required
                         value={pm.address}

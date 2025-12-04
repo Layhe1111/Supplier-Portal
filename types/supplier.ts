@@ -10,6 +10,7 @@ export interface Product {
   material?: string; // Changed to optional
   unitPrice: string;
   moq: string;
+  origin: string; // New field: place of origin/production (required)
   leadTime: string;
   currentStock?: string; // New field: current inventory
   photos?: File[]; // New field: product photos (max 9)
@@ -46,6 +47,7 @@ export interface DesignerProject {
   year: string;
   address: string;
   area: string;
+  renovationType: 'newFitout' | 'remodel' | '';
   photos: File[];
 }
 
@@ -86,7 +88,10 @@ export interface ContractorFormData extends CommonRequirements {
   yearEstablished: string;
   registeredCapital: string;
   numberOfEmployees: string;
+  country: string;
   officeAddress: string;
+  companySupplementFile: File | null; // Company supplementary information (PDF)
+  companySupplementLink: string; // Company supplementary information (Link)
 
   // Section 2: Certifications
   constructionGrade: string;
@@ -98,6 +103,7 @@ export interface ContractorFormData extends CommonRequirements {
 
   // Section 3: Construction Capability
   projectTypes: string[]; // ['residential', 'commercial', 'office', etc.]
+  projectHighlights: DesignerProject[]; // Project highlights (reusing DesignerProject type)
   annualConstructionCapacity: string;
   maxConcurrentProjects: string;
   largestProjectValue: string;
@@ -128,10 +134,13 @@ export interface DesignerFormData extends CommonRequirements {
   companyLegalName: string;
   yearEstablished: string;
   registeredCapital: string;
+  country: string;
   officeAddress: string;
-  designQualificationLevel: string;
+  designAwards: string[]; // Design awards (array)
   designTeamSize: string;
   feeStructure: string[]; // ['byArea', 'byProject', 'other']
+  companySupplementFile: File | null; // Company supplementary information (PDF)
+  companySupplementLink: string; // Company supplementary information (Link)
 
   // Section 2: Design Specialization
   designStyles: string[]; // ['modernMinimalist', 'chinese', 'european', etc.]
@@ -180,10 +189,13 @@ export interface MaterialSupplierFormData extends CommonRequirements {
   companyLegalName: string;
   yearEstablished: string;
   registeredCapital: string;
+  country: string;
   officeAddress: string;
   companyType: string[]; // ['manufacturer', 'agent', 'distributor']
   representedBrands: string[];
   warehouses: { address: string; capacity: string }[];
+  companySupplementFile: File | null; // Company supplementary information (PDF)
+  companySupplementLink: string; // Company supplementary information (Link)
 
   // Section 2: Product Management System
   products: Product[];

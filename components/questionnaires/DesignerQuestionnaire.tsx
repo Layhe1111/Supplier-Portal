@@ -62,6 +62,11 @@ export default function DesignerQuestionnaire({
     onChange('mainSoftware', ['']);
   }
 
+  // Initialize designAwards if undefined (for backward compatibility)
+  if (!data.designAwards || data.designAwards.length === 0) {
+    onChange('designAwards', ['']);
+  }
+
   // Initialize projectTypes if undefined (for backward compatibility)
   if (!data.projectTypes) {
     onChange('projectTypes', []);
@@ -82,6 +87,23 @@ export default function DesignerQuestionnaire({
     const updated = (data.mainSoftware || ['']).filter((_, i) => i !== index);
     // Ensure at least one software field remains
     onChange('mainSoftware', updated.length > 0 ? updated : ['']);
+  };
+
+  // Award management functions
+  const addAward = () => {
+    onChange('designAwards', [...(data.designAwards || ['']), '']);
+  };
+
+  const updateAward = (index: number, value: string) => {
+    const updated = [...(data.designAwards || [''])];
+    updated[index] = value;
+    onChange('designAwards', updated);
+  };
+
+  const removeAward = (index: number) => {
+    const updated = (data.designAwards || ['']).filter((_, i) => i !== index);
+    // Ensure at least one award field remains
+    onChange('designAwards', updated.length > 0 ? updated : ['']);
   };
 
   // Designer management functions
@@ -116,6 +138,7 @@ export default function DesignerQuestionnaire({
       year: '',
       address: '',
       area: '',
+      renovationType: '',
       photos: [],
     };
     const updatedDesigners = (data.designers || []).map((designer) =>
@@ -240,31 +263,75 @@ export default function DesignerQuestionnaire({
           />
         </div>
 
-        <FormInput
-          label="Office Address / 辦公地址"
-          name="officeAddress"
-          required
-          value={data.officeAddress}
-          onChange={(v) => onChange('officeAddress', v)}
-        />
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormInput
-            label="Design Qualification Level / 設計資質等級"
-            name="designQualificationLevel"
-            value={data.designQualificationLevel}
-            onChange={(v) => onChange('designQualificationLevel', v)}
+            label="Country / 國家和地区"
+            name="country"
+            required
+            value={data.country}
+            onChange={(v) => onChange('country', v)}
+            placeholder="e.g., Hong Kong"
           />
 
           <FormInput
-            label="Design Team Size / 設計團隊規模"
-            name="designTeamSize"
-            type="number"
+            label="Office Address / 辦公地址"
+            name="officeAddress"
             required
-            value={data.designTeamSize}
-            onChange={(v) => onChange('designTeamSize', v)}
+            value={data.officeAddress}
+            onChange={(v) => onChange('officeAddress', v)}
           />
         </div>
+
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-sm font-light text-gray-700">
+              Design Awards / 設計獎項
+              <span className="text-xs text-gray-500 ml-2">
+                (At least one required / 至少填一個)
+              </span>
+            </label>
+            <button
+              type="button"
+              onClick={addAward}
+              className="px-3 py-1 bg-gray-900 text-white text-xs font-light hover:bg-gray-800 transition-colors"
+            >
+              + Add Award / 添加獎項
+            </button>
+          </div>
+
+          <div className="space-y-2">
+            {(data.designAwards || ['']).map((award, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={award}
+                  onChange={(e) => updateAward(index, e.target.value)}
+                  placeholder="e.g., Best Design Award 2024"
+                  required={index === 0}
+                  className="flex-1 px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+                />
+                {(data.designAwards || ['']).length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeAward(index)}
+                    className="text-red-500 hover:text-red-700 text-sm font-medium"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <FormInput
+          label="Design Team Size / 設計團隊規模"
+          name="designTeamSize"
+          type="number"
+          required
+          value={data.designTeamSize}
+          onChange={(v) => onChange('designTeamSize', v)}
+        />
 
         <FormSelect
           label="Fee Structure / 設計收費模式"
@@ -276,6 +343,35 @@ export default function DesignerQuestionnaire({
           onChange={(v) => onChange('feeStructure', v as string[])}
           options={feeStructureOptions}
         />
+
+        <div className="mt-6">
+          <h4 className="text-sm font-medium text-gray-900 mb-3">
+            Company Supplementary Information / 公司補充信息
+          </h4>
+          <p className="text-xs text-gray-500 mb-4">
+            You can upload a PDF file or provide a link to your company's supplementary information.
+            <br />
+            您可以上傳PDF文件或提供公司補充信息的鏈接。
+          </p>
+
+          <div className="space-y-4">
+            <FileUpload
+              label="Upload PDF / 上傳PDF文件"
+              name="companySupplementFile"
+              accept=".pdf"
+              onChange={(file) => onChange('companySupplementFile', file)}
+            />
+
+            <FormInput
+              label="Or enter link / 或輸入鏈接"
+              name="companySupplementLink"
+              type="url"
+              value={data.companySupplementLink}
+              onChange={(v) => onChange('companySupplementLink', v)}
+              placeholder="https://..."
+            />
+          </div>
+        </div>
       </FormSection>
 
       {/* Section 2: Design Specialization */}
@@ -541,7 +637,7 @@ export default function DesignerQuestionnaire({
                                   />
 
                                   <FormInput
-                                    label="Address / 地址"
+                                    label="Building Name / 地址"
                                     name={`project-address-${project.id}`}
                                     required
                                     value={project.address}
@@ -551,14 +647,31 @@ export default function DesignerQuestionnaire({
                                   />
                                 </div>
 
-                                <MultiImageUpload
-                                  label="Project Photos / 項目照片"
-                                  name={`project-photos-${project.id}`}
-                                  maxFiles={9}
-                                  onChange={(files) =>
-                                    updateProject(designer.id, project.id, 'photos', files)
-                                  }
-                                />
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  <FormSelect
+                                    label="Renovation Type / 是否重新裝修？"
+                                    name={`project-renovation-${project.id}`}
+                                    type="radio"
+                                    required
+                                    value={project.renovationType}
+                                    onChange={(v) =>
+                                      updateProject(designer.id, project.id, 'renovationType', v)
+                                    }
+                                    options={[
+                                      { value: 'newFitout', label: 'New Fitout 新裝修' },
+                                      { value: 'remodel', label: 'Remodel 改造翻新' },
+                                    ]}
+                                  />
+
+                                  <MultiImageUpload
+                                    label="Project Photos / 項目照片"
+                                    name={`project-photos-${project.id}`}
+                                    maxFiles={9}
+                                    onChange={(files) =>
+                                      updateProject(designer.id, project.id, 'photos', files)
+                                    }
+                                  />
+                                </div>
                               </div>
                             </div>
                           ))}
