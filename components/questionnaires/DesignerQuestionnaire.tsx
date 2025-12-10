@@ -20,6 +20,15 @@ export default function DesignerQuestionnaire({
   data,
   onChange,
 }: DesignerQuestionnaireProps) {
+  // State for project autofill dialog
+  const [showAutofillDialog, setShowAutofillDialog] = React.useState(false);
+  const [autofillSource, setAutofillSource] = React.useState<DesignerProject | null>(null);
+  const [autofillTarget, setAutofillTarget] = React.useState<{
+    type: 'designHighlight' | 'designerProject';
+    projectId: string;
+    designerId?: string;
+  } | null>(null);
+
   const countryOptions = [
     { value: 'Hong Kong', label: 'Hong Kong 香港' },
     { value: 'China', label: 'China 中國' },
@@ -397,6 +406,96 @@ export default function DesignerQuestionnaire({
     onChange('dbInsurances', updated);
   };
 
+  // Function to find existing project by name
+  const findExistingProjectByName = (projectName: string, excludeId?: string): DesignerProject | null => {
+    if (!projectName || projectName.trim() === '') return null;
+
+    const trimmedName = projectName.trim().toLowerCase();
+
+    // Search in Design Highlights
+    const highlightMatch = (data.designHighlights || []).find(
+      (p) => p.id !== excludeId && p.projectName.trim().toLowerCase() === trimmedName
+    );
+    if (highlightMatch) return highlightMatch;
+
+    // Search in all designers' projects
+    for (const designer of data.designers || []) {
+      const projectMatch = designer.projects.find(
+        (p) => p.id !== excludeId && p.projectName.trim().toLowerCase() === trimmedName
+      );
+      if (projectMatch) return projectMatch;
+    }
+
+    return null;
+  };
+
+  // Function to handle project name blur event
+  const handleProjectNameBlur = (
+    projectName: string,
+    targetType: 'designHighlight' | 'designerProject',
+    projectId: string,
+    designerId?: string
+  ) => {
+    if (!projectName || projectName.trim() === '') return;
+
+    const existingProject = findExistingProjectByName(projectName, projectId);
+    if (existingProject) {
+      setAutofillSource(existingProject);
+      setAutofillTarget({ type: targetType, projectId, designerId });
+      setShowAutofillDialog(true);
+    }
+  };
+
+  // Function to handle autofill confirmation
+  const handleAutofillConfirm = () => {
+    if (!autofillSource || !autofillTarget) return;
+
+    const { type, projectId, designerId } = autofillTarget;
+
+    // Copy all fields except id and projectName (keep the original projectName)
+    const fieldsToAutofill = {
+      year: autofillSource.year,
+      address: autofillSource.address,
+      area: autofillSource.area,
+      renovationType: autofillSource.renovationType,
+      projectTypes: autofillSource.projectTypes,
+      photos: autofillSource.photos,
+    };
+
+    if (type === 'designHighlight') {
+      // Update design highlight
+      const updatedProjects = (data.designHighlights || []).map((project) =>
+        project.id === projectId ? { ...project, ...fieldsToAutofill } : project
+      );
+      onChange('designHighlights', updatedProjects);
+    } else if (type === 'designerProject' && designerId) {
+      // Update designer project
+      const updatedDesigners = (data.designers || []).map((designer) =>
+        designer.id === designerId
+          ? {
+              ...designer,
+              projects: designer.projects.map((project) =>
+                project.id === projectId ? { ...project, ...fieldsToAutofill } : project
+              ),
+            }
+          : designer
+      );
+      onChange('designers', updatedDesigners);
+    }
+
+    // Close dialog and reset state
+    setShowAutofillDialog(false);
+    setAutofillSource(null);
+    setAutofillTarget(null);
+  };
+
+  // Function to handle autofill cancellation
+  const handleAutofillCancel = () => {
+    setShowAutofillDialog(false);
+    setAutofillSource(null);
+    setAutofillTarget(null);
+  };
+
   const isHongKong = data.country === 'Hong Kong';
   const isChina = data.country === 'China';
 
@@ -615,6 +714,7 @@ export default function DesignerQuestionnaire({
                       required
                       value={project.projectName}
                       onChange={(v) => updateDesignHighlight(project.id, 'projectName', v)}
+                      onBlur={(v) => handleProjectNameBlur(v, 'designHighlight', project.id)}
                     />
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -1064,6 +1164,7 @@ export default function DesignerQuestionnaire({
                                   onChange={(v) =>
                                     updateProject(designer.id, project.id, 'projectName', v)
                                   }
+                                  onBlur={(v) => handleProjectNameBlur(v, 'designerProject', project.id, designer.id)}
                                 />
 
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -1191,6 +1292,60 @@ export default function DesignerQuestionnaire({
           </div>
         )}
       </FormSection>
+
+      {/* Project Autofill Confirmation Dialog */}
+      {showAutofillDialog && autofillSource && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4">
+            <div className="p-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-2 whitespace-nowrap">
+                Duplicate Project Name Detected / 檢測到重複的項目名稱
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                A project with the name "{autofillSource.projectName}" already exists. Would you like to autofill the project details?
+                <br />
+                <br />
+                已存在名為 "{autofillSource.projectName}" 的項目。是否需要自動填充項目信息？
+              </p>
+
+              <div className="bg-gray-50 rounded p-3 mb-4 text-xs">
+                <p className="font-medium text-gray-700 mb-2 whitespace-nowrap">Existing project details / 現有項目詳情:</p>
+                <div className="space-y-1 text-gray-600">
+                  {autofillSource.year && <div className="whitespace-nowrap">Year / 年份: {autofillSource.year}</div>}
+                  {autofillSource.area && <div className="whitespace-nowrap">Area / 面積: {autofillSource.area}</div>}
+                  {autofillSource.address && <div className="whitespace-nowrap">Building Name / 大廈名稱: {autofillSource.address}</div>}
+                  {autofillSource.renovationType && (
+                    <div className="whitespace-nowrap">
+                      Project Scope / 裝修類型:{' '}
+                      {autofillSource.renovationType === 'newFitout' ? 'New Fitout 全新装修' : 'Remodel 改造翻新'}
+                    </div>
+                  )}
+                  {autofillSource.projectTypes && autofillSource.projectTypes.length > 0 && (
+                    <div className="whitespace-nowrap">Property Types / 項目類型: {autofillSource.projectTypes.join(', ')}</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={handleAutofillCancel}
+                  className="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap"
+                >
+                  No, Keep Current / 否，保持當前
+                </button>
+                <button
+                  type="button"
+                  onClick={handleAutofillConfirm}
+                  className="px-4 py-2 bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition-colors whitespace-nowrap"
+                >
+                  Yes, Autofill / 是，自動填充
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
