@@ -10,7 +10,7 @@ Open http://localhost:3000 in your browser.
 
 ## 2. Complete Registration / 完成註冊
 
-### Step 1: Login Page / 登錄頁面
+### Step 1: Login Page / 登入頁面
 - Visit http://localhost:3000
 - Click "New Supplier? Register Here" / 點擊"新供應商？點此註冊"
 

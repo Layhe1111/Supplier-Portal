@@ -273,7 +273,7 @@ export default function ProductModal({
 
                 <div>
                   <label className="block text-xs text-gray-600 mb-1">
-                    Or enter link / 或輸入鏈接
+                    Or enter link / 或輸入連結
                   </label>
                   <input
                     type="url"

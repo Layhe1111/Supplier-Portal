@@ -203,7 +203,7 @@ export default function ContractorQuestionnaire({
           />
 
           <FormSelect
-            label="Country / 國家和地区"
+            label="Country / 國家和地區"
             name="country"
             required
             value={data.country}
@@ -226,7 +226,7 @@ export default function ContractorQuestionnaire({
         {isChina && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormInput
-              label="Business Registration Number / 工商注冊號"
+              label="Business Registration Number / 工商註冊號"
               name="cnBusinessRegistrationNumber"
               required
               value={data.cnBusinessRegistrationNumber}
@@ -247,7 +247,7 @@ export default function ContractorQuestionnaire({
 
         {isChina && (
           <FormInput
-            label="Employees eligible to work legally in Hong Kong / 可以在香港合法工作的雇員數"
+            label="Employees eligible to work legally in Hong Kong / 可以在香港合法工作的僱員數"
             name="hkWorkEligibleEmployees"
             type="number"
             required
@@ -289,7 +289,7 @@ export default function ContractorQuestionnaire({
           <p className="text-xs text-gray-500 mb-4">
             You can upload files or provide a link to your company website.
             <br />
-            您可以上傳文件或提供公司網站鏈接。
+            您可以上傳文件或提供公司網站連結。
           </p>
 
           <div className="space-y-4">
@@ -494,7 +494,7 @@ export default function ContractorQuestionnaire({
             Areas of Expertise / 專業領域
           </h4>
           <FormSelect
-            label="Property Types / 主要项目類型"
+            label="Property Types / 主要項目類型"
             name="projectTypes"
             type="checkbox"
             multiple
@@ -611,7 +611,7 @@ export default function ContractorQuestionnaire({
                       />
 
                       <FormSelect
-                        label="Property Types / 主要项目類型"
+                        label="Property Types / 主要項目類型"
                         name={`project-types-${project.id}`}
                         type="checkbox"
                         multiple
@@ -645,7 +645,7 @@ export default function ContractorQuestionnaire({
           </h4>
           <div className="space-y-4">
             <FormInput
-              label="Accumulated Project Area per Year (sqft) / 年施工面积（平方呎）"
+              label="Accumulated Project Area per Year (sqft) / 年施工面積（平方呎）"
               name="annualConstructionCapacity"
               type="number"
               required
@@ -655,7 +655,7 @@ export default function ContractorQuestionnaire({
             />
 
             <FormInput
-              label="Maximum Number of Projects in Parallel / 最多能同时承接的项目数"
+              label="Maximum Number of Projects in Parallel / 最多能同時承接的項目數"
               name="maxConcurrentProjects"
               type="number"
               required

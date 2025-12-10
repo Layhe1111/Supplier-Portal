@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 type LoginMethod = 'email' | 'phone';
 
 const COUNTRY_CODES = [
-  { code: '+86', name: '中国 China', flag: '🇨🇳' },
+  { code: '+86', name: '中國 China', flag: '🇨🇳' },
   { code: '+852', name: '香港 Hong Kong', flag: '🇭🇰' },
 ];
 
@@ -72,7 +72,7 @@ export default function LoginPage() {
                 </h3>
               </div>
               <p className="text-sm text-gray-600">
-                邮箱登录
+                電郵登入
               </p>
             </button>
 
@@ -95,7 +95,7 @@ export default function LoginPage() {
                 </h3>
               </div>
               <p className="text-sm text-gray-600">
-                电话登录
+                電話登入
               </p>
             </button>
           </div>

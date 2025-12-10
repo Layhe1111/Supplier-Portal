@@ -190,10 +190,11 @@ export interface DesignerFormData extends CommonRequirements {
   dbConstructionGrade: string;
   dbLicenseNumber: string;
   dbCertificateUpload: File | null;
-  dbSafetyProductionLicense: 'yes' | 'no' | '';
   dbIsocertifications: string[];
-  dbOtherCertifications: string;
+  dbIsoCertificateUploads: Record<string, File | null>;
+  dbOtherCertifications: CertificationItem[];
   dbProjectTypes: string[];
+  dbProjectHighlights: DesignerProject[];
   dbAnnualConstructionCapacity: string;
   dbMaxConcurrentProjects: string;
   dbLargestProjectValue: string;
@@ -203,6 +204,9 @@ export interface DesignerFormData extends CommonRequirements {
   dbNumberOfSafetyOfficers: string;
   dbHasConstructionManager: 'yes' | 'no' | '';
   dbNumberOfConstructionManagers: string;
+  dbHasMepLead: 'yes' | 'no' | '';
+  dbNumberOfMepLeads: string;
+  dbCnHkProjectCompliance: boolean;
   dbInsurances: Insurance[];
   dbHasEnvironmentalHealthSafety: 'yes' | 'no' | '';
   dbEnvironmentalHealthSafetyFile: File | null;

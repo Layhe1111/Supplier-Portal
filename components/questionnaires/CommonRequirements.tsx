@@ -60,10 +60,10 @@ export default function CommonRequirements({
       </FormSection>
 
       {/* Submitter Information */}
-      <FormSection title="Contact Information / 联系人信息">
+      <FormSection title="Contact Information / 聯絡人資料">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormInput
-            label="Contact Person / 联系人"
+            label="Contact Person / 聯絡人"
             name="submitterName"
             required
             value={data.submitterName}
@@ -109,7 +109,7 @@ export default function CommonRequirements({
           </div>
 
           <FormInput
-            label="Email / 邮箱"
+            label="Email / 電郵"
             name="submitterEmail"
             type="email"
             required

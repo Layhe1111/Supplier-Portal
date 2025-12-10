@@ -2,8 +2,16 @@ import React from 'react';
 import FormSection from '../FormSection';
 import FormInput from '../FormInput';
 import FormSelect from '../FormSelect';
+import FormCheckbox from '../FormCheckbox';
 import FileUpload from '../FileUpload';
-import { DesignerFormData, ProjectManager, Insurance } from '@/types/supplier';
+import MultiImageUpload from '../MultiImageUpload';
+import {
+  DesignerFormData,
+  DesignerProject,
+  Insurance,
+  ProjectManager,
+  ProjectManagerProject,
+} from '@/types/supplier';
 
 interface DesignerDBSectionProps {
   data: DesignerFormData;
@@ -52,30 +60,157 @@ export default function DesignerDBSection({
     return tomorrow.toISOString().split('T')[0];
   }, []);
 
+  // Initialize other certifications (handle legacy string data)
+  const dbOtherCerts = data.dbOtherCertifications as any;
+  if (!Array.isArray(dbOtherCerts) || dbOtherCerts.length === 0) {
+    onChange('dbOtherCertifications', [
+      {
+        id: `${Date.now()}-cert`,
+        name: typeof dbOtherCerts === 'string' ? dbOtherCerts : '',
+        file: null,
+      },
+    ]);
+  }
+
+  if (!data.dbIsoCertificateUploads) {
+    onChange('dbIsoCertificateUploads', {});
+  }
+
+  if (!data.dbProjectHighlights) {
+    onChange('dbProjectHighlights', []);
+  }
+
+  const isChina = data.country === 'China';
+
+  const toggleDbIsoCertification = (isoValue: string) => {
+    const current = data.dbIsocertifications || [];
+    const exists = current.includes(isoValue);
+    const nextSelected = exists
+      ? current.filter((item) => item !== isoValue)
+      : [...current, isoValue];
+    onChange('dbIsocertifications', nextSelected);
+
+    const currentUploads = data.dbIsoCertificateUploads || {};
+    const nextUploads: Record<string, File | null> = {};
+    nextSelected.forEach((iso) => {
+      nextUploads[iso] = currentUploads[iso] ?? null;
+    });
+    onChange('dbIsoCertificateUploads', nextUploads);
+  };
+
+  const addDbOtherCertification = () => {
+    onChange('dbOtherCertifications', [
+      ...(data.dbOtherCertifications || []),
+      { id: `${Date.now()}-cert`, name: '', file: null },
+    ]);
+  };
+
+  const updateDbOtherCertification = (
+    id: string,
+    field: 'name' | 'file',
+    value: string | File | null
+  ) => {
+    const updated = (data.dbOtherCertifications || []).map((cert) =>
+      cert.id === id ? { ...cert, [field]: value } : cert
+    );
+    onChange('dbOtherCertifications', updated);
+  };
+
+  const removeDbOtherCertification = (id: string) => {
+    const updated = (data.dbOtherCertifications || []).filter((cert) => cert.id !== id);
+    onChange(
+      'dbOtherCertifications',
+      updated.length > 0 ? updated : [{ id: `${Date.now()}-cert`, name: '', file: null }]
+    );
+  };
+
+  const addDbProjectHighlight = () => {
+    const newProject: DesignerProject = {
+      id: Date.now().toString(),
+      projectName: '',
+      year: '',
+      address: '',
+      area: '',
+      renovationType: '',
+      projectTypes: [],
+      projectHighlight: false,
+      photos: [],
+    };
+    onChange('dbProjectHighlights', [...(data.dbProjectHighlights || []), newProject]);
+  };
+
+  const updateDbProjectHighlight = (
+    projectId: string,
+    field: keyof DesignerProject,
+    value: any
+  ) => {
+    const updatedProjects = (data.dbProjectHighlights || []).map((project) =>
+      project.id === projectId ? { ...project, [field]: value } : project
+    );
+    onChange('dbProjectHighlights', updatedProjects);
+  };
+
+  const removeDbProjectHighlight = (projectId: string) => {
+    const updatedProjects = (data.dbProjectHighlights || []).filter(
+      (project) => project.id !== projectId
+    );
+    onChange('dbProjectHighlights', updatedProjects);
+  };
+
+  const addDbProjectToManager = (pmIndex: number) => {
+    const newProject: ProjectManagerProject = {
+      id: `${Date.now()}-${Math.random()}`,
+      projectName: '',
+      clientName: '',
+      year: '',
+      buildingName: '',
+      area: '',
+    };
+    const updated = [...(data.dbProjectManagers || [])];
+    const targetPm = updated[pmIndex];
+    if (!targetPm) return;
+    const updatedProjects = [...(targetPm.projects || []), newProject];
+    updated[pmIndex] = { ...targetPm, projects: updatedProjects };
+    onChange('dbProjectManagers', updated as ProjectManager[]);
+  };
+
   return (
     <div className="space-y-8">
-      {/* D&B Section 2: Certifications */}
-      <FormSection title="D&B Certifications / D&B資質與認證">
+      {/* Section 2: Certifications */}
+      <FormSection title="Section 2: Certifications / 資質與認證">
         <div className="mb-6">
-          <h4 className="text-sm font-medium text-gray-900 mb-3">
-            Business Licenses / 資質等級
-          </h4>
           <div className="space-y-4">
-            <FormInput
-              label="Construction Grade / 施工資質等級"
-              name="dbConstructionGrade"
-              required
-              value={data.dbConstructionGrade}
-              onChange={(v) => onChange('dbConstructionGrade', v)}
-            />
+            <div>
+              <label className="block text-sm font-light text-gray-700 mb-2">
+                Do you have RGBC certificate / 是否有RGBC牌 <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={data.dbConstructionGrade === 'RGBC' ? 'yes' : 'no'}
+                onChange={(e) => {
+                  if (e.target.value === 'yes') {
+                    onChange('dbConstructionGrade', 'RGBC');
+                  } else {
+                    onChange('dbConstructionGrade', '');
+                    onChange('dbLicenseNumber', '');
+                  }
+                }}
+                required
+                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 text-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 sm:text-sm h-[42px]"
+              >
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
+            </div>
 
-            <FormInput
-              label="License Number / 資質證書號"
-              name="dbLicenseNumber"
-              required
-              value={data.dbLicenseNumber}
-              onChange={(v) => onChange('dbLicenseNumber', v)}
-            />
+            {data.dbConstructionGrade === 'RGBC' && (
+              <FormInput
+                label="Certificate Number / 資質證書編號"
+                name="dbLicenseNumber"
+                required
+                value={data.dbLicenseNumber}
+                onChange={(v) => onChange('dbLicenseNumber', v)}
+              />
+            )}
 
             <FileUpload
               label="Certificate Upload / 資質證書上傳"
@@ -87,53 +222,124 @@ export default function DesignerDBSection({
           </div>
         </div>
 
-        <div className="mb-6">
-          <h4 className="text-sm font-medium text-gray-900 mb-3">
-            Safety & Quality Certifications / 安全與質量認證
-          </h4>
+        <div>
           <div className="space-y-4">
-            <FormSelect
-              label="Safety Production License / 安全生產許可證"
-              name="dbSafetyProductionLicense"
-              type="radio"
-              required
-              value={data.dbSafetyProductionLicense}
-              onChange={(v) => onChange('dbSafetyProductionLicense', v as 'yes' | 'no')}
-              options={[
-                { value: 'yes', label: 'Yes 是' },
-                { value: 'no', label: 'No 否' },
-              ]}
-            />
+            <div className="space-y-3">
+              <label className="block text-sm font-light text-gray-700">
+                ISO Certification / ISO認證
+              </label>
+              <div className="space-y-3">
+                {isoOptions.map((option) => {
+                  const checked =
+                    Array.isArray(data.dbIsocertifications) &&
+                    data.dbIsocertifications.includes(option.value);
+                  return (
+                    <div
+                      key={option.value}
+                      className="p-3 border border-gray-200 rounded bg-white space-y-2"
+                    >
+                      <label className="flex items-center">
+                        <input
+                          type="checkbox"
+                          name={`db-iso-${option.value}`}
+                          checked={checked}
+                          onChange={() => toggleDbIsoCertification(option.value)}
+                          className="h-4 w-4 text-gray-900 focus:ring-gray-900 border-gray-300"
+                        />
+                        <span className="ml-2 text-sm text-gray-700">{option.label}</span>
+                      </label>
 
-            <FormSelect
-              label="ISO Certifications / ISO認證"
-              name="dbIsocertifications"
-              type="checkbox"
-              multiple
-              value={data.dbIsocertifications}
-              onChange={(v) => onChange('dbIsocertifications', v as string[])}
-              options={isoOptions}
-            />
+                      {checked && (
+                        <FileUpload
+                          label={`${option.label} Certificate Upload / 證書上傳`}
+                          name={`db-iso-${option.value}-upload`}
+                          required
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          onChange={(file) => {
+                            onChange('dbIsoCertificateUploads', {
+                              ...(data.dbIsoCertificateUploads || {}),
+                              [option.value]: file,
+                            });
+                          }}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
 
-            <FormInput
-              label="Other Certifications / 其他認證"
-              name="dbOtherCertifications"
-              value={data.dbOtherCertifications}
-              onChange={(v) => onChange('dbOtherCertifications', v)}
-              placeholder="e.g., LEED, Green Building, etc."
-            />
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="block text-sm font-light text-gray-700">
+                  Other Certifications / 其他認證
+                  <span className="text-xs text-gray-500 ml-2">
+                    Add items and upload certificates
+                  </span>
+                </label>
+                <button
+                  type="button"
+                  onClick={addDbOtherCertification}
+                  className="px-3 py-1 bg-gray-900 text-white text-xs font-light hover:bg-gray-800 transition-colors"
+                >
+                  + Add Certification / 添加
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                {(data.dbOtherCertifications || []).map((cert, index) => (
+                  <div
+                    key={cert.id}
+                    className="p-4 border border-gray-200 bg-gray-50 rounded space-y-3"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-700">
+                        Certification {index + 1} / 認證 {index + 1}
+                      </span>
+                      {(data.dbOtherCertifications || []).length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeDbOtherCertification(cert.id)}
+                          className="text-xs text-red-600 hover:text-red-800"
+                        >
+                          Remove / 刪除
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormInput
+                        label="Certification Name / 認證名稱"
+                        name={`db-other-cert-${cert.id}`}
+                        value={cert.name}
+                        onChange={(v) => updateDbOtherCertification(cert.id, 'name', v)}
+                        placeholder="e.g., CIC Safety Certificate"
+                      />
+
+                      <FileUpload
+                        label="Certificate Upload / 證書上傳"
+                        name={`db-other-cert-upload-${cert.id}`}
+                        required={!!cert.name.trim()}
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={(file) => updateDbOtherCertification(cert.id, 'file', file)}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </FormSection>
 
-      {/* D&B Section 3: Construction Capability */}
-      <FormSection title="D&B Construction Capability / D&B施工能力">
+      {/* Section 3: Construction Capability */}
+      <FormSection title="Section 3: Construction Capability / 施工能力">
         <div className="mb-6">
           <h4 className="text-sm font-medium text-gray-900 mb-3">
             Areas of Expertise / 專業領域
           </h4>
           <FormSelect
-          label="Property Types / 主要项目類型"
+            label="Property Types / 主要項目類型"
             name="dbProjectTypes"
             type="checkbox"
             multiple
@@ -144,89 +350,44 @@ export default function DesignerDBSection({
           />
         </div>
 
-        <div>
-          <h4 className="text-sm font-medium text-gray-900 mb-3">
-            Company Scale / 公司規模
-          </h4>
-          <div className="space-y-4">
-            <FormInput
-              label="Accumulated Project Area per Year (sqft) / 年施工面积（平方呎）"
-              name="dbAnnualConstructionCapacity"
-              type="number"
-              required
-              value={data.dbAnnualConstructionCapacity}
-              onChange={(v) => onChange('dbAnnualConstructionCapacity', v)}
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormInput
-                label="Max Concurrent Projects / 最大同時項目數"
-                name="dbMaxConcurrentProjects"
-                type="number"
-                required
-                value={data.dbMaxConcurrentProjects}
-                onChange={(v) => onChange('dbMaxConcurrentProjects', v)}
-              />
-
-              <FormInput
-                label="Average Project Value (HKD) / 平均項目金額（港幣）"
-                name="dbLargestProjectValue"
-                type="number"
-                required
-                value={data.dbLargestProjectValue}
-                onChange={(v) => onChange('dbLargestProjectValue', v)}
-              />
-            </div>
-          </div>
-        </div>
-      </FormSection>
-
-      {/* D&B Section 5: Personnel */}
-      <FormSection title="D&B Personnel / D&B人員配置">
-        <div className="mb-6">
-          <FileUpload
-            label="Organization Chart / 組織架構圖"
-            name="dbOrganizationChart"
-            required
-            accept=".pdf,.jpg,.jpeg,.png"
-            onChange={(file) => onChange('dbOrganizationChart', file)}
-          />
-        </div>
-
+        {/* Project Highlights Section */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
             <h4 className="text-sm font-medium text-gray-900">
-              Project Managers / 項目經理
+              Project Highlights / 亮點項目
               <span className="text-red-500 ml-1">*</span>
             </h4>
             <button
               type="button"
-              onClick={addDbProjectManager}
+              onClick={addDbProjectHighlight}
               className="px-4 py-2 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
             >
-              + Add Project Manager / 添加項目經理
+              + Add Project / 添加項目
             </button>
           </div>
 
-          {(!data.dbProjectManagers || data.dbProjectManagers.length === 0) ? (
+          {(!data.dbProjectHighlights || data.dbProjectHighlights.length === 0) ? (
             <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded">
               <p className="text-gray-500 text-sm">
-                No project managers added. Click "Add Project Manager" to add personnel information.
+                No projects added yet. Click "Add Project" to add project highlights.
                 <br />
-                尚未添加項目經理。點擊"添加項目經理"按鈕添加人員信息。
+                尚未添加項目。點擊"添加項目"按鈕添加亮點項目。
               </p>
             </div>
           ) : (
             <div className="space-y-6">
-              {data.dbProjectManagers.map((pm, index) => (
-                <div key={pm.id} className="border border-gray-200 p-6 bg-gray-50 rounded">
+              {(data.dbProjectHighlights || []).map((project, index) => (
+                <div
+                  key={project.id}
+                  className="border border-gray-200 p-6 bg-gray-50 rounded"
+                >
                   <div className="flex items-center justify-between mb-4">
                     <h5 className="text-sm font-medium text-gray-900">
-                      Project Manager {index + 1} / 項目經理 {index + 1}
+                      Project {index + 1} / 項目 {index + 1}
                     </h5>
                     <button
                       type="button"
-                      onClick={() => removeDbProjectManager(pm.id)}
+                      onClick={() => removeDbProjectHighlight(project.id)}
                       className="text-red-500 hover:text-red-700 text-sm font-medium"
                     >
                       Remove / 刪除
@@ -235,74 +396,86 @@ export default function DesignerDBSection({
 
                   <div className="space-y-4">
                     <FormInput
-                      label="Name / 姓名"
-                      name={`db-pm-name-${pm.id}`}
+                      label="Project Name / 項目名稱"
+                      name={`db-project-name-${project.id}`}
                       required
-                      value={pm.name}
-                      onChange={(v) => updateDbProjectManager(pm.id, 'name', v)}
-                    />
-
-                    <FormInput
-                      label="Year of Experience / 年資"
-                      name={`db-pm-experience-${pm.id}`}
-                      type="number"
-                      required
-                      value={pm.yearsExperience || ''}
-                      onChange={(v) => updateDbProjectManager(pm.id, 'yearsExperience', v)}
-                      placeholder="e.g., 8"
-                    />
-
-                    <FormInput
-                      label="Languages / 語言能力"
-                      name={`db-pm-languages-${pm.id}`}
-                      required
-                      value={pm.languages}
-                      onChange={(v) => updateDbProjectManager(pm.id, 'languages', v)}
-                      placeholder="e.g., Cantonese, English, Mandarin"
-                    />
-
-                    <FormInput
-                      label="Main Project / 主要項目"
-                      name={`db-pm-project-${pm.id}`}
-                      required
-                      value={pm.mainProject}
-                      onChange={(v) => updateDbProjectManager(pm.id, 'mainProject', v)}
+                      value={project.projectName}
+                      onChange={(v) =>
+                        updateDbProjectHighlight(project.id, 'projectName', v)
+                      }
                     />
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <FormInput
                         label="Year / 年份"
-                        name={`db-pm-year-${pm.id}`}
-                        type="number"
+                        name={`db-project-year-${project.id}`}
                         required
-                        value={pm.year}
-                        onChange={(v) => updateDbProjectManager(pm.id, 'year', v)}
+                        value={project.year}
+                        onChange={(v) =>
+                          updateDbProjectHighlight(project.id, 'year', v)
+                        }
+                        placeholder="e.g., 2024"
+                      />
+
+                      <FormInput
+                        label="Area (sqft) / 面積（平方呎）"
+                        name={`db-project-area-${project.id}`}
+                        required
+                        value={project.area}
+                        onChange={(v) =>
+                          updateDbProjectHighlight(project.id, 'area', v)
+                        }
+                        placeholder="e.g., 1500 sq ft"
                       />
 
                       <FormInput
                         label="Building Name / 大廈名稱"
-                        name={`db-pm-address-${pm.id}`}
+                        name={`db-project-address-${project.id}`}
                         required
-                        value={pm.address}
-                        onChange={(v) => updateDbProjectManager(pm.id, 'address', v)}
+                        value={project.address}
+                        onChange={(v) =>
+                          updateDbProjectHighlight(project.id, 'address', v)
+                        }
                       />
-
-              <FormInput
-                label="Area (sqft) / 面積（平方呎）"
-                name={`db-pm-area-${pm.id}`}
-                required
-                value={pm.area}
-                onChange={(v) => updateDbProjectManager(pm.id, 'area', v)}
-                placeholder="e.g., 1500 sq ft"
-              />
                     </div>
 
-                    <FileUpload
-                      label="CV / 簡歷"
-                      name={`db-pm-cv-${pm.id}`}
-                      required
-                      accept=".pdf,.jpg,.jpeg,.png"
-                      onChange={(file) => updateDbProjectManager(pm.id, 'cv', file)}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormSelect
+                        label="Project Scope / 是否重新裝修？"
+                        name={`db-project-renovation-${project.id}`}
+                        type="radio"
+                        required
+                        value={project.renovationType}
+                        onChange={(v) =>
+                          updateDbProjectHighlight(project.id, 'renovationType', v)
+                        }
+                        options={[
+                          { value: 'newFitout', label: 'New Fitout 全新装修' },
+                          { value: 'remodel', label: 'Remodel 改造翻新' },
+                        ]}
+                      />
+
+                      <FormSelect
+                        label="Property Types / 主要項目類型"
+                        name={`db-project-types-${project.id}`}
+                        type="checkbox"
+                        multiple
+                        required
+                        value={project.projectTypes || []}
+                        onChange={(v) =>
+                          updateDbProjectHighlight(project.id, 'projectTypes', v as string[])
+                        }
+                        options={projectTypeOptions}
+                      />
+                    </div>
+
+                    <MultiImageUpload
+                      label="Project Photos / 項目照片"
+                      name={`db-project-photos-${project.id}`}
+                      maxFiles={9}
+                      onChange={(files) =>
+                        updateDbProjectHighlight(project.id, 'photos', files)
+                      }
                     />
                   </div>
                 </div>
@@ -311,124 +484,447 @@ export default function DesignerDBSection({
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <div>
+          <h4 className="text-sm font-medium text-gray-900 mb-3">
+            Company Scale / 公司規模
+          </h4>
           <div className="space-y-4">
+            <FormInput
+              label="Accumulated Project Area per Year (sqft) / 年施工面積（平方呎）"
+              name="dbAnnualConstructionCapacity"
+              type="number"
+              required
+              value={data.dbAnnualConstructionCapacity}
+              onChange={(v) => onChange('dbAnnualConstructionCapacity', v)}
+              placeholder="e.g., 100000"
+            />
+
+            <FormInput
+              label="Maximum Number of Projects in Parallel / 最多能同時承接的項目數"
+              name="dbMaxConcurrentProjects"
+              type="number"
+              required
+              value={data.dbMaxConcurrentProjects}
+              onChange={(v) => onChange('dbMaxConcurrentProjects', v)}
+              placeholder="e.g., 5"
+            />
+
+            <FormInput
+              label="Average Project Value (HKD) / 平均項目金額（港幣）"
+              name="dbLargestProjectValue"
+              type="number"
+              required
+              value={data.dbLargestProjectValue}
+              onChange={(v) => onChange('dbLargestProjectValue', v)}
+              placeholder="e.g., 5000000"
+            />
+          </div>
+        </div>
+      </FormSection>
+
+      {/* Section 5: Personnel */}
+      <FormSection title="Section 5: Personnel / 人員">
+        <div className="mb-6">
+          <FileUpload
+            label="Company Organization Chart / 公司組織架構圖"
+            name="dbOrganizationChart"
+            required
+            accept=".pdf,.jpg,.jpeg,.png"
+            onChange={(file) => onChange('dbOrganizationChart', file)}
+          />
+        </div>
+
+        <div className="mb-6">
+          <h4 className="text-sm font-medium text-gray-900 mb-3">
+            Project Managers / 項目經理
+          </h4>
+
+          <div className="space-y-6">
+            {(data.dbProjectManagers || []).map((pm, pmIndex) => (
+              <div key={pm.id} className="p-4 border border-gray-200 bg-gray-50">
+                <div className="flex justify-between items-center mb-4">
+                  <h5 className="text-sm font-medium text-gray-700">
+                    Project Manager #{pmIndex + 1} / 項目經理 #{pmIndex + 1}
+                  </h5>
+                  {(data.dbProjectManagers || []).length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => removeDbProjectManager(pm.id)}
+                      className="text-xs text-red-600 hover:text-red-800"
+                    >
+                      Remove / 刪除
+                    </button>
+                  )}
+                </div>
+
+                <div className="space-y-4">
+                  <FormInput
+                    label="Name / 姓名"
+                    name={`db-pm-name-${pmIndex}`}
+                    required
+                    value={pm.name}
+                    onChange={(v) => {
+                      updateDbProjectManager(pm.id, 'name', v);
+                    }}
+                  />
+
+                  <FormInput
+                    label="Year of Experience / 年資"
+                    name={`db-pm-experience-${pmIndex}`}
+                    type="number"
+                    required
+                    value={pm.yearsExperience || ''}
+                    onChange={(v) => {
+                      updateDbProjectManager(pm.id, 'yearsExperience', v);
+                    }}
+                    placeholder="e.g., 8"
+                  />
+
+                  <FormInput
+                    label="Languages / 語言"
+                    name={`db-pm-languages-${pmIndex}`}
+                    required
+                    value={pm.languages}
+                    onChange={(v) => {
+                      updateDbProjectManager(pm.id, 'languages', v);
+                    }}
+                    placeholder="e.g., English, Chinese, Spanish"
+                  />
+
+                  {/* Projects Section */}
+                  <div className="mt-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-sm font-light text-gray-700">
+                        Projects / 項目經歷
+                        <span className="text-red-500 ml-1">*</span>
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => addDbProjectToManager(pmIndex)}
+                        className="px-3 py-1 bg-gray-900 text-white text-xs font-light hover:bg-gray-800 transition-colors"
+                      >
+                        + Add Project / 添加項目經歷
+                      </button>
+                    </div>
+
+                    <div className="space-y-3">
+                      {(pm.projects || []).map((project, projectIndex) => (
+                        <div
+                          key={project.id}
+                          className="p-4 border border-gray-200 bg-white rounded space-y-3"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium text-gray-700">
+                              Project {projectIndex + 1} / 項目 {projectIndex + 1}
+                            </span>
+                            {(pm.projects || []).length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const updated = [...(data.dbProjectManagers || [])];
+                                  updated[pmIndex] = {
+                                    ...updated[pmIndex],
+                                    projects: updated[pmIndex].projects.filter(
+                                      (_: any, idx: number) => idx !== projectIndex
+                                    ),
+                                  };
+                                  onChange('dbProjectManagers', updated as ProjectManager[]);
+                                }}
+                                className="text-xs text-red-600 hover:text-red-800"
+                              >
+                                Remove / 刪除
+                              </button>
+                            )}
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormInput
+                              label="Project Name / 項目名稱"
+                              name={`db-pm-${pmIndex}-project-${projectIndex}-name`}
+                              required
+                              value={project.projectName}
+                              onChange={(v) => {
+                                const updated = [...(data.dbProjectManagers || [])];
+                                const updatedProjects = [...(updated[pmIndex].projects || [])];
+                                updatedProjects[projectIndex] = {
+                                  ...updatedProjects[projectIndex],
+                                  projectName: v,
+                                };
+                                updated[pmIndex] = {
+                                  ...updated[pmIndex],
+                                  projects: updatedProjects,
+                                };
+                                onChange('dbProjectManagers', updated as ProjectManager[]);
+                              }}
+                            />
+
+                            <FormInput
+                              label="Client Name / 客戶名稱"
+                              name={`db-pm-${pmIndex}-project-${projectIndex}-client`}
+                              required
+                              value={project.clientName}
+                              onChange={(v) => {
+                                const updated = [...(data.dbProjectManagers || [])];
+                                const updatedProjects = [...(updated[pmIndex].projects || [])];
+                                updatedProjects[projectIndex] = {
+                                  ...updatedProjects[projectIndex],
+                                  clientName: v,
+                                };
+                                updated[pmIndex] = {
+                                  ...updated[pmIndex],
+                                  projects: updatedProjects,
+                                };
+                                onChange('dbProjectManagers', updated as ProjectManager[]);
+                              }}
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <FormInput
+                              label="Year / 年份"
+                              name={`db-pm-${pmIndex}-project-${projectIndex}-year`}
+                              required
+                              value={project.year}
+                              onChange={(v) => {
+                                const updated = [...(data.dbProjectManagers || [])];
+                                const updatedProjects = [...(updated[pmIndex].projects || [])];
+                                updatedProjects[projectIndex] = {
+                                  ...updatedProjects[projectIndex],
+                                  year: v,
+                                };
+                                updated[pmIndex] = {
+                                  ...updated[pmIndex],
+                                  projects: updatedProjects,
+                                };
+                                onChange('dbProjectManagers', updated as ProjectManager[]);
+                              }}
+                              placeholder="e.g., 2023"
+                            />
+
+                            <FormInput
+                              label="Building Name / 大廈名稱"
+                              name={`db-pm-${pmIndex}-project-${projectIndex}-building`}
+                              required
+                              value={project.buildingName}
+                              onChange={(v) => {
+                                const updated = [...(data.dbProjectManagers || [])];
+                                const updatedProjects = [...(updated[pmIndex].projects || [])];
+                                updatedProjects[projectIndex] = {
+                                  ...updatedProjects[projectIndex],
+                                  buildingName: v,
+                                };
+                                updated[pmIndex] = {
+                                  ...updated[pmIndex],
+                                  projects: updatedProjects,
+                                };
+                                onChange('dbProjectManagers', updated as ProjectManager[]);
+                              }}
+                            />
+
+                            <FormInput
+                              label="Area (sqft) / 面積（平方呎）"
+                              name={`db-pm-${pmIndex}-project-${projectIndex}-area`}
+                              required
+                              value={project.area}
+                              onChange={(v) => {
+                                const updated = [...(data.dbProjectManagers || [])];
+                                const updatedProjects = [...(updated[pmIndex].projects || [])];
+                                updatedProjects[projectIndex] = {
+                                  ...updatedProjects[projectIndex],
+                                  area: v,
+                                };
+                                updated[pmIndex] = {
+                                  ...updated[pmIndex],
+                                  projects: updatedProjects,
+                                };
+                                onChange('dbProjectManagers', updated as ProjectManager[]);
+                              }}
+                              placeholder="e.g., 5000"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <FileUpload
+                    label="Project Manager CV / 項目經理簡歷"
+                    name={`db-pm-cv-${pmIndex}`}
+                    accept=".pdf,.doc,.docx"
+                    onChange={(file) => {
+                      const updated = [...(data.dbProjectManagers || [])];
+                      updated[pmIndex] = { ...updated[pmIndex], cv: file };
+                      onChange('dbProjectManagers', updated as ProjectManager[]);
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+
+            <button
+              type="button"
+              onClick={addDbProjectManager}
+              className="w-full py-2.5 border border-dashed border-gray-300 text-sm text-gray-600 hover:border-gray-900 hover:text-gray-900 transition-colors"
+            >
+              + Add Project Manager / 添加項目經理
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div>
             <FormSelect
-              label="Safety Officer / 專職安全員"
+              label="Do you have Safety Officer(s)? / 是否有安全主任？"
               name="dbHasSafetyOfficer"
               type="radio"
               required
               value={data.dbHasSafetyOfficer}
               onChange={(v) => onChange('dbHasSafetyOfficer', v as 'yes' | 'no')}
               options={[
-                { value: 'yes', label: 'Yes 是' },
-                { value: 'no', label: 'No 否' },
+                { value: 'yes', label: 'Yes 有' },
+                { value: 'no', label: 'No 無' },
               ]}
             />
 
             {data.dbHasSafetyOfficer === 'yes' && (
-              <FormInput
-                label="Number of Safety Officers / 專職安全員人數"
-                name="dbNumberOfSafetyOfficers"
-                type="number"
-                required
-                value={data.dbNumberOfSafetyOfficers}
-                onChange={(v) => onChange('dbNumberOfSafetyOfficers', v)}
-              />
+              <div className="mt-4">
+                <FormInput
+                  label="Number of Safety Officers / 安全主任人數"
+                  name="dbNumberOfSafetyOfficers"
+                  type="number"
+                  required
+                  value={data.dbNumberOfSafetyOfficers}
+                  onChange={(v) => onChange('dbNumberOfSafetyOfficers', v)}
+                  placeholder="e.g., 3"
+                />
+              </div>
             )}
           </div>
 
-          <div className="space-y-4">
+          <div>
             <FormSelect
-              label="Construction Manager / 專職施工管理人員"
+              label="Do you have Construction Manager(s)? / 是否有施工經理？"
               name="dbHasConstructionManager"
               type="radio"
               required
               value={data.dbHasConstructionManager}
               onChange={(v) => onChange('dbHasConstructionManager', v as 'yes' | 'no')}
               options={[
-                { value: 'yes', label: 'Yes 是' },
-                { value: 'no', label: 'No 否' },
+                { value: 'yes', label: 'Yes 有' },
+                { value: 'no', label: 'No 無' },
               ]}
             />
 
             {data.dbHasConstructionManager === 'yes' && (
-              <FormInput
-                label="Number of Construction Managers / 專職施工管理人數"
-                name="dbNumberOfConstructionManagers"
-                type="number"
-                required
-                value={data.dbNumberOfConstructionManagers}
-                onChange={(v) => onChange('dbNumberOfConstructionManagers', v)}
-              />
+              <div className="mt-4">
+                <FormInput
+                  label="Number of Construction Managers / 施工經理人數"
+                  name="dbNumberOfConstructionManagers"
+                  type="number"
+                  required
+                  value={data.dbNumberOfConstructionManagers}
+                  onChange={(v) => onChange('dbNumberOfConstructionManagers', v)}
+                  placeholder="e.g., 5"
+                />
+              </div>
+            )}
+          </div>
+
+          <div>
+            <FormSelect
+              label="Do you have MEP Lead(s)? / 是否有機電負責人？"
+              name="dbHasMepLead"
+              type="radio"
+              required
+              value={data.dbHasMepLead}
+              onChange={(v) => onChange('dbHasMepLead', v as 'yes' | 'no')}
+              options={[
+                { value: 'yes', label: 'Yes 有' },
+                { value: 'no', label: 'No 無' },
+              ]}
+            />
+
+            {data.dbHasMepLead === 'yes' && (
+              <div className="mt-4">
+                <FormInput
+                  label="Number of MEP Leads / 機電負責人人數"
+                  name="dbNumberOfMepLeads"
+                  type="number"
+                  required
+                  value={data.dbNumberOfMepLeads}
+                  onChange={(v) => onChange('dbNumberOfMepLeads', v)}
+                  placeholder="e.g., 2"
+                />
+              </div>
             )}
           </div>
         </div>
       </FormSection>
 
-      {/* D&B Section 6: Compliance and Governance */}
-      <FormSection title="D&B Compliance and Governance / D&B合規與治理">
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h4 className="text-sm font-medium text-gray-900">
-              Insurance Coverage / 保險覆蓋
-              <span className="text-red-500 ml-1">*</span>
-            </h4>
-            <button
-              type="button"
-              onClick={addDbInsurance}
-              className="px-4 py-2 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
-            >
-              + Add Insurance / 添加保險
-            </button>
+      {/* Section 6: Compliance and Governance */}
+      <FormSection title="Section 6: Compliance and Governance / 合規與治理">
+        {isChina && (
+          <div className="mb-6">
+            <FormCheckbox
+              label="If taking projects in Hong Kong, we commit to hiring workers who can legally work in Hong Kong and hold valid HKID and Construction Safety Certificate / 如在香港承接項目，保證聘請可在香港合法工作的工人且持有有效香港身份證與建造業安全證明書（平安咭）"
+              name="dbCnHkProjectCompliance"
+              checked={!!data.dbCnHkProjectCompliance}
+              onChange={(v) => onChange('dbCnHkProjectCompliance', v)}
+              required
+            />
           </div>
+        )}
 
-          {(!data.dbInsurances || data.dbInsurances.length === 0) ? (
-            <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded">
-              <p className="text-gray-500 text-sm">
-                No insurance added. Click "Add Insurance" to add insurance information.
-                <br />
-                尚未添加保險。點擊"添加保險"按鈕添加保險信息。
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {data.dbInsurances.map((insurance, index) => (
-                <div key={insurance.id} className="border border-gray-200 p-4 bg-gray-50 rounded">
-                  <div className="flex items-center justify-between mb-3">
-                    <h5 className="text-sm font-medium text-gray-900">
-                      Insurance {index + 1} / 保險 {index + 1}
-                    </h5>
+        <div className="mb-6">
+          <h4 className="text-sm font-medium text-gray-900 mb-3">
+            Insurance / 保險 (At least one required / 至少需要一個)
+          </h4>
+
+          <div className="space-y-6">
+            {(data.dbInsurances || []).map((insurance, index) => (
+              <div key={insurance.id} className="p-4 border border-gray-200 bg-gray-50">
+                <div className="flex justify-between items-center mb-4">
+                  <h5 className="text-sm font-medium text-gray-700">
+                    Insurance #{index + 1} / 保險 #{index + 1}
+                  </h5>
+                  {(data.dbInsurances || []).length > 1 && (
                     <button
                       type="button"
                       onClick={() => removeDbInsurance(insurance.id)}
-                      className="text-red-500 hover:text-red-700 text-sm font-medium"
+                      className="text-xs text-red-600 hover:text-red-800"
                     >
                       Remove / 刪除
                     </button>
-                  </div>
+                  )}
+                </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <FormInput
-                      label="Insurance Type / 保險類型"
-                      name={`db-insurance-type-${insurance.id}`}
-                      required
-                      value={insurance.type}
-                      onChange={(v) => updateDbInsurance(insurance.id, 'type', v)}
-                      placeholder="e.g., Liability, Workers Comp"
-                    />
+                <div className="space-y-4">
+                  <FormSelect
+                    label="Insurance Type / 保險類型"
+                    name={`db-insurance-type-${index}`}
+                    required
+                    value={insurance.type}
+                    onChange={(v) => updateDbInsurance(insurance.id, 'type', v)}
+                    options={[
+                      { value: "Contractors' All Risks", label: "Contractors' All Risks 建築工程保險" },
+                      { value: 'General Liability insurance', label: 'General Liability insurance 第三者責任保險' },
+                      { value: 'Worker Compensation', label: 'Worker Compensation 僱員補償保險' },
+                    ]}
+                  />
 
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormInput
-                      label="Provider / 保險公司"
-                      name={`db-insurance-provider-${insurance.id}`}
+                      label="Insurance Provider / 保險公司"
+                      name={`db-insurance-provider-${index}`}
                       required
                       value={insurance.provider}
                       onChange={(v) => updateDbInsurance(insurance.id, 'provider', v)}
+                      placeholder="e.g., AIA, HSBC Insurance"
                     />
 
                     <FormInput
-                      label="Expiry Date / 到期日"
-                      name={`db-insurance-expiry-${insurance.id}`}
+                      label="Expiry Date / 到期日期"
+                      name={`db-insurance-expiry-${index}`}
                       type="date"
                       required
                       value={insurance.expiryDate}
@@ -437,102 +933,104 @@ export default function DesignerDBSection({
                     />
                   </div>
 
-                  <div className="mt-3">
-                    <FileUpload
-                      label="Insurance Certificate / 保險證明"
-                      name={`db-insurance-file-${insurance.id}`}
-                      required
-                      accept=".pdf,.jpg,.jpeg,.png"
-                      onChange={(file) => updateDbInsurance(insurance.id, 'file', file)}
-                    />
-                  </div>
+                  <FileUpload
+                    label="Insurance Certificate / 保險證明"
+                    name={`db-insurance-file-${index}`}
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    onChange={(file) => updateDbInsurance(insurance.id, 'file', file)}
+                  />
                 </div>
-              ))}
+              </div>
+            ))}
+
+            <button
+              type="button"
+              onClick={addDbInsurance}
+              className="w-full py-2.5 border border-dashed border-gray-300 text-sm text-gray-600 hover:border-gray-900 hover:text-gray-900 transition-colors"
+            >
+              + Add Insurance / 添加保險
+            </button>
+          </div>
+        </div>
+
+        <div className="mb-6">
+          <FormSelect
+            label="Do you have Environmental Health and Safety policy? / 是否有環境健康安全政策？"
+            name="dbHasEnvironmentalHealthSafety"
+            type="radio"
+            required
+            value={data.dbHasEnvironmentalHealthSafety}
+            onChange={(v) => onChange('dbHasEnvironmentalHealthSafety', v as 'yes' | 'no')}
+            options={[
+              { value: 'yes', label: 'Yes 有' },
+              { value: 'no', label: 'No 無' },
+            ]}
+          />
+
+          {data.dbHasEnvironmentalHealthSafety === 'yes' && (
+            <div className="mt-4">
+              <FileUpload
+                label="Environmental Health and Safety Document / 環境健康安全文件"
+                name="dbEnvironmentalHealthSafetyFile"
+                accept=".pdf"
+                onChange={(file) => onChange('dbEnvironmentalHealthSafetyFile', file)}
+              />
             </div>
           )}
         </div>
 
-        <div className="space-y-6">
-          <div>
-            <FormSelect
-              label="Environmental, Health & Safety Policy / 環保與健康安全政策"
-              name="dbHasEnvironmentalHealthSafety"
-              type="radio"
-              required
-              value={data.dbHasEnvironmentalHealthSafety}
-              onChange={(v) => onChange('dbHasEnvironmentalHealthSafety', v as 'yes' | 'no')}
-              options={[
-                { value: 'yes', label: 'Yes 是' },
-                { value: 'no', label: 'No 否' },
-              ]}
-            />
+        <div className="mb-6">
+          <FormSelect
+            label="Any incidents in the past 3 years? / 過去3年是否有任何事故？"
+            name="dbHasIncidentsPast3Years"
+            type="radio"
+            required
+            value={data.dbHasIncidentsPast3Years}
+            onChange={(v) => onChange('dbHasIncidentsPast3Years', v as 'yes' | 'no')}
+            options={[
+              { value: 'yes', label: 'Yes 有' },
+              { value: 'no', label: 'No 無' },
+            ]}
+          />
 
-            {data.dbHasEnvironmentalHealthSafety === 'yes' && (
-              <div className="mt-3">
-                <FileUpload
-                  label="Upload Policy Document / 上傳政策文件"
-                  name="dbEnvironmentalHealthSafetyFile"
-                  required
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  onChange={(file) => onChange('dbEnvironmentalHealthSafetyFile', file)}
-                />
-              </div>
-            )}
-          </div>
+          {data.dbHasIncidentsPast3Years === 'yes' && (
+            <div className="mt-4">
+              <FileUpload
+                label="Incidents Report / 事故報告"
+                name="dbIncidentsFile"
+                required
+                accept=".pdf"
+                onChange={(file) => onChange('dbIncidentsFile', file)}
+              />
+            </div>
+          )}
+        </div>
 
-          <div>
-            <FormSelect
-              label="Any Incidents in Past 3 Years / 過去3年是否有事故"
-              name="dbHasIncidentsPast3Years"
-              type="radio"
-              required
-              value={data.dbHasIncidentsPast3Years}
-              onChange={(v) => onChange('dbHasIncidentsPast3Years', v as 'yes' | 'no')}
-              options={[
-                { value: 'yes', label: 'Yes 是' },
-                { value: 'no', label: 'No 否' },
-              ]}
-            />
+        <div>
+          <FormSelect
+            label="Any litigation in the past 3 years? / 過去3年是否有任何訴訟？"
+            name="dbHasLitigationPast3Years"
+            type="radio"
+            required
+            value={data.dbHasLitigationPast3Years}
+            onChange={(v) => onChange('dbHasLitigationPast3Years', v as 'yes' | 'no')}
+            options={[
+              { value: 'yes', label: 'Yes 有' },
+              { value: 'no', label: 'No 無' },
+            ]}
+          />
 
-            {data.dbHasIncidentsPast3Years === 'yes' && (
-              <div className="mt-3">
-                <FileUpload
-                  label="Upload Incident Report / 上傳事故報告"
-                  name="dbIncidentsFile"
-                  required
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  onChange={(file) => onChange('dbIncidentsFile', file)}
-                />
-              </div>
-            )}
-          </div>
-
-          <div>
-            <FormSelect
-              label="Any Litigation in Past 3 Years / 過去3年是否有訴訟"
-              name="dbHasLitigationPast3Years"
-              type="radio"
-              required
-              value={data.dbHasLitigationPast3Years}
-              onChange={(v) => onChange('dbHasLitigationPast3Years', v as 'yes' | 'no')}
-              options={[
-                { value: 'yes', label: 'Yes 是' },
-                { value: 'no', label: 'No 否' },
-              ]}
-            />
-
-            {data.dbHasLitigationPast3Years === 'yes' && (
-              <div className="mt-3">
-                <FileUpload
-                  label="Upload Litigation Details / 上傳訴訟詳情"
-                  name="dbLitigationFile"
-                  required
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  onChange={(file) => onChange('dbLitigationFile', file)}
-                />
-              </div>
-            )}
-          </div>
+          {data.dbHasLitigationPast3Years === 'yes' && (
+            <div className="mt-4">
+              <FileUpload
+                label="Litigation Report / 訴訟報告"
+                name="dbLitigationFile"
+                required
+                accept=".pdf"
+                onChange={(file) => onChange('dbLitigationFile', file)}
+              />
+            </div>
+          )}
         </div>
       </FormSection>
     </div>

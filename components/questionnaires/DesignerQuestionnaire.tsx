@@ -4,6 +4,7 @@ import FormInput from '../FormInput';
 import FormSelect from '../FormSelect';
 import FileUpload from '../FileUpload';
 import MultiImageUpload from '../MultiImageUpload';
+import MultiSelectWithSearch from '../MultiSelectWithSearch';
 import DesignerDBSection from './DesignerDBSection';
 import { DesignerFormData, Designer, DesignerProject, ProjectManager, Insurance } from '@/types/supplier';
 
@@ -48,14 +49,61 @@ export default function DesignerQuestionnaire({
     { value: 'other', label: 'Other 其他' },
   ];
 
-  const designStyleOptions = [
-    { value: 'modernMinimalist', label: 'Modern Minimalist 現代簡約' },
-    { value: 'chinese', label: 'Chinese Style 中式' },
-    { value: 'european', label: 'European Style 歐式' },
-    { value: 'industrial', label: 'Industrial 工業風' },
-    { value: 'eclectic', label: 'Eclectic 混搭' },
-    { value: 'other', label: 'Other 其他' },
-  ];
+  // Project type to style mappings
+  const projectTypeStyleMap: Record<string, { value: string; label: string }[]> = {
+    residential: [
+      { value: 'modernMinimalist', label: '現代簡約風 / Modern Minimalist' },
+      { value: 'nordic', label: '北歐風 / Nordic Style' },
+      { value: 'newChinese', label: '新中式風 / New Chinese Style' },
+      { value: 'lightLuxury', label: '輕奢風 / Light Luxury Style' },
+      { value: 'japaneseLog', label: '日式原木風 / Japanese Log Style' },
+      { value: 'industrial', label: '工業風 / Industrial Style' },
+      { value: 'classic', label: '復古風 / Classic Style' },
+      { value: 'french', label: '法式風 / French Style' },
+      { value: 'hongKong', label: '港式風 / Hong Kong Style' },
+    ],
+    commercial: [
+      { value: 'modernLightLuxury', label: '現代輕奢風 / Modern Light Luxury Style' },
+      { value: 'industrial', label: '工業風 / Industrial Style' },
+      { value: 'wabiSabi', label: '侘寂風 / Wabi-sabi Style' },
+      { value: 'chineseFashion', label: '國潮風 / Chinese Fashion Style' },
+      { value: 'minimalist', label: '極簡風 / Minimalist Style' },
+    ],
+    office: [
+      { value: 'modernMinimalist', label: '現代簡約風 / Modern Minimalist' },
+      { value: 'industrial', label: '工業風 / Industrial Style' },
+      { value: 'newChinese', label: '新中式風 / New Chinese Style' },
+      { value: 'lightLuxuryBusiness', label: '輕奢商務風 / Light Luxury Business Style' },
+      { value: 'nordic', label: '北歐風 / Nordic Style' },
+      { value: 'intelligentTech', label: '智能科技風 / Intelligent Technology Style' },
+    ],
+    hotel: [
+      { value: 'modernLightLuxury', label: '現代輕奢風 / Modern Light Luxury Style' },
+      { value: 'newChinese', label: '新中式風 / New Chinese Style' },
+      { value: 'wabiSabi', label: '侘寂風 / Wabi-sabi Style' },
+      { value: 'southeastAsian', label: '東南亞風 / Southeast Asian Style' },
+      { value: 'industrial', label: '工業風 / Industrial Style' },
+      { value: 'frenchRetro', label: '法式復古風 / French Retro Style' },
+    ],
+    medical: [
+      { value: 'modernMinimalist', label: '現代簡約風 / Modern Minimalist' },
+      { value: 'healingLog', label: '療癒系原木風 / Healing Log Style' },
+      { value: 'minimalistMedical', label: '極簡醫療風 / Minimalist Medical Style' },
+      { value: 'lightLuxury', label: '輕奢風 / Light Luxury Style' },
+    ],
+    education: [
+      { value: 'childlikeNature', label: '童趣自然風 / Childlike Nature Style' },
+      { value: 'modernMinimalist', label: '現代簡約風 / Modern Minimalist' },
+      { value: 'newChinese', label: '新中式風 / New Chinese Style' },
+      { value: 'nordic', label: '北歐風 / Nordic Style' },
+    ],
+    industrial: [
+      { value: 'originalIndustrial', label: '工業風 / Original Industrial Style' },
+      { value: 'modernMinimalist', label: '現代極簡風 / Modern Minimalist' },
+      { value: 'technology', label: '科技風 / Technology Style' },
+    ],
+    other: [],
+  };
 
   const projectTypeOptions = [
     { value: 'residential', label: 'Residential 住宅' },
@@ -106,6 +154,61 @@ export default function DesignerQuestionnaire({
   if (!data.projectTypes) {
     onChange('projectTypes', []);
   }
+
+  // Initialize designStyles if undefined or not an array (for backward compatibility)
+  if (!Array.isArray(data.designStyles)) {
+    onChange('designStyles', []);
+  }
+
+  // Get available styles based on selected project types
+  const getAvailableStyles = React.useMemo(() => {
+    if (!data.projectTypes || data.projectTypes.length === 0) {
+      return [];
+    }
+
+    // Collect all unique styles from selected project types
+    const stylesMap = new Map<string, { value: string; label: string }>();
+
+    data.projectTypes.forEach((type) => {
+      const styles = projectTypeStyleMap[type] || [];
+      styles.forEach((style) => {
+        if (!stylesMap.has(style.value)) {
+          stylesMap.set(style.value, style);
+        }
+      });
+    });
+
+    // Add custom styles that are already selected
+    if (data.designStyles && Array.isArray(data.designStyles)) {
+      data.designStyles.forEach((style) => {
+        if (style.startsWith('custom_') && !stylesMap.has(style)) {
+          // Extract the custom name (remove 'custom_' prefix)
+          const customName = style.substring(7);
+          stylesMap.set(style, {
+            value: style,
+            label: `${customName} (Custom / 自定義)`,
+          });
+        }
+      });
+    }
+
+    return Array.from(stylesMap.values());
+  }, [data.projectTypes, data.designStyles]);
+
+  // Clean up selected styles that are no longer available when project types change
+  React.useEffect(() => {
+    if (data.projectTypes && data.projectTypes.length > 0) {
+      const availableStyleValues = new Set(getAvailableStyles.map(s => s.value));
+      // Keep custom styles even if project types change
+      const validStyles = (data.designStyles || []).filter(
+        style => availableStyleValues.has(style) || style.startsWith('custom_')
+      );
+
+      if (validStyles.length !== (data.designStyles || []).length) {
+        onChange('designStyles', validStyles);
+      }
+    }
+  }, [data.projectTypes]);
 
   // Award management functions
   const addAward = () => {
@@ -211,7 +314,16 @@ export default function DesignerQuestionnaire({
       year: '',
       address: '',
       area: '',
-      projects: [],
+      projects: [
+        {
+          id: `${Date.now()}-project`,
+          projectName: '',
+          clientName: '',
+          year: '',
+          buildingName: '',
+          area: '',
+        },
+      ],
       cv: null,
     };
     onChange('dbProjectManagers', [...(data.dbProjectManagers || []), newManager]);
@@ -322,7 +434,7 @@ export default function DesignerQuestionnaire({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormSelect
-            label="Country / 國家和地区"
+            label="Country / 國家和地區"
             name="country"
             required
             value={data.country}
@@ -353,7 +465,7 @@ export default function DesignerQuestionnaire({
         {isChina && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormInput
-              label="Business Registration Number / 工商注冊號"
+              label="Business Registration Number / 工商註冊號"
               name="cnBusinessRegistrationNumber"
               required
               value={data.cnBusinessRegistrationNumber}
@@ -374,7 +486,7 @@ export default function DesignerQuestionnaire({
 
         {isChina && (
           <FormInput
-            label="Employees eligible to work legally in Hong Kong / 可以在香港合法工作的雇員數"
+            label="Employees eligible to work legally in Hong Kong / 可以在香港合法工作的僱員數"
             name="hkWorkEligibleEmployees"
             type="number"
             required
@@ -549,7 +661,7 @@ export default function DesignerQuestionnaire({
                       />
 
                       <FormSelect
-                        label="Property Types / 主要项目類型"
+                        label="Property Types / 主要項目類型"
                         name={`highlight-project-types-${project.id}`}
                         type="checkbox"
                         multiple
@@ -582,7 +694,7 @@ export default function DesignerQuestionnaire({
           <p className="text-xs text-gray-500 mb-4">
             You can upload files or provide a link to your company website.
             <br />
-            您可以上傳文件或提供公司網站鏈接。
+            您可以上傳文件或提供公司網站連結。
           </p>
 
           <div className="space-y-4">
@@ -626,31 +738,104 @@ export default function DesignerQuestionnaire({
 
       {/* Section 2: Design Specialization */}
       <FormSection title="Section 2: Design Specialization / 設計專業">
-        <div className="mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          {/* Left Column: Project Types */}
+          <div>
+            <FormSelect
+              label="Property Types / 主要項目類型"
+              name="projectTypes"
+              type="checkbox"
+              multiple
+              required
+              value={data.projectTypes}
+              onChange={(v) => onChange('projectTypes', v as string[])}
+              options={projectTypeOptions}
+            />
+          </div>
 
-          <FormSelect
-            label="Design Styles / 擅長風格"
-            name="designStyles"
-            type="checkbox"
-            multiple
-            required
-            value={data.designStyles}
-            onChange={(v) => onChange('designStyles', v as string[])}
-            options={designStyleOptions}
-          />
-        </div>
+          {/* Right Column: Design Styles */}
+          <div>
+            {(!data.projectTypes || data.projectTypes.length === 0) ? (
+              <div>
+                <label className="block text-sm font-light text-gray-700 mb-2">
+                  Design Styles / 擅長風格 <span className="text-red-500">*</span>
+                </label>
+                <div className="p-4 border-2 border-dashed border-gray-300 rounded bg-gray-50 text-center">
+                  <p className="text-xs text-gray-500">
+                    Please select Property Types first to see available design styles.
+                    <br />
+                    請先選擇項目類型，然後會顯示可選的設計風格。
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <MultiSelectWithSearch
+                  label="Design Styles / 擅長風格"
+                  name="designStyles"
+                  value={data.designStyles || []}
+                  onChange={(v) => onChange('designStyles', v)}
+                  options={getAvailableStyles}
+                  required
+                  placeholder="Search and select styles... / 搜尋並選擇風格..."
+                  emptyMessage="No styles found / 找不到風格"
+                />
 
-        <div className="mb-6">
-          <FormSelect
-            label="Property Types / 主要项目類型"
-            name="projectTypes"
-            type="checkbox"
-            multiple
-            required
-            value={data.projectTypes}
-            onChange={(v) => onChange('projectTypes', v as string[])}
-            options={projectTypeOptions}
-          />
+                {/* Custom style input when "other" is selected */}
+                {data.projectTypes.includes('other') && (
+                  <div className="pt-2 border-t border-gray-200">
+                    <label className="block text-xs font-light text-gray-600 mb-2">
+                      Custom Style / 自定義風格
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        id="customStyleInput"
+                        placeholder="Enter custom style / 輸入自定義風格"
+                        className="flex-1 px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const input = e.currentTarget;
+                            const value = input.value.trim();
+                            if (value) {
+                              const customStyle = `custom_${value}`;
+                              if (!(data.designStyles || []).includes(customStyle)) {
+                                onChange('designStyles', [...(data.designStyles || []), customStyle]);
+                                input.value = '';
+                              }
+                            }
+                          }
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const input = document.getElementById('customStyleInput') as HTMLInputElement;
+                          if (input) {
+                            const value = input.value.trim();
+                            if (value) {
+                              const customStyle = `custom_${value}`;
+                              if (!(data.designStyles || []).includes(customStyle)) {
+                                onChange('designStyles', [...(data.designStyles || []), customStyle]);
+                                input.value = '';
+                              }
+                            }
+                          }
+                        }}
+                        className="px-4 py-2 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors whitespace-nowrap"
+                      >
+                        Add / 添加
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Press Enter or click Add to add custom style / 按 Enter 或點擊添加來添加自定義風格
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         <div>
@@ -933,7 +1118,7 @@ export default function DesignerQuestionnaire({
                                   />
 
                                   <FormSelect
-                                    label="Property Types / 主要项目類型"
+                                    label="Property Types / 主要項目類型"
                                     name={`project-types-${project.id}`}
                                     type="checkbox"
                                     multiple
