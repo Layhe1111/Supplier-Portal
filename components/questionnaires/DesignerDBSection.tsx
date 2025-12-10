@@ -46,6 +46,12 @@ export default function DesignerDBSection({
     { value: '45001', label: 'ISO 45001' },
   ];
 
+  const tomorrowDateString = React.useMemo(() => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split('T')[0];
+  }, []);
+
   return (
     <div className="space-y-8">
       {/* D&B Section 2: Certifications */}
@@ -127,7 +133,7 @@ export default function DesignerDBSection({
             Areas of Expertise / 專業領域
           </h4>
           <FormSelect
-            label="Project Types / 主要工程類型"
+          label="Property Types / 主要项目類型"
             name="dbProjectTypes"
             type="checkbox"
             multiple
@@ -140,11 +146,11 @@ export default function DesignerDBSection({
 
         <div>
           <h4 className="text-sm font-medium text-gray-900 mb-3">
-            Construction Scale / 施工規模
+            Company Scale / 公司規模
           </h4>
           <div className="space-y-4">
             <FormInput
-              label="Annual Construction Capacity / 年施工能力 (sqft)"
+              label="Accumulated Project Area per Year (sqft) / 年施工面积（平方呎）"
               name="dbAnnualConstructionCapacity"
               type="number"
               required
@@ -163,7 +169,7 @@ export default function DesignerDBSection({
               />
 
               <FormInput
-                label="Largest Project Value / 最大單項工程金額 (HKD)"
+                label="Average Project Value (HKD) / 平均項目金額（港幣）"
                 name="dbLargestProjectValue"
                 type="number"
                 required
@@ -177,6 +183,16 @@ export default function DesignerDBSection({
 
       {/* D&B Section 5: Personnel */}
       <FormSection title="D&B Personnel / D&B人員配置">
+        <div className="mb-6">
+          <FileUpload
+            label="Organization Chart / 組織架構圖"
+            name="dbOrganizationChart"
+            required
+            accept=".pdf,.jpg,.jpeg,.png"
+            onChange={(file) => onChange('dbOrganizationChart', file)}
+          />
+        </div>
+
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
             <h4 className="text-sm font-medium text-gray-900">
@@ -227,6 +243,16 @@ export default function DesignerDBSection({
                     />
 
                     <FormInput
+                      label="Year of Experience / 年資"
+                      name={`db-pm-experience-${pm.id}`}
+                      type="number"
+                      required
+                      value={pm.yearsExperience || ''}
+                      onChange={(v) => updateDbProjectManager(pm.id, 'yearsExperience', v)}
+                      placeholder="e.g., 8"
+                    />
+
+                    <FormInput
                       label="Languages / 語言能力"
                       name={`db-pm-languages-${pm.id}`}
                       required
@@ -254,21 +280,21 @@ export default function DesignerDBSection({
                       />
 
                       <FormInput
-                        label="Building Name / 地址"
+                        label="Building Name / 大廈名稱"
                         name={`db-pm-address-${pm.id}`}
                         required
                         value={pm.address}
                         onChange={(v) => updateDbProjectManager(pm.id, 'address', v)}
                       />
 
-                      <FormInput
-                        label="Area / 面積"
-                        name={`db-pm-area-${pm.id}`}
-                        required
-                        value={pm.area}
-                        onChange={(v) => updateDbProjectManager(pm.id, 'area', v)}
-                        placeholder="e.g., 1500 sq ft"
-                      />
+              <FormInput
+                label="Area (sqft) / 面積（平方呎）"
+                name={`db-pm-area-${pm.id}`}
+                required
+                value={pm.area}
+                onChange={(v) => updateDbProjectManager(pm.id, 'area', v)}
+                placeholder="e.g., 1500 sq ft"
+              />
                     </div>
 
                     <FileUpload
@@ -284,14 +310,6 @@ export default function DesignerDBSection({
             </div>
           )}
         </div>
-
-        <FileUpload
-          label="Organization Chart / 組織架構圖"
-          name="dbOrganizationChart"
-          required
-          accept=".pdf,.jpg,.jpeg,.png"
-          onChange={(file) => onChange('dbOrganizationChart', file)}
-        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <div className="space-y-4">
@@ -414,6 +432,7 @@ export default function DesignerDBSection({
                       type="date"
                       required
                       value={insurance.expiryDate}
+                      min={tomorrowDateString}
                       onChange={(v) => updateDbInsurance(insurance.id, 'expiryDate', v)}
                     />
                   </div>

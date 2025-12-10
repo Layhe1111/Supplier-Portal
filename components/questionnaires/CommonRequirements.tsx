@@ -1,6 +1,5 @@
 import React from 'react';
 import FormSection from '../FormSection';
-import FileUpload from '../FileUpload';
 import FormCheckbox from '../FormCheckbox';
 import FormInput from '../FormInput';
 import { CommonRequirements as CommonReq } from '@/types/supplier';
@@ -14,32 +13,23 @@ export default function CommonRequirements({
   data,
   onChange,
 }: CommonRequirementsProps) {
+  const phoneCodeOptions = [
+    '+852',
+    '+86',
+    '+853',
+    '+886',
+    '+65',
+    '+60',
+    '+81',
+    '+82',
+    '+44',
+    '+1',
+    '+61',
+    '+971',
+  ];
+
   return (
     <>
-      {/* Document Checklist */}
-      <FormSection title="Document Checklist / 文件上傳清單">
-        <p className="text-sm text-gray-600 mb-4">
-          All suppliers must provide / 所有供應商需提供：
-        </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FileUpload
-            label="Business Registration / 商業登記證"
-            name="businessRegistration"
-            required
-            accept=".pdf,.jpg,.jpeg,.png"
-            onChange={(file) => onChange('businessRegistration', file)}
-          />
-
-          <FileUpload
-            label="Company Photos / 公司形象照片"
-            name="companyPhotos"
-            accept=".jpg,.jpeg,.png"
-            onChange={(file) => onChange('companyPhotos', file)}
-          />
-        </div>
-      </FormSection>
-
       {/* Quality Commitment */}
       <FormSection title="Quality Commitment / 質量承諾">
         <div className="space-y-3">
@@ -90,14 +80,33 @@ export default function CommonRequirements({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormInput
-            label="Contact Number / 聯繫電話"
-            name="submitterPhone"
-            type="tel"
-            required
-            value={data.submitterPhone}
-            onChange={(v) => onChange('submitterPhone', v)}
-          />
+          <div>
+            <label className="block text-sm font-light text-gray-700 mb-1">
+              Contact Number / 聯繫電話 <span className="text-red-500">*</span>
+            </label>
+            <div className="flex gap-2">
+              <select
+                value={data.submitterPhoneCode}
+                onChange={(e) => onChange('submitterPhoneCode', e.target.value)}
+                className="w-28 px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+              >
+                {phoneCodeOptions.map((code) => (
+                  <option key={code} value={code}>
+                    {code}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="tel"
+                name="submitterPhone"
+                required
+                value={data.submitterPhone}
+                onChange={(e) => onChange('submitterPhone', e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+                placeholder="e.g., 91234567"
+              />
+            </div>
+          </div>
 
           <FormInput
             label="Email / 邮箱"

@@ -67,6 +67,9 @@ export default function MultiImageUpload({
             onChange={handleFileChange}
             className="sr-only"
           />
+          <p className="text-xs text-gray-500 mt-1">
+            Accepted formats: images (JPG/PNG/HEIC etc.) / 支援格式：圖片（JPG/PNG/HEIC 等）
+          </p>
         </div>
       )}
 

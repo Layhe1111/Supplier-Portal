@@ -48,7 +48,7 @@ This is the core feature! You can add as many products as you want:
    - Brand / 品牌
    - Material / 材質
    - Specification / 規格 (e.g., 120cm x 60cm x 75cm)
-   - Unit Price (HKD) / 單價
+   - Unit Price (HKD) / 單價（港幣）
    - MOQ / 最小起訂量
    - Lead Time (days) / 交貨周期
    - Description / 產品描述

@@ -54,11 +54,15 @@ export default function SupplierRegistrationPage() {
       const commonFields = {
         businessRegistration: null,
         companyPhotos: null,
+        hkBusinessRegistrationNumber: '',
+        cnBusinessRegistrationNumber: '',
+        cnUnifiedSocialCreditCode: '',
         guaranteeInfoTrue: false,
         acceptQualitySupervision: false,
         agreeInfoSharing: false,
         submitterName: '',
         submitterPosition: '',
+        submitterPhoneCode: '+852',
         submitterPhone: '',
         submitterEmail: '',
         submissionDate: new Date().toISOString().split('T')[0],
@@ -74,14 +78,21 @@ export default function SupplierRegistrationPage() {
           numberOfEmployees: '',
           country: '',
           officeAddress: '',
+          hkWorkEligibleEmployees: '',
           companySupplementFile: null,
           companySupplementLink: '',
           constructionGrade: '',
           licenseNumber: '',
           certificateUpload: null,
-          safetyProductionLicense: '',
           isocertifications: [],
-          otherCertifications: '',
+          isoCertificateUploads: {},
+          otherCertifications: [
+            {
+              id: `${Date.now()}-cert`,
+              name: '',
+              file: null,
+            },
+          ],
           projectTypes: [],
           projectHighlights: [],
           annualConstructionCapacity: '',
@@ -93,6 +104,9 @@ export default function SupplierRegistrationPage() {
           numberOfSafetyOfficers: '',
           hasConstructionManager: '',
           numberOfConstructionManagers: '',
+          hasMepLead: '',
+          numberOfMepLeads: '',
+          cnHkProjectCompliance: false,
           insurances: [{
             id: Date.now().toString(),
             type: '',
@@ -117,9 +131,11 @@ export default function SupplierRegistrationPage() {
           registeredCapital: '',
           country: '',
           officeAddress: '',
+          hkWorkEligibleEmployees: '',
           designAwards: [''],
           designTeamSize: '',
           feeStructure: [],
+          designHighlights: [],
           companySupplementFile: null,
           companySupplementLink: '',
           designStyles: [],
@@ -169,12 +185,14 @@ export default function SupplierRegistrationPage() {
           registeredCapital: '',
           country: '',
           officeAddress: '',
+          hkWorkEligibleEmployees: '',
           companyType: [],
           representedBrands: [''],
           warehouses: [{ address: '', capacity: '' }],
           companySupplementFile: null,
           companySupplementLink: '',
           products: [],
+          projectHighlights: [],
           sampleProvided: '',
           sampleCost: '',
           sampleDeliveryTime: '',
@@ -280,9 +298,12 @@ export default function SupplierRegistrationPage() {
           </div>
 
           <div className="bg-white shadow-sm border border-gray-200 p-8">
-            <h2 className="text-xl font-light text-gray-900 mb-6">
+            <h2 className="text-xl font-light text-gray-900 mb-2">
               Select Supplier Type / 選擇供應商類型
             </h2>
+            <p className="text-sm text-gray-600 mb-6">
+              Which of the below options best describes your organization? / 以下哪個最符合你的公司？
+            </p>
 
             <div className="space-y-4">
               <button
@@ -307,7 +328,7 @@ export default function SupplierRegistrationPage() {
                   Designer / 設計師
                 </h3>
                 <p className="mt-2 text-sm text-gray-600">
-                  Interior design and architectural services
+                  Interior and architectural design services
                   <br />
                   室內設計與建築服務
                 </p>

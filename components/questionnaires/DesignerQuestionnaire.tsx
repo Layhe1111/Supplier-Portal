@@ -19,9 +19,32 @@ export default function DesignerQuestionnaire({
   data,
   onChange,
 }: DesignerQuestionnaireProps) {
+  const countryOptions = [
+    { value: 'Hong Kong', label: 'Hong Kong 香港' },
+    { value: 'China', label: 'China 中國' },
+    { value: 'Macau', label: 'Macau 澳門' },
+    { value: 'Taiwan', label: 'Taiwan 台灣' },
+    { value: 'Singapore', label: 'Singapore 新加坡' },
+    { value: 'Malaysia', label: 'Malaysia 馬來西亞' },
+    { value: 'Japan', label: 'Japan 日本' },
+    { value: 'South Korea', label: 'South Korea 韓國' },
+    { value: 'Thailand', label: 'Thailand 泰國' },
+    { value: 'Vietnam', label: 'Vietnam 越南' },
+    { value: 'Philippines', label: 'Philippines 菲律賓' },
+    { value: 'Indonesia', label: 'Indonesia 印尼' },
+    { value: 'India', label: 'India 印度' },
+    { value: 'United Arab Emirates', label: 'UAE 阿聯酋' },
+    { value: 'United Kingdom', label: 'United Kingdom 英國' },
+    { value: 'United States', label: 'United States 美國' },
+    { value: 'Canada', label: 'Canada 加拿大' },
+    { value: 'Australia', label: 'Australia 澳洲' },
+    { value: 'Germany', label: 'Germany 德國' },
+    { value: 'France', label: 'France 法國' },
+  ];
   const feeStructureOptions = [
     { value: 'byArea', label: 'By Area 按面積' },
     { value: 'byProject', label: 'By Project 按項目' },
+    { value: 'byPeriod', label: 'By Period 按時間' },
     { value: 'other', label: 'Other 其他' },
   ];
 
@@ -45,6 +68,13 @@ export default function DesignerQuestionnaire({
     { value: 'other', label: 'Other 其他' },
   ];
 
+  const softwareOptions = [
+    { value: 'AutoCAD', label: 'AutoCAD' },
+    { value: 'SketchUp', label: 'SketchUp' },
+    { value: 'Revit', label: 'Revit' },
+    { value: '3DMax', label: '3DMax' },
+  ];
+
   // Initialize designers array if undefined (for backward compatibility with old data)
   if (!data.designers) {
     onChange('designers', []);
@@ -57,9 +87,9 @@ export default function DesignerQuestionnaire({
 
   // Initialize mainSoftware if it's a string (for backward compatibility)
   if (typeof data.mainSoftware === 'string') {
-    onChange('mainSoftware', data.mainSoftware ? [data.mainSoftware] : ['']);
-  } else if (!data.mainSoftware || data.mainSoftware.length === 0) {
-    onChange('mainSoftware', ['']);
+    onChange('mainSoftware', data.mainSoftware ? [data.mainSoftware] : []);
+  } else if (!data.mainSoftware) {
+    onChange('mainSoftware', []);
   }
 
   // Initialize designAwards if undefined (for backward compatibility)
@@ -67,27 +97,15 @@ export default function DesignerQuestionnaire({
     onChange('designAwards', ['']);
   }
 
+  // Initialize designHighlights if undefined
+  if (!data.designHighlights) {
+    onChange('designHighlights', []);
+  }
+
   // Initialize projectTypes if undefined (for backward compatibility)
   if (!data.projectTypes) {
     onChange('projectTypes', []);
   }
-
-  // Software management functions
-  const addSoftware = () => {
-    onChange('mainSoftware', [...(data.mainSoftware || ['']), '']);
-  };
-
-  const updateSoftware = (index: number, value: string) => {
-    const updated = [...(data.mainSoftware || [''])];
-    updated[index] = value;
-    onChange('mainSoftware', updated);
-  };
-
-  const removeSoftware = (index: number) => {
-    const updated = (data.mainSoftware || ['']).filter((_, i) => i !== index);
-    // Ensure at least one software field remains
-    onChange('mainSoftware', updated.length > 0 ? updated : ['']);
-  };
 
   // Award management functions
   const addAward = () => {
@@ -139,6 +157,8 @@ export default function DesignerQuestionnaire({
       address: '',
       area: '',
       renovationType: '',
+      projectTypes: [],
+      projectHighlight: false,
       photos: [],
     };
     const updatedDesigners = (data.designers || []).map((designer) =>
@@ -185,11 +205,13 @@ export default function DesignerQuestionnaire({
     const newManager: ProjectManager = {
       id: Date.now().toString(),
       name: '',
+      yearsExperience: '',
       languages: '',
       mainProject: '',
       year: '',
       address: '',
       area: '',
+      projects: [],
       cv: null,
     };
     onChange('dbProjectManagers', [...(data.dbProjectManagers || []), newManager]);
@@ -226,17 +248,52 @@ export default function DesignerQuestionnaire({
     onChange('dbInsurances', updated);
   };
 
+  // Design highlight management functions
+  const addDesignHighlight = () => {
+    const newProject: DesignerProject = {
+      id: Date.now().toString(),
+      projectName: '',
+      year: '',
+      address: '',
+      area: '',
+      renovationType: '',
+      projectTypes: [],
+      projectHighlight: false,
+      photos: [],
+    };
+    onChange('designHighlights', [...(data.designHighlights || []), newProject]);
+  };
+
+  const updateDesignHighlight = (
+    projectId: string,
+    field: keyof DesignerProject,
+    value: any
+  ) => {
+    const updatedProjects = (data.designHighlights || []).map((project) =>
+      project.id === projectId ? { ...project, [field]: value } : project
+    );
+    onChange('designHighlights', updatedProjects);
+  };
+
+  const removeDesignHighlight = (projectId: string) => {
+    const updatedProjects = (data.designHighlights || []).filter((project) => project.id !== projectId);
+    onChange('designHighlights', updatedProjects);
+  };
+
   const removeDbInsurance = (id: string) => {
     const updated = (data.dbInsurances || []).filter((ins) => ins.id !== id);
     onChange('dbInsurances', updated);
   };
+
+  const isHongKong = data.country === 'Hong Kong';
+  const isChina = data.country === 'China';
 
   return (
     <>
       {/* Section 1: Design Company Overview */}
       <FormSection title="Section 1: Design Company Overview / 設計公司概況">
         <FormInput
-          label="Company Legal Name / 公司全稱"
+          label="Entity Name / 公司全稱"
           name="companyLegalName"
           required
           value={data.companyLegalName}
@@ -245,7 +302,7 @@ export default function DesignerQuestionnaire({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormInput
-            label="Year Established / 成立年份"
+            label="Year of Incorporation / 成立年份"
             name="yearEstablished"
             type="number"
             required
@@ -256,7 +313,7 @@ export default function DesignerQuestionnaire({
           <FormInput
             label="Registered Capital / 註冊資本"
             name="registeredCapital"
-            required
+            required={!isHongKong}
             placeholder="e.g., HKD 1,000,000"
             value={data.registeredCapital}
             onChange={(v) => onChange('registeredCapital', v)}
@@ -264,13 +321,13 @@ export default function DesignerQuestionnaire({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormInput
+          <FormSelect
             label="Country / 國家和地区"
             name="country"
             required
             value={data.country}
-            onChange={(v) => onChange('country', v)}
-            placeholder="e.g., Hong Kong"
+            onChange={(v) => onChange('country', v as string)}
+            options={countryOptions}
           />
 
           <FormInput
@@ -282,13 +339,72 @@ export default function DesignerQuestionnaire({
           />
         </div>
 
+        {isHongKong && (
+          <FormInput
+            label="Business Registration Number / 商業登記號"
+            name="hkBusinessRegistrationNumber"
+            required
+            value={data.hkBusinessRegistrationNumber}
+            onChange={(v) => onChange('hkBusinessRegistrationNumber', v)}
+            placeholder="e.g., 12345678-000"
+          />
+        )}
+
+        {isChina && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormInput
+              label="Business Registration Number / 工商注冊號"
+              name="cnBusinessRegistrationNumber"
+              required
+              value={data.cnBusinessRegistrationNumber}
+              onChange={(v) => onChange('cnBusinessRegistrationNumber', v)}
+              placeholder="e.g., 123456789012345"
+            />
+
+            <FormInput
+              label="Unified Social Credit Code / 統一社會信用代碼"
+              name="cnUnifiedSocialCreditCode"
+              required
+              value={data.cnUnifiedSocialCreditCode}
+              onChange={(v) => onChange('cnUnifiedSocialCreditCode', v)}
+              placeholder="e.g., 123456789012345678"
+            />
+          </div>
+        )}
+
+        {isChina && (
+          <FormInput
+            label="Employees eligible to work legally in Hong Kong / 可以在香港合法工作的雇員數"
+            name="hkWorkEligibleEmployees"
+            type="number"
+            required
+            value={data.hkWorkEligibleEmployees}
+            onChange={(v) => onChange('hkWorkEligibleEmployees', v)}
+            placeholder="e.g., 5"
+          />
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <FileUpload
+            label="Business Registration / 商業登記證"
+            name="businessRegistration"
+            required
+            accept=".pdf,.jpg,.jpeg,.png"
+            onChange={(file) => onChange('businessRegistration', file)}
+          />
+
+          <FileUpload
+            label="Company Photos / 公司形象照片"
+            name="companyPhotos"
+            accept=".jpg,.jpeg,.png"
+            onChange={(file) => onChange('companyPhotos', file)}
+          />
+        </div>
+
         <div>
           <div className="flex items-center justify-between mb-2">
             <label className="block text-sm font-light text-gray-700">
               Design Awards / 設計獎項
-              <span className="text-xs text-gray-500 ml-2">
-                (At least one required / 至少填一個)
-              </span>
             </label>
             <button
               type="button"
@@ -307,7 +423,6 @@ export default function DesignerQuestionnaire({
                   value={award}
                   onChange={(e) => updateAward(index, e.target.value)}
                   placeholder="e.g., Best Design Award 2024"
-                  required={index === 0}
                   className="flex-1 px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
                 />
                 {(data.designAwards || ['']).length > 1 && (
@@ -334,7 +449,7 @@ export default function DesignerQuestionnaire({
         />
 
         <FormSelect
-          label="Fee Structure / 設計收費模式"
+          label="Prefered Fee Structure / 設計收費模式"
           name="feeStructure"
           type="checkbox"
           multiple
@@ -345,25 +460,160 @@ export default function DesignerQuestionnaire({
         />
 
         <div className="mt-6">
+          <div className="flex items-center justify-between mb-3">
+            <h4 className="text-sm font-medium text-gray-900">Design Highlights / 設計亮點</h4>
+            <button
+              type="button"
+              onClick={addDesignHighlight}
+              className="px-3 py-1.5 bg-gray-900 text-white text-xs font-light hover:bg-gray-800 transition-colors"
+            >
+              + Add Highlight / 添加亮點
+            </button>
+          </div>
+
+          {(!data.designHighlights || data.designHighlights.length === 0) ? (
+            <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded bg-white">
+              <p className="text-gray-500 text-xs">
+                No highlights added yet. Click "Add Highlight" to add a project.
+                <br />
+                尚未添加亮點。點擊“添加亮點”添加項目。
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {(data.designHighlights || []).map((project, index) => (
+                <div key={project.id} className="border border-gray-200 p-4 bg-gray-50 rounded">
+                  <div className="flex items-center justify-between mb-3">
+                    <h6 className="text-xs font-medium text-gray-900">
+                      Highlight {index + 1} / 亮點 {index + 1}
+                    </h6>
+                    <button
+                      type="button"
+                      onClick={() => removeDesignHighlight(project.id)}
+                      className="text-red-500 hover:text-red-700 text-xs"
+                    >
+                      Remove / 刪除
+                    </button>
+                  </div>
+
+                  <div className="space-y-3">
+                    <FormInput
+                      label="Project Name / 項目名稱"
+                      name={`highlight-project-name-${project.id}`}
+                      required
+                      value={project.projectName}
+                      onChange={(v) => updateDesignHighlight(project.id, 'projectName', v)}
+                    />
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <FormInput
+                        label="Year / 年份"
+                        name={`highlight-year-${project.id}`}
+                        type="number"
+                        required
+                        value={project.year}
+                        onChange={(v) => updateDesignHighlight(project.id, 'year', v)}
+                        placeholder="e.g., 2024"
+                      />
+
+                      <FormInput
+                        label="Area (sqft) / 面積（平方呎）"
+                        name={`highlight-area-${project.id}`}
+                        required
+                        value={project.area}
+                        onChange={(v) => updateDesignHighlight(project.id, 'area', v)}
+                        placeholder="e.g., 1500 sq ft"
+                      />
+
+                      <FormInput
+                        label="Building Name / 大廈名稱"
+                        name={`highlight-address-${project.id}`}
+                        required
+                        value={project.address}
+                        onChange={(v) => updateDesignHighlight(project.id, 'address', v)}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormSelect
+                        label="Project Scope / 是否重新裝修？"
+                        name={`highlight-renovation-${project.id}`}
+                        type="radio"
+                        required
+                        value={project.renovationType}
+                        onChange={(v) => updateDesignHighlight(project.id, 'renovationType', v)}
+                        options={[
+                          { value: 'newFitout', label: 'New Fitout 全新装修' },
+                          { value: 'remodel', label: 'Remodel 改造翻新' },
+                        ]}
+                      />
+
+                      <FormSelect
+                        label="Property Types / 主要项目類型"
+                        name={`highlight-project-types-${project.id}`}
+                        type="checkbox"
+                        multiple
+                        required
+                        value={project.projectTypes || []}
+                        onChange={(v) =>
+                          updateDesignHighlight(project.id, 'projectTypes', v as string[])
+                        }
+                        options={projectTypeOptions}
+                      />
+                    </div>
+
+                    <MultiImageUpload
+                      label="Project Photos / 項目照片"
+                      name={`highlight-photos-${project.id}`}
+                      maxFiles={9}
+                      onChange={(files) => updateDesignHighlight(project.id, 'photos', files)}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="mt-6">
           <h4 className="text-sm font-medium text-gray-900 mb-3">
-            Company Supplementary Information / 公司補充信息
+            Company Brochure
           </h4>
           <p className="text-xs text-gray-500 mb-4">
-            You can upload a PDF file or provide a link to your company's supplementary information.
+            You can upload files or provide a link to your company website.
             <br />
-            您可以上傳PDF文件或提供公司補充信息的鏈接。
+            您可以上傳文件或提供公司網站鏈接。
           </p>
 
           <div className="space-y-4">
-            <FileUpload
-              label="Upload PDF / 上傳PDF文件"
-              name="companySupplementFile"
-              accept=".pdf"
-              onChange={(file) => onChange('companySupplementFile', file)}
-            />
+            <div>
+              <label className="block text-sm font-light text-gray-700 mb-2">
+                Upload Files / 上傳文件
+              </label>
+              <input
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                multiple
+                onChange={(e) => {
+                  const files = Array.from(e.target.files || []);
+                  onChange('companySupplementFile', files.length > 0 ? files : null);
+                }}
+                className="w-full px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Accepted formats: PDF, JPG, PNG / 支援格式：PDF、JPG、PNG
+              </p>
+              {data.companySupplementFile && (
+                <p className="text-xs text-gray-500 mt-1">
+                  {Array.isArray(data.companySupplementFile)
+                    ? `${data.companySupplementFile.length} file(s) selected / 已選擇 ${data.companySupplementFile.length} 個文件`
+                    : '1 file selected / 已選擇 1 個文件'}
+                </p>
+              )}
+            </div>
 
             <FormInput
-              label="Or enter link / 或輸入鏈接"
+              label="Or enter company website / 或輸入公司網站"
               name="companySupplementLink"
               type="url"
               value={data.companySupplementLink}
@@ -377,9 +627,7 @@ export default function DesignerQuestionnaire({
       {/* Section 2: Design Specialization */}
       <FormSection title="Section 2: Design Specialization / 設計專業">
         <div className="mb-6">
-          <h4 className="text-sm font-medium text-gray-900 mb-3">
-            Design Focus / 設計領域
-          </h4>
+
           <FormSelect
             label="Design Styles / 擅長風格"
             name="designStyles"
@@ -393,11 +641,8 @@ export default function DesignerQuestionnaire({
         </div>
 
         <div className="mb-6">
-          <h4 className="text-sm font-medium text-gray-900 mb-3">
-            Areas of Expertise / 專業領域
-          </h4>
           <FormSelect
-            label="Project Types / 主要工程類型"
+            label="Property Types / 主要项目類型"
             name="projectTypes"
             type="checkbox"
             multiple
@@ -427,45 +672,69 @@ export default function DesignerQuestionnaire({
             />
 
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-light text-gray-700">
-                  Main Software / 主要軟件
-                  <span className="text-red-500 ml-1">*</span>
-                  <span className="text-xs text-gray-500 ml-2">
-                    (At least one required / 至少填一個)
-                  </span>
-                </label>
-                <button
-                  type="button"
-                  onClick={addSoftware}
-                  className="px-3 py-1 bg-gray-900 text-white text-xs font-light hover:bg-gray-800 transition-colors"
-                >
-                  + Add Software / 添加軟件
-                </button>
-              </div>
+              <FormSelect
+                label="Main Software / 主要軟件"
+                name="mainSoftware"
+                type="checkbox"
+                multiple
+                required
+                value={(data.mainSoftware || []).filter(s => softwareOptions.some(opt => opt.value === s))}
+                onChange={(v) => {
+                  const predefinedSoftware = v as string[];
+                  const customSoftware = (data.mainSoftware || []).filter(s => !softwareOptions.some(opt => opt.value === s));
+                  onChange('mainSoftware', [...predefinedSoftware, ...customSoftware]);
+                }}
+                options={softwareOptions}
+              />
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4 justify-items-start">
-                {(data.mainSoftware || ['']).map((software, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      value={software}
-                      onChange={(e) => updateSoftware(index, e.target.value)}
-                      placeholder="e.g., AutoCAD"
-                      required={index === 0}
-                      className="w-[240px] px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
-                    />
-                    {(data.mainSoftware || ['']).length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeSoftware(index)}
-                        className="text-red-500 hover:text-red-700 text-sm font-medium"
-                      >
-                        ✕
-                      </button>
-                    )}
-                  </div>
-                ))}
+              {/* Custom Software Section */}
+              <div className="mt-4">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-xs font-light text-gray-600">
+                    Other Software / 其他軟件
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const customSoftware = (data.mainSoftware || []).filter(s => !softwareOptions.some(opt => opt.value === s));
+                      onChange('mainSoftware', [...(data.mainSoftware || []), '']);
+                    }}
+                    className="px-2 py-1 bg-gray-600 text-white text-xs font-light hover:bg-gray-700 transition-colors"
+                  >
+                    + Add Other / 添加其他
+                  </button>
+                </div>
+
+                <div className="space-y-2">
+                  {(data.mainSoftware || [])
+                    .map((software, index) => ({ software, index }))
+                    .filter(({ software }) => !softwareOptions.some(opt => opt.value === software))
+                    .map(({ software, index }) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={software}
+                          onChange={(e) => {
+                            const updated = [...(data.mainSoftware || [])];
+                            updated[index] = e.target.value;
+                            onChange('mainSoftware', updated);
+                          }}
+                          placeholder="e.g., Rhino"
+                          className="flex-1 px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = (data.mainSoftware || []).filter((_, i) => i !== index);
+                            onChange('mainSoftware', updated);
+                          }}
+                          className="text-red-500 hover:text-red-700 text-sm font-medium"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                </div>
               </div>
             </div>
           </div>
@@ -561,7 +830,7 @@ export default function DesignerQuestionnaire({
                     <div className="border-t border-gray-300 pt-4">
                       <div className="flex items-center justify-between mb-4">
                         <h6 className="text-sm font-medium text-gray-900">
-                          Projects / 項目
+                          Projects / 項目經歷
                           <span className="text-red-500 ml-1">*</span>
                         </h6>
                         <button
@@ -569,7 +838,7 @@ export default function DesignerQuestionnaire({
                           onClick={() => addProject(designer.id)}
                           className="px-3 py-1.5 bg-gray-700 text-white text-xs font-light hover:bg-gray-600 transition-colors"
                         >
-                          + Add Project / 添加項目
+                          + Add Project / 添加項目經歷
                         </button>
                       </div>
 
@@ -626,7 +895,7 @@ export default function DesignerQuestionnaire({
                                   />
 
                                   <FormInput
-                                    label="Area / 面積"
+                                    label="Area (sqft) / 面積（平方呎）"
                                     name={`project-area-${project.id}`}
                                     required
                                     value={project.area}
@@ -637,7 +906,7 @@ export default function DesignerQuestionnaire({
                                   />
 
                                   <FormInput
-                                    label="Building Name / 地址"
+                                    label="Building Name / 大廈名稱"
                                     name={`project-address-${project.id}`}
                                     required
                                     value={project.address}
@@ -649,7 +918,7 @@ export default function DesignerQuestionnaire({
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                   <FormSelect
-                                    label="Renovation Type / 是否重新裝修？"
+                                    label="Project Scope / 是否重新裝修？"
                                     name={`project-renovation-${project.id}`}
                                     type="radio"
                                     required
@@ -658,20 +927,33 @@ export default function DesignerQuestionnaire({
                                       updateProject(designer.id, project.id, 'renovationType', v)
                                     }
                                     options={[
-                                      { value: 'newFitout', label: 'New Fitout 新裝修' },
+                                      { value: 'newFitout', label: 'New Fitout 全新装修' },
                                       { value: 'remodel', label: 'Remodel 改造翻新' },
                                     ]}
                                   />
 
-                                  <MultiImageUpload
-                                    label="Project Photos / 項目照片"
-                                    name={`project-photos-${project.id}`}
-                                    maxFiles={9}
-                                    onChange={(files) =>
-                                      updateProject(designer.id, project.id, 'photos', files)
+                                  <FormSelect
+                                    label="Property Types / 主要项目類型"
+                                    name={`project-types-${project.id}`}
+                                    type="checkbox"
+                                    multiple
+                                    required
+                                    value={project.projectTypes || []}
+                                    onChange={(v) =>
+                                      updateProject(designer.id, project.id, 'projectTypes', v as string[])
                                     }
+                                    options={projectTypeOptions}
                                   />
                                 </div>
+
+                                <MultiImageUpload
+                                  label="Project Photos / 項目照片"
+                                  name={`project-photos-${project.id}`}
+                                  maxFiles={9}
+                                  onChange={(files) =>
+                                    updateProject(designer.id, project.id, 'photos', files)
+                                  }
+                                />
                               </div>
                             </div>
                           ))}

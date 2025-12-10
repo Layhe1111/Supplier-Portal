@@ -19,15 +19,27 @@ export interface Product {
   model3D: File | null;
 }
 
+// Project Manager Project Interface
+export interface ProjectManagerProject {
+  id: string;
+  projectName: string;
+  clientName: string;
+  year: string;
+  buildingName: string;
+  area: string;
+}
+
 // Project Manager Interface
 export interface ProjectManager {
   id: string;
   name: string;
+  yearsExperience: string;
   languages: string;
   mainProject: string;
   year: string;
   address: string;
   area: string;
+  projects: ProjectManagerProject[];
   cv: File | null;
 }
 
@@ -40,6 +52,13 @@ export interface Insurance {
   file: File | null;
 }
 
+// Certification item for dynamic lists
+export interface CertificationItem {
+  id: string;
+  name: string;
+  file: File | null;
+}
+
 // Designer Project Interface
 export interface DesignerProject {
   id: string;
@@ -48,6 +67,8 @@ export interface DesignerProject {
   address: string;
   area: string;
   renovationType: 'newFitout' | 'remodel' | '';
+  projectTypes?: string[]; // Project types for each project highlight
+  projectHighlight?: boolean; // Flag to mark the project as a highlight
   photos: File[];
 }
 
@@ -65,6 +86,9 @@ export interface CommonRequirements {
   // Document Upload
   businessRegistration: File | null;
   companyPhotos: File | null;
+  hkBusinessRegistrationNumber: string;
+  cnBusinessRegistrationNumber: string;
+  cnUnifiedSocialCreditCode: string;
 
   // Quality Commitment
   guaranteeInfoTrue: boolean;
@@ -74,6 +98,7 @@ export interface CommonRequirements {
   // Submitter Information
   submitterName: string;
   submitterPosition: string;
+  submitterPhoneCode: string;
   submitterPhone: string;
   submitterEmail: string;
   submissionDate: string;
@@ -90,16 +115,17 @@ export interface ContractorFormData extends CommonRequirements {
   numberOfEmployees: string;
   country: string;
   officeAddress: string;
-  companySupplementFile: File | null; // Company supplementary information (PDF)
+  companySupplementFile: File[] | null; // Company supplementary information (PDF)
   companySupplementLink: string; // Company supplementary information (Link)
+  hkWorkEligibleEmployees: string;
 
   // Section 2: Certifications
   constructionGrade: string;
   licenseNumber: string;
   certificateUpload: File | null;
-  safetyProductionLicense: 'yes' | 'no' | '';
   isocertifications: string[]; // ['9001', '14001', '45001']
-  otherCertifications: string;
+  isoCertificateUploads: Record<string, File | null>;
+  otherCertifications: CertificationItem[];
 
   // Section 3: Construction Capability
   projectTypes: string[]; // ['residential', 'commercial', 'office', etc.]
@@ -115,6 +141,9 @@ export interface ContractorFormData extends CommonRequirements {
   numberOfSafetyOfficers: string;
   hasConstructionManager: 'yes' | 'no' | '';
   numberOfConstructionManagers: string;
+  hasMepLead: 'yes' | 'no' | '';
+  numberOfMepLeads: string;
+  cnHkProjectCompliance: boolean;
 
   // Section 6: Compliance and Governance
   insurances: Insurance[];
@@ -136,10 +165,12 @@ export interface DesignerFormData extends CommonRequirements {
   registeredCapital: string;
   country: string;
   officeAddress: string;
+  hkWorkEligibleEmployees: string;
   designAwards: string[]; // Design awards (array)
   designTeamSize: string;
-  feeStructure: string[]; // ['byArea', 'byProject', 'other']
-  companySupplementFile: File | null; // Company supplementary information (PDF)
+  feeStructure: string[]; // ['byArea', 'byProject', 'byPeriod', 'other']
+  designHighlights: DesignerProject[]; // Key design highlights
+  companySupplementFile: File[] | null; // Company supplementary information (PDF)
   companySupplementLink: string; // Company supplementary information (Link)
 
   // Section 2: Design Specialization
@@ -191,16 +222,20 @@ export interface MaterialSupplierFormData extends CommonRequirements {
   registeredCapital: string;
   country: string;
   officeAddress: string;
+  hkWorkEligibleEmployees: string;
   companyType: string[]; // ['manufacturer', 'agent', 'distributor']
   representedBrands: string[];
   warehouses: { address: string; capacity: string }[];
-  companySupplementFile: File | null; // Company supplementary information (PDF)
+  companySupplementFile: File[] | null; // Company supplementary information (PDF)
   companySupplementLink: string; // Company supplementary information (Link)
 
   // Section 2: Product Management System
   products: Product[];
 
-  // Section 3: Sample Service
+  // Section 3: Project Highlights
+  projectHighlights: DesignerProject[];
+
+  // Section 4: Sample Service
   sampleProvided: 'yes' | 'no' | '';
   sampleCost: 'free' | 'charged' | '';
   sampleDeliveryTime: string;

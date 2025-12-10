@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import FormSection from '../FormSection';
 import FormInput from '../FormInput';
 import FormSelect from '../FormSelect';
+import FormCheckbox from '../FormCheckbox';
 import FileUpload from '../FileUpload';
 import MultiImageUpload from '../MultiImageUpload';
-import { ContractorFormData, ProjectManager, DesignerProject } from '@/types/supplier';
+import { ContractorFormData, ProjectManager, DesignerProject, ProjectManagerProject } from '@/types/supplier';
 
 interface ContractorQuestionnaireProps {
   data: ContractorFormData;
@@ -18,6 +19,28 @@ export default function ContractorQuestionnaire({
   data,
   onChange,
 }: ContractorQuestionnaireProps) {
+  const countryOptions = [
+    { value: 'Hong Kong', label: 'Hong Kong 香港' },
+    { value: 'China', label: 'China 中國' },
+    { value: 'Macau', label: 'Macau 澳門' },
+    { value: 'Taiwan', label: 'Taiwan 台灣' },
+    { value: 'Singapore', label: 'Singapore 新加坡' },
+    { value: 'Malaysia', label: 'Malaysia 馬來西亞' },
+    { value: 'Japan', label: 'Japan 日本' },
+    { value: 'South Korea', label: 'South Korea 韓國' },
+    { value: 'Thailand', label: 'Thailand 泰國' },
+    { value: 'Vietnam', label: 'Vietnam 越南' },
+    { value: 'Philippines', label: 'Philippines 菲律賓' },
+    { value: 'Indonesia', label: 'Indonesia 印尼' },
+    { value: 'India', label: 'India 印度' },
+    { value: 'United Arab Emirates', label: 'UAE 阿聯酋' },
+    { value: 'United Kingdom', label: 'United Kingdom 英國' },
+    { value: 'United States', label: 'United States 美國' },
+    { value: 'Canada', label: 'Canada 加拿大' },
+    { value: 'Australia', label: 'Australia 澳洲' },
+    { value: 'Germany', label: 'Germany 德國' },
+    { value: 'France', label: 'France 法國' },
+  ];
   const projectTypeOptions = [
     { value: 'residential', label: 'Residential 住宅' },
     { value: 'commercial', label: 'Commercial 商業' },
@@ -35,6 +58,22 @@ export default function ContractorQuestionnaire({
     { value: '45001', label: 'ISO 45001' },
   ];
 
+  // Initialize other certifications (handle legacy string data)
+  const otherCerts = data.otherCertifications as any;
+  if (!Array.isArray(otherCerts) || otherCerts.length === 0) {
+    onChange('otherCertifications', [
+      {
+        id: `${Date.now()}-cert`,
+        name: typeof otherCerts === 'string' ? otherCerts : '',
+        file: null,
+      },
+    ]);
+  }
+
+  if (!data.isoCertificateUploads) {
+    onChange('isoCertificateUploads', {});
+  }
+
   // Project Highlights management functions
   const addProjectHighlight = () => {
     const newProject: DesignerProject = {
@@ -44,6 +83,8 @@ export default function ContractorQuestionnaire({
       address: '',
       area: '',
       renovationType: '',
+      projectTypes: [],
+      projectHighlight: false,
       photos: [],
     };
     onChange('projectHighlights', [...(data.projectHighlights || []), newProject]);
@@ -67,12 +108,64 @@ export default function ContractorQuestionnaire({
     onChange('projectHighlights', updatedProjects);
   };
 
+  const toggleIsoCertification = (isoValue: string) => {
+    const current = data.isocertifications || [];
+    const exists = current.includes(isoValue);
+    const nextSelected = exists
+      ? current.filter((item) => item !== isoValue)
+      : [...current, isoValue];
+    onChange('isocertifications', nextSelected);
+
+    const currentUploads = data.isoCertificateUploads || {};
+    const nextUploads: Record<string, File | null> = {};
+    nextSelected.forEach((iso) => {
+      nextUploads[iso] = currentUploads[iso] ?? null;
+    });
+    onChange('isoCertificateUploads', nextUploads);
+  };
+
+  // Other certifications management
+  const addOtherCertification = () => {
+    onChange('otherCertifications', [
+      ...(data.otherCertifications || []),
+      { id: `${Date.now()}-cert`, name: '', file: null },
+    ]);
+  };
+
+  const updateOtherCertification = (
+    id: string,
+    field: 'name' | 'file',
+    value: string | File | null
+  ) => {
+    const updated = (data.otherCertifications || []).map((cert) =>
+      cert.id === id ? { ...cert, [field]: value } : cert
+    );
+    onChange('otherCertifications', updated);
+  };
+
+  const removeOtherCertification = (id: string) => {
+    const updated = (data.otherCertifications || []).filter((cert) => cert.id !== id);
+    onChange(
+      'otherCertifications',
+      updated.length > 0 ? updated : [{ id: `${Date.now()}-cert`, name: '', file: null }]
+    );
+  };
+
+  const tomorrowDateString = React.useMemo(() => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split('T')[0];
+  }, []);
+
+  const isHongKong = data.country === 'Hong Kong';
+  const isChina = data.country === 'China';
+
   return (
     <>
       {/* Section 1: Company Profile */}
       <FormSection title="Section 1: Company Profile / 公司基本信息">
         <FormInput
-          label="Company Legal Name / 公司全稱"
+          label="Entity Name / 公司全稱"
           name="companyLegalName"
           required
           value={data.companyLegalName}
@@ -81,7 +174,7 @@ export default function ContractorQuestionnaire({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormInput
-            label="Year Established / 成立年份"
+            label="Year of Incorporation / 成立年份"
             name="yearEstablished"
             type="number"
             required
@@ -92,7 +185,7 @@ export default function ContractorQuestionnaire({
           <FormInput
             label="Registered Capital / 註冊資本"
             name="registeredCapital"
-            required
+            required={!isHongKong}
             placeholder="e.g., HKD 1,000,000"
             value={data.registeredCapital}
             onChange={(v) => onChange('registeredCapital', v)}
@@ -109,15 +202,60 @@ export default function ContractorQuestionnaire({
             onChange={(v) => onChange('numberOfEmployees', v)}
           />
 
-          <FormInput
+          <FormSelect
             label="Country / 國家和地区"
             name="country"
             required
             value={data.country}
-            onChange={(v) => onChange('country', v)}
-            placeholder="e.g., Hong Kong"
+            onChange={(v) => onChange('country', v as string)}
+            options={countryOptions}
           />
         </div>
+
+        {isHongKong && (
+          <FormInput
+            label="Business Registration Number / 商業登記號"
+            name="hkBusinessRegistrationNumber"
+            required
+            value={data.hkBusinessRegistrationNumber}
+            onChange={(v) => onChange('hkBusinessRegistrationNumber', v)}
+            placeholder="e.g., 12345678-000"
+          />
+        )}
+
+        {isChina && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormInput
+              label="Business Registration Number / 工商注冊號"
+              name="cnBusinessRegistrationNumber"
+              required
+              value={data.cnBusinessRegistrationNumber}
+              onChange={(v) => onChange('cnBusinessRegistrationNumber', v)}
+              placeholder="e.g., 123456789012345"
+            />
+
+            <FormInput
+              label="Unified Social Credit Code / 統一社會信用代碼"
+              name="cnUnifiedSocialCreditCode"
+              required
+              value={data.cnUnifiedSocialCreditCode}
+              onChange={(v) => onChange('cnUnifiedSocialCreditCode', v)}
+              placeholder="e.g., 123456789012345678"
+            />
+          </div>
+        )}
+
+        {isChina && (
+          <FormInput
+            label="Employees eligible to work legally in Hong Kong / 可以在香港合法工作的雇員數"
+            name="hkWorkEligibleEmployees"
+            type="number"
+            required
+            value={data.hkWorkEligibleEmployees}
+            onChange={(v) => onChange('hkWorkEligibleEmployees', v)}
+            placeholder="e.g., 5"
+          />
+        )}
 
         <FormInput
           label="Office Address / 辦公地址"
@@ -127,26 +265,62 @@ export default function ContractorQuestionnaire({
           onChange={(v) => onChange('officeAddress', v)}
         />
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <FileUpload
+            label="Business Registration / 商業登記證"
+            name="businessRegistration"
+            required
+            accept=".pdf,.jpg,.jpeg,.png"
+            onChange={(file) => onChange('businessRegistration', file)}
+          />
+
+          <FileUpload
+            label="Company Photos / 公司形象照片"
+            name="companyPhotos"
+            accept=".jpg,.jpeg,.png"
+            onChange={(file) => onChange('companyPhotos', file)}
+          />
+        </div>
+
         <div className="mt-6">
           <h4 className="text-sm font-medium text-gray-900 mb-3">
-            Company Supplementary Information / 公司補充信息
+            Company Brochure
           </h4>
           <p className="text-xs text-gray-500 mb-4">
-            You can upload a PDF file or provide a link to your company's supplementary information.
+            You can upload files or provide a link to your company website.
             <br />
-            您可以上傳PDF文件或提供公司補充信息的鏈接。
+            您可以上傳文件或提供公司網站鏈接。
           </p>
 
           <div className="space-y-4">
-            <FileUpload
-              label="Upload PDF / 上傳PDF文件"
-              name="companySupplementFile"
-              accept=".pdf"
-              onChange={(file) => onChange('companySupplementFile', file)}
-            />
+            <div>
+              <label className="block text-sm font-light text-gray-700 mb-2">
+                Upload Files / 上傳文件
+              </label>
+              <input
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                multiple
+                onChange={(e) => {
+                  const files = Array.from(e.target.files || []);
+                  onChange('companySupplementFile', files.length > 0 ? files : null);
+                }}
+                className="w-full px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Accepted formats: PDF, JPG, PNG / 支援格式：PDF、JPG、PNG
+              </p>
+              {data.companySupplementFile && (
+                <p className="text-xs text-gray-500 mt-1">
+                  {Array.isArray(data.companySupplementFile)
+                    ? `${data.companySupplementFile.length} file(s) selected / 已選擇 ${data.companySupplementFile.length} 個文件`
+                    : '1 file selected / 已選擇 1 個文件'}
+                </p>
+              )}
+            </div>
 
             <FormInput
-              label="Or enter link / 或輸入鏈接"
+              label="Or enter company website / 或輸入公司網站"
               name="companySupplementLink"
               type="url"
               value={data.companySupplementLink}
@@ -160,51 +334,38 @@ export default function ContractorQuestionnaire({
       {/* Section 2: Certifications */}
       <FormSection title="Section 2: Certifications / 資質與認證">
         <div className="mb-6">
-          <h4 className="text-sm font-medium text-gray-900 mb-3">
-            Business Licenses / 資質等級
-          </h4>
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-light text-gray-700 mb-2">
-                Construction Grade / 施工資質等級 <span className="text-red-500">*</span>
+                Do you have RGBC certificate / 是否有RGBC牌 <span className="text-red-500">*</span>
               </label>
-              <div className="grid grid-cols-2 gap-4">
-                <select
-                  value={data.constructionGrade === 'RGBC' ? 'RGBC' : 'Others'}
-                  onChange={(e) => {
-                    if (e.target.value === 'RGBC') {
-                      onChange('constructionGrade', 'RGBC');
-                    } else {
-                      onChange('constructionGrade', '');
-                    }
-                  }}
-                  required
-                  className="appearance-none relative block w-full px-3 py-2 border border-gray-300 text-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 sm:text-sm h-[42px]"
-                >
-                  <option value="RGBC">RGBC</option>
-                  <option value="Others">Others 其他</option>
-                </select>
-                {data.constructionGrade !== 'RGBC' && (
-                  <input
-                    type="text"
-                    name="constructionGradeCustom"
-                    required
-                    value={data.constructionGrade === 'RGBC' ? '' : data.constructionGrade}
-                    onChange={(e) => onChange('constructionGrade', e.target.value)}
-                    placeholder="Enter construction grade..."
-                    className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 sm:text-sm"
-                  />
-                )}
-              </div>
+              <select
+                value={data.constructionGrade === 'RGBC' ? 'yes' : 'no'}
+                onChange={(e) => {
+                  if (e.target.value === 'yes') {
+                    onChange('constructionGrade', 'RGBC');
+                  } else {
+                    onChange('constructionGrade', '');
+                    onChange('licenseNumber', '');
+                  }
+                }}
+                required
+                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 text-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 sm:text-sm h-[42px]"
+              >
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
             </div>
 
-            <FormInput
-              label="License Number / 資質證書編號"
-              name="licenseNumber"
-              required
-              value={data.licenseNumber}
-              onChange={(v) => onChange('licenseNumber', v)}
-            />
+            {data.constructionGrade === 'RGBC' && (
+              <FormInput
+                label="Certificate Number / 資質證書編號"
+                name="licenseNumber"
+                required
+                value={data.licenseNumber}
+                onChange={(v) => onChange('licenseNumber', v)}
+              />
+            )}
 
             <FileUpload
               label="Certificate Upload / 資質證書上傳"
@@ -217,40 +378,111 @@ export default function ContractorQuestionnaire({
         </div>
 
         <div>
-          <h4 className="text-sm font-medium text-gray-900 mb-3">
-            Safety Certifications / 安全認證
-          </h4>
           <div className="space-y-4">
-            <FormSelect
-              label="Safety Production License / 安全生產許可證"
-              name="safetyProductionLicense"
-              type="radio"
-              required
-              value={data.safetyProductionLicense}
-              onChange={(v) => onChange('safetyProductionLicense', v as 'yes' | 'no')}
-              options={[
-                { value: 'yes', label: 'Yes 有' },
-                { value: 'no', label: 'No 無' },
-              ]}
-            />
+            <div className="space-y-3">
+              <label className="block text-sm font-light text-gray-700">
+                ISO Certification / ISO認證
+              </label>
+              <div className="space-y-3">
+                {isoOptions.map((option) => {
+                  const checked =
+                    Array.isArray(data.isocertifications) &&
+                    data.isocertifications.includes(option.value);
+                  return (
+                    <div
+                      key={option.value}
+                      className="p-3 border border-gray-200 rounded bg-white space-y-2"
+                    >
+                      <label className="flex items-center">
+                        <input
+                          type="checkbox"
+                          name={`iso-${option.value}`}
+                          checked={checked}
+                          onChange={() => toggleIsoCertification(option.value)}
+                          className="h-4 w-4 text-gray-900 focus:ring-gray-900 border-gray-300"
+                        />
+                        <span className="ml-2 text-sm text-gray-700">{option.label}</span>
+                      </label>
 
-            <FormSelect
-              label="ISO Certification / ISO認證"
-              name="isocertifications"
-              type="checkbox"
-              multiple
-              value={data.isocertifications}
-              onChange={(v) => onChange('isocertifications', v as string[])}
-              options={isoOptions}
-            />
+                      {checked && (
+                        <FileUpload
+                          label={`${option.label} Certificate Upload / 證書上傳`}
+                          name={`iso-${option.value}-upload`}
+                          required
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          onChange={(file) => {
+                            onChange('isoCertificateUploads', {
+                              ...(data.isoCertificateUploads || {}),
+                              [option.value]: file,
+                            });
+                          }}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
 
-            <FormInput
-              label="Other Certifications / 其他認證"
-              name="otherCertifications"
-              value={data.otherCertifications}
-              onChange={(v) => onChange('otherCertifications', v)}
-              placeholder="List any other certifications..."
-            />
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="block text-sm font-light text-gray-700">
+                  Other Certifications / 其他認證
+                  <span className="text-xs text-gray-500 ml-2">
+                    Add items and upload certificates
+                  </span>
+                </label>
+                <button
+                  type="button"
+                  onClick={addOtherCertification}
+                  className="px-3 py-1 bg-gray-900 text-white text-xs font-light hover:bg-gray-800 transition-colors"
+                >
+                  + Add Certification / 添加
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                {(data.otherCertifications || []).map((cert, index) => (
+                  <div
+                    key={cert.id}
+                    className="p-4 border border-gray-200 bg-gray-50 rounded space-y-3"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-700">
+                        Certification {index + 1} / 認證 {index + 1}
+                      </span>
+                      {(data.otherCertifications || []).length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeOtherCertification(cert.id)}
+                          className="text-xs text-red-600 hover:text-red-800"
+                        >
+                          Remove / 刪除
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormInput
+                        label="Certification Name / 認證名稱"
+                        name={`other-cert-${cert.id}`}
+                        value={cert.name}
+                        onChange={(v) => updateOtherCertification(cert.id, 'name', v)}
+                        placeholder="e.g., CIC Safety Certificate"
+                      />
+
+                      <FileUpload
+                        label="Certificate Upload / 證書上傳"
+                        name={`other-cert-upload-${cert.id}`}
+                        required={!!cert.name.trim()}
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={(file) => updateOtherCertification(cert.id, 'file', file)}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </FormSection>
@@ -262,7 +494,7 @@ export default function ContractorQuestionnaire({
             Areas of Expertise / 專業領域
           </h4>
           <FormSelect
-            label="Project Types / 主要工程類型"
+            label="Property Types / 主要项目類型"
             name="projectTypes"
             type="checkbox"
             multiple
@@ -341,7 +573,7 @@ export default function ContractorQuestionnaire({
                       />
 
                       <FormInput
-                        label="Area / 面積"
+                        label="Area (sqft) / 面積（平方呎）"
                         name={`project-area-${project.id}`}
                         required
                         value={project.area}
@@ -352,7 +584,7 @@ export default function ContractorQuestionnaire({
                       />
 
                       <FormInput
-                        label="Building Name / 地址"
+                        label="Building Name / 大廈名稱"
                         name={`project-address-${project.id}`}
                         required
                         value={project.address}
@@ -364,7 +596,7 @@ export default function ContractorQuestionnaire({
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormSelect
-                        label="Renovation Type / 是否重新裝修？"
+                        label="Project Scope / 是否重新裝修？"
                         name={`project-renovation-${project.id}`}
                         type="radio"
                         required
@@ -373,20 +605,33 @@ export default function ContractorQuestionnaire({
                           updateProjectHighlight(project.id, 'renovationType', v)
                         }
                         options={[
-                          { value: 'newFitout', label: 'New Fitout 新裝修' },
+                          { value: 'newFitout', label: 'New Fitout 全新装修' },
                           { value: 'remodel', label: 'Remodel 改造翻新' },
                         ]}
                       />
 
-                      <MultiImageUpload
-                        label="Project Photos / 項目照片"
-                        name={`project-photos-${project.id}`}
-                        maxFiles={9}
-                        onChange={(files) =>
-                          updateProjectHighlight(project.id, 'photos', files)
+                      <FormSelect
+                        label="Property Types / 主要项目類型"
+                        name={`project-types-${project.id}`}
+                        type="checkbox"
+                        multiple
+                        required
+                        value={project.projectTypes || []}
+                        onChange={(v) =>
+                          updateProjectHighlight(project.id, 'projectTypes', v as string[])
                         }
+                        options={projectTypeOptions}
                       />
                     </div>
+
+                    <MultiImageUpload
+                      label="Project Photos / 項目照片"
+                      name={`project-photos-${project.id}`}
+                      maxFiles={9}
+                      onChange={(files) =>
+                        updateProjectHighlight(project.id, 'photos', files)
+                      }
+                    />
                   </div>
                 </div>
               ))}
@@ -396,11 +641,11 @@ export default function ContractorQuestionnaire({
 
         <div>
           <h4 className="text-sm font-medium text-gray-900 mb-3">
-            Construction Scale / 施工規模
+            Company Scale / 公司規模
           </h4>
           <div className="space-y-4">
             <FormInput
-              label="Annual Construction Capacity / 年施工能力 (sqft)"
+              label="Accumulated Project Area per Year (sqft) / 年施工面积（平方呎）"
               name="annualConstructionCapacity"
               type="number"
               required
@@ -410,7 +655,7 @@ export default function ContractorQuestionnaire({
             />
 
             <FormInput
-              label="Maximum Concurrent Projects / 同時承接項目數"
+              label="Maximum Number of Projects in Parallel / 最多能同时承接的项目数"
               name="maxConcurrentProjects"
               type="number"
               required
@@ -420,7 +665,7 @@ export default function ContractorQuestionnaire({
             />
 
             <FormInput
-              label="Largest Project Value / 最大項目金額 (HKD)"
+              label="Average Project Value (HKD) / 平均項目金額（港幣）"
               name="largestProjectValue"
               type="number"
               required
@@ -435,22 +680,32 @@ export default function ContractorQuestionnaire({
       {/* Section 5: Personnel */}
       <FormSection title="Section 5: Personnel / 人員">
         <div className="mb-6">
+          <FileUpload
+            label="Company Organization Chart / 公司組織架構圖"
+            name="organizationChart"
+            required
+            accept=".pdf,.jpg,.jpeg,.png"
+            onChange={(file) => onChange('organizationChart', file)}
+          />
+        </div>
+
+        <div className="mb-6">
           <h4 className="text-sm font-medium text-gray-900 mb-3">
             Project Managers / 項目經理
           </h4>
 
           <div className="space-y-6">
-            {(data.projectManagers || []).map((pm, index) => (
+            {(data.projectManagers || []).map((pm, pmIndex) => (
               <div key={pm.id} className="p-4 border border-gray-200 bg-gray-50">
                 <div className="flex justify-between items-center mb-4">
                   <h5 className="text-sm font-medium text-gray-700">
-                    Project Manager #{index + 1} / 項目經理 #{index + 1}
+                    Project Manager #{pmIndex + 1} / 項目經理 #{pmIndex + 1}
                   </h5>
                   {(data.projectManagers || []).length > 0 && (
                     <button
                       type="button"
                       onClick={() => {
-                        const updated = (data.projectManagers || []).filter((_, i) => i !== index);
+                        const updated = (data.projectManagers || []).filter((_, i) => i !== pmIndex);
                         onChange('projectManagers', updated);
                       }}
                       className="text-xs text-red-600 hover:text-red-800"
@@ -463,92 +718,221 @@ export default function ContractorQuestionnaire({
                 <div className="space-y-4">
                   <FormInput
                     label="Name / 姓名"
-                    name={`pm-name-${index}`}
+                    name={`pm-name-${pmIndex}`}
                     required
                     value={pm.name}
                     onChange={(v) => {
                       const updated = [...(data.projectManagers || [])];
-                      updated[index] = { ...updated[index], name: v };
+                      updated[pmIndex] = { ...updated[pmIndex], name: v };
                       onChange('projectManagers', updated);
                     }}
                   />
 
                   <FormInput
+                    label="Year of Experience / 年資"
+                    name={`pm-experience-${pmIndex}`}
+                    type="number"
+                    required
+                    value={pm.yearsExperience || ''}
+                    onChange={(v) => {
+                      const updated = [...(data.projectManagers || [])];
+                      updated[pmIndex] = { ...updated[pmIndex], yearsExperience: v };
+                      onChange('projectManagers', updated);
+                    }}
+                    placeholder="e.g., 8"
+                  />
+
+                  <FormInput
                     label="Languages / 語言"
-                    name={`pm-languages-${index}`}
+                    name={`pm-languages-${pmIndex}`}
                     required
                     value={pm.languages}
                     onChange={(v) => {
                       const updated = [...(data.projectManagers || [])];
-                      updated[index] = { ...updated[index], languages: v };
+                      updated[pmIndex] = { ...updated[pmIndex], languages: v };
                       onChange('projectManagers', updated);
                     }}
                     placeholder="e.g., English, Chinese, Spanish"
                   />
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormInput
-                      label="Main Project / 主要項目"
-                      name={`pm-mainProject-${index}`}
-                      required
-                      value={pm.mainProject}
-                      onChange={(v) => {
-                        const updated = [...(data.projectManagers || [])];
-                        updated[index] = { ...updated[index], mainProject: v };
-                        onChange('projectManagers', updated);
-                      }}
-                    />
+                  {/* Projects Section */}
+                  <div className="mt-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-sm font-light text-gray-700">
+                        Projects / 項目經歷
+                        <span className="text-red-500 ml-1">*</span>
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = [...(data.projectManagers || [])];
+                          const newProject: ProjectManagerProject = {
+                            id: `${Date.now()}-${Math.random()}`,
+                            projectName: '',
+                            clientName: '',
+                            year: '',
+                            buildingName: '',
+                            area: '',
+                          };
+                          updated[pmIndex] = {
+                            ...updated[pmIndex],
+                            projects: [...(updated[pmIndex].projects || []), newProject],
+                          };
+                          onChange('projectManagers', updated);
+                        }}
+                        className="px-3 py-1 bg-gray-900 text-white text-xs font-light hover:bg-gray-800 transition-colors"
+                      >
+                        + Add Project / 添加項目經歷
+                      </button>
+                    </div>
 
-                    <FormInput
-                      label="Year / 年份"
-                      name={`pm-year-${index}`}
-                      type="number"
-                      required
-                      value={pm.year}
-                      onChange={(v) => {
-                        const updated = [...(data.projectManagers || [])];
-                        updated[index] = { ...updated[index], year: v };
-                        onChange('projectManagers', updated);
-                      }}
-                      placeholder="e.g., 2023"
-                    />
-                  </div>
+                    <div className="space-y-3">
+                      {(pm.projects || []).map((project, projectIndex) => (
+                        <div
+                          key={project.id}
+                          className="p-4 border border-gray-200 bg-white rounded space-y-3"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium text-gray-700">
+                              Project {projectIndex + 1} / 項目 {projectIndex + 1}
+                            </span>
+                            {(pm.projects || []).length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const updated = [...(data.projectManagers || [])];
+                                  updated[pmIndex] = {
+                                    ...updated[pmIndex],
+                                    projects: updated[pmIndex].projects.filter(
+                                      (_, idx) => idx !== projectIndex
+                                    ),
+                                  };
+                                  onChange('projectManagers', updated);
+                                }}
+                                className="text-xs text-red-600 hover:text-red-800"
+                              >
+                                Remove / 刪除
+                              </button>
+                            )}
+                          </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormInput
-                      label="Building Name / 地址"
-                      name={`pm-address-${index}`}
-                      required
-                      value={pm.address}
-                      onChange={(v) => {
-                        const updated = [...(data.projectManagers || [])];
-                        updated[index] = { ...updated[index], address: v };
-                        onChange('projectManagers', updated);
-                      }}
-                    />
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormInput
+                              label="Project Name / 項目名稱"
+                              name={`pm-${pmIndex}-project-${projectIndex}-name`}
+                              required
+                              value={project.projectName}
+                              onChange={(v) => {
+                                const updated = [...(data.projectManagers || [])];
+                                const updatedProjects = [...updated[pmIndex].projects];
+                                updatedProjects[projectIndex] = {
+                                  ...updatedProjects[projectIndex],
+                                  projectName: v,
+                                };
+                                updated[pmIndex] = {
+                                  ...updated[pmIndex],
+                                  projects: updatedProjects,
+                                };
+                                onChange('projectManagers', updated);
+                              }}
+                            />
 
-                    <FormInput
-                      label="Area (sqft) / 面積"
-                      name={`pm-area-${index}`}
-                      type="number"
-                      required
-                      value={pm.area}
-                      onChange={(v) => {
-                        const updated = [...(data.projectManagers || [])];
-                        updated[index] = { ...updated[index], area: v };
-                        onChange('projectManagers', updated);
-                      }}
-                      placeholder="e.g., 5000"
-                    />
+                            <FormInput
+                              label="Client Name / 客戶名稱"
+                              name={`pm-${pmIndex}-project-${projectIndex}-client`}
+                              required
+                              value={project.clientName}
+                              onChange={(v) => {
+                                const updated = [...(data.projectManagers || [])];
+                                const updatedProjects = [...updated[pmIndex].projects];
+                                updatedProjects[projectIndex] = {
+                                  ...updatedProjects[projectIndex],
+                                  clientName: v,
+                                };
+                                updated[pmIndex] = {
+                                  ...updated[pmIndex],
+                                  projects: updatedProjects,
+                                };
+                                onChange('projectManagers', updated);
+                              }}
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <FormInput
+                              label="Year / 年份"
+                              name={`pm-${pmIndex}-project-${projectIndex}-year`}
+                              required
+                              value={project.year}
+                              onChange={(v) => {
+                                const updated = [...(data.projectManagers || [])];
+                                const updatedProjects = [...updated[pmIndex].projects];
+                                updatedProjects[projectIndex] = {
+                                  ...updatedProjects[projectIndex],
+                                  year: v,
+                                };
+                                updated[pmIndex] = {
+                                  ...updated[pmIndex],
+                                  projects: updatedProjects,
+                                };
+                                onChange('projectManagers', updated);
+                              }}
+                              placeholder="e.g., 2023"
+                            />
+
+                            <FormInput
+                              label="Building Name / 大廈名稱"
+                              name={`pm-${pmIndex}-project-${projectIndex}-building`}
+                              required
+                              value={project.buildingName}
+                              onChange={(v) => {
+                                const updated = [...(data.projectManagers || [])];
+                                const updatedProjects = [...updated[pmIndex].projects];
+                                updatedProjects[projectIndex] = {
+                                  ...updatedProjects[projectIndex],
+                                  buildingName: v,
+                                };
+                                updated[pmIndex] = {
+                                  ...updated[pmIndex],
+                                  projects: updatedProjects,
+                                };
+                                onChange('projectManagers', updated);
+                              }}
+                            />
+
+                            <FormInput
+                              label="Area (sqft) / 面積（平方呎）"
+                              name={`pm-${pmIndex}-project-${projectIndex}-area`}
+                              required
+                              value={project.area}
+                              onChange={(v) => {
+                                const updated = [...(data.projectManagers || [])];
+                                const updatedProjects = [...updated[pmIndex].projects];
+                                updatedProjects[projectIndex] = {
+                                  ...updatedProjects[projectIndex],
+                                  area: v,
+                                };
+                                updated[pmIndex] = {
+                                  ...updated[pmIndex],
+                                  projects: updatedProjects,
+                                };
+                                onChange('projectManagers', updated);
+                              }}
+                              placeholder="e.g., 5000"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
                   <FileUpload
                     label="Project Manager CV / 項目經理簡歷"
-                    name={`pm-cv-${index}`}
+                    name={`pm-cv-${pmIndex}`}
                     accept=".pdf,.doc,.docx"
                     onChange={(file) => {
                       const updated = [...(data.projectManagers || [])];
-                      updated[index] = { ...updated[index], cv: file };
+                      updated[pmIndex] = { ...updated[pmIndex], cv: file };
                       onChange('projectManagers', updated);
                     }}
                   />
@@ -562,11 +946,22 @@ export default function ContractorQuestionnaire({
                 const newPM: ProjectManager = {
                   id: Date.now().toString(),
                   name: '',
+                  yearsExperience: '',
                   languages: '',
                   mainProject: '',
                   year: '',
                   address: '',
                   area: '',
+                  projects: [
+                    {
+                      id: `${Date.now()}-project`,
+                      projectName: '',
+                      clientName: '',
+                      year: '',
+                      buildingName: '',
+                      area: '',
+                    },
+                  ],
                   cv: null,
                 };
                 onChange('projectManagers', [...(data.projectManagers || []), newPM]);
@@ -576,16 +971,6 @@ export default function ContractorQuestionnaire({
               + Add Project Manager / 添加項目經理
             </button>
           </div>
-        </div>
-
-        <div className="mb-6">
-          <FileUpload
-            label="Company Organization Chart / 公司組織架構圖"
-            name="organizationChart"
-            required
-            accept=".pdf,.jpg,.jpeg,.png"
-            onChange={(file) => onChange('organizationChart', file)}
-          />
         </div>
 
         <div className="space-y-4">
@@ -632,7 +1017,7 @@ export default function ContractorQuestionnaire({
               ]}
             />
 
-            {data.hasConstructionManager === 'yes' && (
+              {data.hasConstructionManager === 'yes' && (
               <div className="mt-4">
                 <FormInput
                   label="Number of Construction Managers / 施工經理人數"
@@ -646,11 +1031,52 @@ export default function ContractorQuestionnaire({
               </div>
             )}
           </div>
+
+          <div>
+            <FormSelect
+              label="Do you have MEP Lead(s)? / 是否有機電負責人？"
+              name="hasMepLead"
+              type="radio"
+              required
+              value={data.hasMepLead}
+              onChange={(v) => onChange('hasMepLead', v as 'yes' | 'no')}
+              options={[
+                { value: 'yes', label: 'Yes 有' },
+                { value: 'no', label: 'No 無' },
+              ]}
+            />
+
+            {data.hasMepLead === 'yes' && (
+              <div className="mt-4">
+                <FormInput
+                  label="Number of MEP Leads / 機電負責人人數"
+                  name="numberOfMepLeads"
+                  type="number"
+                  required
+                  value={data.numberOfMepLeads}
+                  onChange={(v) => onChange('numberOfMepLeads', v)}
+                  placeholder="e.g., 2"
+                />
+              </div>
+            )}
+          </div>
         </div>
       </FormSection>
 
       {/* Section 6: Compliance and Governance */}
       <FormSection title="Section 6: Compliance and Governance / 合規與治理">
+        {isChina && (
+          <div className="mb-6">
+            <FormCheckbox
+              label="If taking projects in Hong Kong, we commit to hiring workers who can legally work in Hong Kong and hold valid HKID and Construction Safety Certificate / 如在香港承接項目，保證聘請可在香港合法工作的工人且持有有效香港身份證與建造業安全證明書（平安咭）"
+              name="cnHkProjectCompliance"
+              checked={!!data.cnHkProjectCompliance}
+              onChange={(v) => onChange('cnHkProjectCompliance', v)}
+              required
+            />
+          </div>
+        )}
+
         <div className="mb-6">
           <h4 className="text-sm font-medium text-gray-900 mb-3">
             Insurance / 保險 (At least one required / 至少需要一個)
@@ -678,17 +1104,21 @@ export default function ContractorQuestionnaire({
                 </div>
 
                 <div className="space-y-4">
-                  <FormInput
+                  <FormSelect
                     label="Insurance Type / 保險類型"
                     name={`insurance-type-${index}`}
                     required
                     value={insurance.type}
                     onChange={(v) => {
                       const updated = [...(data.insurances || [])];
-                      updated[index] = { ...updated[index], type: v };
+                      updated[index] = { ...updated[index], type: v as string };
                       onChange('insurances', updated);
                     }}
-                    placeholder="e.g., Liability Insurance, Workers Compensation"
+                    options={[
+                      { value: "Contractors' All Risks", label: "Contractors' All Risks 建築工程保險" },
+                      { value: 'General Liability insurance', label: 'General Liability insurance 第三者責任保險' },
+                      { value: 'Worker Compensation', label: 'Worker Compensation 僱員補償保險' },
+                    ]}
                   />
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -711,6 +1141,7 @@ export default function ContractorQuestionnaire({
                       type="date"
                       required
                       value={insurance.expiryDate}
+                      min={tomorrowDateString}
                       onChange={(v) => {
                         const updated = [...(data.insurances || [])];
                         updated[index] = { ...updated[index], expiryDate: v };

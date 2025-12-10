@@ -21,6 +21,13 @@ export default function FileUpload({
 }: FileUploadProps) {
   const [fileName, setFileName] = useState<string>('');
 
+  const formattedAccept =
+    accept
+      ?.split(',')
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .join(', ') || '';
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     setFileName(file?.name || '');
@@ -53,6 +60,11 @@ export default function FileUpload({
           className="sr-only"
         />
       </div>
+      {formattedAccept && (
+        <p className="text-xs text-gray-500 mt-1">
+          Accepted formats: {formattedAccept} / 支援格式：{formattedAccept}
+        </p>
+      )}
     </div>
   );
 }

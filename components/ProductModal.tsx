@@ -29,6 +29,7 @@ export default function ProductModal({
     material: '',
     unitPrice: '',
     moq: '',
+    origin: '',
     leadTime: '',
     currentStock: '',
     photos: [],
@@ -52,6 +53,7 @@ export default function ProductModal({
         material: '',
         unitPrice: '',
         moq: '',
+        origin: '',
         leadTime: '',
         currentStock: '',
         photos: [],
@@ -171,7 +173,7 @@ export default function ProductModal({
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormInput
-                label="Unit Price (HKD) / 單價"
+                label="Unit Price (HKD) / 單價（港幣）"
                 name="unitPrice"
                 type="number"
                 required
@@ -230,6 +232,9 @@ export default function ProductModal({
                 }}
                 className="w-full px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
               />
+              <p className="text-xs text-gray-500 mt-1">
+                Accepted formats: images (JPG/PNG/HEIC etc.) / 支援格式：圖片（JPG/PNG/HEIC 等）
+              </p>
               {formData.photos && formData.photos.length > 0 && (
                 <p className="text-xs text-gray-500 mt-1">
                   {formData.photos.length} photo(s) selected / 已選擇 {formData.photos.length} 張照片
@@ -256,6 +261,9 @@ export default function ProductModal({
                     }}
                     className="w-full px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Accepted formats: PDF / 支援格式：PDF
+                  </p>
                   {formData.specificationFile && (
                     <p className="text-xs text-gray-500 mt-1">
                       {formData.specificationFile.name}
