@@ -1094,7 +1094,7 @@ export default function DesignerQuestionnaire({
                       />
 
                       <FormInput
-                        label="Experience / 資歷"
+                        label="Years of Experience / 年資"
                         name={`designer-experience-${designer.id}`}
                         required
                         value={designer.experience}
