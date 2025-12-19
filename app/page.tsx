@@ -34,7 +34,28 @@ export default function LoginPage() {
       router.push('/dashboard');
     } else {
       // User hasn't completed registration, redirect to registration page
-      router.push('/register/supplier');
+      // Temporary demo logic: use phone number to simulate account type
+      // Phone "1" = full supplier (original 3 types)
+      // Phone "2" = basic supplier (simplified form)
+      if (loginMethod === 'phone') {
+        if (formData.phone === '1') {
+          // Full supplier - original registration flow
+          localStorage.setItem('accountType', 'full');
+          router.push('/register/supplier');
+        } else if (formData.phone === '2') {
+          // Basic supplier - simplified registration flow
+          localStorage.setItem('accountType', 'basic');
+          router.push('/register/basic');
+        } else {
+          // Default to full supplier for other phone numbers
+          localStorage.setItem('accountType', 'full');
+          router.push('/register/supplier');
+        }
+      } else {
+        // Email login defaults to full supplier
+        localStorage.setItem('accountType', 'full');
+        router.push('/register/supplier');
+      }
     }
   };
 
@@ -177,6 +198,16 @@ export default function LoginPage() {
                 className="w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-light bg-gray-900 text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors"
               >
                 Sign In / 登入
+              </button>
+            </div>
+
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => router.push('/signup')}
+                className="text-sm text-gray-600 hover:text-gray-900"
+              >
+                Don&apos;t have an account? Sign up / 沒有帳戶？註冊
               </button>
             </div>
           </form>

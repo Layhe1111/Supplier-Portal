@@ -2,8 +2,96 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { SupplierFormData, Product, MaterialSupplierFormData } from '@/types/supplier';
+import { SupplierFormData, Product, MaterialSupplierFormData, BasicSupplierFormData } from '@/types/supplier';
 import ProductModal from '@/components/ProductModal';
+
+// Mock basic supplier data
+const mockBasicSuppliers: BasicSupplierFormData[] = [
+  {
+    supplierType: 'basic',
+    companyName: 'Essex Building Materials Ltd',
+    companyNameChinese: '中宜建材有限公司',
+    country: 'Hong Kong',
+    companyAddress: 'Room 11, 8/F, Vanta Industrial Centre, 21-33 Tai Lin Pai Road, Kwai Chung, N.T., Hong Kong',
+    businessType: 'Advertising',
+    contactPhone: '2301 1696',
+    contactPhoneCode: '+852',
+    contactEmail: 'info@essex.hk',
+    contactFax: '2739 7078',
+    businessDescription: 'Professional advertising and marketing solutions',
+    submissionDate: new Date().toISOString(),
+  },
+  {
+    supplierType: 'basic',
+    companyName: 'Golden Dragon Construction Co',
+    companyNameChinese: '金龍建築有限公司',
+    country: 'Hong Kong',
+    companyAddress: 'Unit 5, 12/F, Metro Centre II, 21 Lam Hing Street, Kowloon Bay, Hong Kong',
+    businessType: 'Construction',
+    contactPhone: '2345 6789',
+    contactPhoneCode: '+852',
+    contactEmail: 'info@goldendragon.hk',
+    contactFax: '2345 6790',
+    businessDescription: 'Full-service construction and renovation',
+    submissionDate: new Date().toISOString(),
+  },
+  {
+    supplierType: 'basic',
+    companyName: 'Harmony Interior Design Studio',
+    companyNameChinese: '和諧室內設計工作室',
+    country: 'Hong Kong',
+    companyAddress: '18/F, Tower A, Southmark, 11 Yip Hing Street, Wong Chuk Hang, Hong Kong',
+    businessType: 'Interior Design',
+    contactPhone: '2567 8901',
+    contactPhoneCode: '+852',
+    contactEmail: 'contact@harmony-design.hk',
+    contactFax: '2567 8902',
+    businessDescription: 'Creative interior design and space planning',
+    submissionDate: new Date().toISOString(),
+  },
+  {
+    supplierType: 'basic',
+    companyName: 'Pacific Furniture Trading',
+    companyNameChinese: '太平洋傢俬貿易公司',
+    country: 'Hong Kong',
+    companyAddress: 'Shop 3-5, G/F, Wing Lee Industrial Building, 35-37 Au Pui Wan Street, Fo Tan, N.T., Hong Kong',
+    businessType: 'Furniture Supply',
+    contactPhone: '2789 0123',
+    contactPhoneCode: '+852',
+    contactEmail: 'sales@pacificfurniture.hk',
+    contactFax: '2789 0124',
+    businessDescription: 'Import and distribution of quality furniture',
+    submissionDate: new Date().toISOString(),
+  },
+  {
+    supplierType: 'basic',
+    companyName: 'Smart Home Technology Ltd',
+    companyNameChinese: '智慧家居科技有限公司',
+    country: 'Hong Kong',
+    companyAddress: 'Unit 1208, 12/F, Tsuen Wan Industrial Centre, 220-248 Texaco Road, Tsuen Wan, N.T., Hong Kong',
+    businessType: 'Smart Home Solutions',
+    contactPhone: '2890 1234',
+    contactPhoneCode: '+852',
+    contactEmail: 'info@smarthome.hk',
+    contactFax: '2890 1235',
+    businessDescription: 'Smart home automation and integration',
+    submissionDate: new Date().toISOString(),
+  },
+  {
+    supplierType: 'basic',
+    companyName: 'Green Earth Landscaping',
+    companyNameChinese: '綠色地球園藝公司',
+    country: 'Hong Kong',
+    companyAddress: 'Flat A, 3/F, Block 2, Greenfield Garden, 8 Ma Tau Kok Road, Kowloon, Hong Kong',
+    businessType: 'Landscaping',
+    contactPhone: '2901 2345',
+    contactPhoneCode: '+852',
+    contactEmail: 'contact@greenearth.hk',
+    contactFax: '2901 2346',
+    businessDescription: 'Landscape design and maintenance services',
+    submissionDate: new Date().toISOString(),
+  },
+];
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -14,6 +102,8 @@ export default function DashboardPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [editingIndex, setEditingIndex] = useState<number | undefined>(undefined);
+  const [showBasicSuppliers, setShowBasicSuppliers] = useState(false);
+  const [basicSupplierSearch, setBasicSupplierSearch] = useState('');
 
   useEffect(() => {
     const isLoggedIn = localStorage.getItem('isLoggedIn');
@@ -104,6 +194,16 @@ export default function DashboardPage() {
     return matchesSearch && matchesCategory;
   });
 
+  // Filter basic suppliers
+  const filteredBasicSuppliers = mockBasicSuppliers.filter((supplier) => {
+    const searchLower = basicSupplierSearch.toLowerCase();
+    return (
+      supplier.companyName.toLowerCase().includes(searchLower) ||
+      (supplier.companyNameChinese?.toLowerCase().includes(searchLower) ?? false) ||
+      supplier.businessType.toLowerCase().includes(searchLower)
+    );
+  });
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -135,9 +235,17 @@ export default function DashboardPage() {
                   {userData.supplierType === 'material' && 'Material Supplier / 材料供應商'}
                 </p>
               </div>
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Contact / 聯繫人</p>
-                <p className="text-base text-gray-900">{userData.submitterName}</p>
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Contact / 聯繫人</p>
+                  <p className="text-base text-gray-900">{userData.submitterName}</p>
+                </div>
+                <button
+                  onClick={() => setShowBasicSuppliers(!showBasicSuppliers)}
+                  className="ml-4 px-4 py-2 text-sm border border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition-colors whitespace-nowrap"
+                >
+                  {showBasicSuppliers ? '返回' : '查看其他供應商，設計師，施工方'}
+                </button>
               </div>
             </div>
           )}
@@ -196,8 +304,8 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Product Management - Only show for material suppliers */}
-        {userData?.supplierType === 'material' && (
+        {/* Product Management - Only show for material suppliers and when not viewing basic suppliers */}
+        {userData?.supplierType === 'material' && !showBasicSuppliers && (
           <div className="bg-white border border-gray-200 p-8">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-light text-gray-900">
@@ -349,8 +457,91 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Info Section for Non-Material Suppliers */}
-        {userData?.supplierType !== 'material' && (
+        {/* Basic Suppliers List - when viewing basic suppliers */}
+        {showBasicSuppliers && (
+          <div className="bg-white border border-gray-200 p-8">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-light text-gray-900">
+                Other Suppliers / 其他供應商
+              </h3>
+              <div className="flex-1 max-w-md ml-8">
+                <input
+                  type="text"
+                  placeholder="Search by name / 搜索公司名稱"
+                  value={basicSupplierSearch}
+                  onChange={(e) => setBasicSupplierSearch(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
+                />
+              </div>
+            </div>
+
+            {filteredBasicSuppliers.length === 0 ? (
+              <div className="text-center py-12 text-gray-500">
+                No suppliers found / 未找到供應商
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[600px] overflow-y-auto">
+                {filteredBasicSuppliers.map((supplier, index) => (
+                  <div
+                    key={index}
+                    className="border border-gray-200 p-6 hover:shadow-md transition-shadow"
+                  >
+                    {/* Company Names */}
+                    <h4 className="text-base font-medium text-gray-900 mb-1">
+                      {supplier.companyName}
+                    </h4>
+                    {supplier.companyNameChinese && (
+                      <p className="text-sm text-gray-700 mb-3">
+                        {supplier.companyNameChinese}
+                      </p>
+                    )}
+
+                    {/* Address */}
+                    <p className="text-sm text-gray-600 mb-3">
+                      {supplier.companyAddress}
+                    </p>
+
+                    {/* Contact Information */}
+                    <div className="space-y-1 text-sm text-gray-700">
+                      <p>
+                        <span className="font-medium">T:</span> ({supplier.contactPhoneCode}) {supplier.contactPhone}
+                      </p>
+                      <p>
+                        <span className="font-medium">F:</span> ({supplier.contactPhoneCode}) {supplier.contactFax}
+                      </p>
+                      <p>
+                        <span className="font-medium">E:</span> {supplier.contactEmail}
+                      </p>
+                    </div>
+
+                    {/* Business Type */}
+                    <div className="mt-3 flex items-center text-sm">
+                      <span className="text-yellow-600 mr-2">▶</span>
+                      <span className="text-gray-700">
+                        <span className="font-medium">{supplier.businessType}</span>
+                      </span>
+                    </div>
+
+                    {/* Business Description (if available) */}
+                    {supplier.businessDescription && (
+                      <p className="mt-3 text-sm text-gray-600 italic">
+                        {supplier.businessDescription}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="mt-4 text-sm text-gray-600">
+              Showing {filteredBasicSuppliers.length} of {mockBasicSuppliers.length} suppliers
+              / 顯示 {filteredBasicSuppliers.length} / {mockBasicSuppliers.length} 個供應商
+            </div>
+          </div>
+        )}
+
+        {/* Info Section for Non-Material Suppliers - when not viewing basic suppliers */}
+        {userData?.supplierType !== 'material' && !showBasicSuppliers && (
           <div className="bg-white border border-gray-200 p-8">
             <div className="text-center py-12">
               <svg className="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

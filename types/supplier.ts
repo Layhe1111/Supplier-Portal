@@ -246,11 +246,36 @@ export interface MaterialSupplierFormData extends CommonRequirements {
   freeShippingToHK: 'yes' | 'no' | '';
 }
 
+// Basic Supplier Form Data (for suppliers without invitation code)
+export interface BasicSupplierFormData {
+  supplierType: 'basic';
+
+  // Required fields
+  companyName: string;
+  companyNameChinese?: string; // Required for HK, China, Macau, Taiwan, Singapore
+  country: string;
+  companyAddress: string;
+  businessType: string;
+  contactPhone: string;
+  contactPhoneCode: string;
+  contactEmail: string;
+  contactFax: string;
+
+  // Optional fields
+  businessDescription?: string;
+  companyWebsite?: string;
+  companyLogo?: File | null;
+
+  // Metadata
+  submissionDate: string;
+}
+
 // Union type for all supplier form data
 export type SupplierFormData =
   | ContractorFormData
   | DesignerFormData
-  | MaterialSupplierFormData;
+  | MaterialSupplierFormData
+  | BasicSupplierFormData;
 
 // Type guard functions
 export function isContractorForm(
@@ -269,4 +294,10 @@ export function isMaterialSupplierForm(
   data: SupplierFormData
 ): data is MaterialSupplierFormData {
   return data.supplierType === 'material';
+}
+
+export function isBasicSupplierForm(
+  data: SupplierFormData
+): data is BasicSupplierFormData {
+  return data.supplierType === 'basic';
 }
