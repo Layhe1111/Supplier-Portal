@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { MaterialSupplierFormData, Product } from '@/types/supplier';
 import ProductModal from '@/components/ProductModal';
+import { supabase } from '@/lib/supabaseClient';
 
 export default function ProductManagePage() {
   const router = useRouter();
@@ -14,30 +15,56 @@ export default function ProductManagePage() {
   const [editingIndex, setEditingIndex] = useState<number | undefined>(undefined);
 
   useEffect(() => {
-    // Check authentication
-    const isLoggedIn = localStorage.getItem('isLoggedIn');
-    if (!isLoggedIn) {
-      router.push('/');
-      return;
-    }
+    const loadData = async () => {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) {
+        router.push('/');
+        return;
+      }
 
-    // Load user data
-    const data = localStorage.getItem('supplierData');
-    if (!data) {
-      router.push('/register/supplier');
-      return;
-    }
+      try {
+        const res = await fetch('/api/suppliers/me', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-    const parsedData = JSON.parse(data);
+        if (!res.ok) {
+          throw new Error('Failed to load supplier data');
+        }
 
-    // Check if user is material supplier
-    if (parsedData.supplierType !== 'material') {
-      router.push('/dashboard');
-      return;
-    }
+        const body = await res.json();
+        const supplier = body.supplier as MaterialSupplierFormData | null;
+        if (!supplier) {
+          router.push('/register/supplier');
+          return;
+        }
 
-    setUserData(parsedData);
-    setProducts(parsedData.products || []);
+        if (supplier.supplierType !== 'material') {
+          router.push('/dashboard');
+          return;
+        }
+
+        setUserData(supplier);
+        setProducts(supplier.products || []);
+      } catch (err) {
+        const data = localStorage.getItem('supplierData');
+        if (!data) {
+          router.push('/register/supplier');
+          return;
+        }
+
+        const parsedData = JSON.parse(data);
+        if (parsedData.supplierType !== 'material') {
+          router.push('/dashboard');
+          return;
+        }
+
+        setUserData(parsedData);
+        setProducts(parsedData.products || []);
+      }
+    };
+
+    loadData();
   }, [router]);
 
   const handleAddProduct = () => {
@@ -71,16 +98,36 @@ export default function ProductManagePage() {
     }
   };
 
-  const handleSaveAll = () => {
+  const handleSaveAll = async () => {
     if (!userData) return;
 
-    const updatedData = {
-      ...userData,
-      products: products,
-    };
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData.session?.access_token;
+    if (!token) {
+      router.push('/');
+      return;
+    }
 
-    localStorage.setItem('supplierData', JSON.stringify(updatedData));
-    router.push('/dashboard');
+    try {
+      const res = await fetch('/api/products', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ products }),
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        alert(body.error || 'Failed to save products');
+        return;
+      }
+
+      router.push('/dashboard');
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to save products');
+    }
   };
 
   const handleCancel = () => {

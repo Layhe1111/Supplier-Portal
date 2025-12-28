@@ -3,6 +3,7 @@ import FormSection from '../FormSection';
 import FormInput from '../FormInput';
 import FormSelect from '../FormSelect';
 import FileUpload from '../FileUpload';
+import MultiFileUpload from '../MultiFileUpload';
 import MultiImageUpload from '../MultiImageUpload';
 import { MaterialSupplierFormData, Product, DesignerProject } from '@/types/supplier';
 
@@ -178,13 +179,21 @@ export default function MaterialSupplierQuestionnaire({
     <>
       {/* Section 1: Supplier Basic Information */}
       <FormSection title="Section 1: Supplier Basic Information / 供應商基本信息">
-        <FormInput
-          label="Entity Name / 公司全稱"
-          name="companyLegalName"
-          required
-          value={data.companyLegalName}
-          onChange={(v) => onChange('companyLegalName', v)}
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormInput
+            label="Company English Name / 公司英文名"
+            name="companyName"
+            value={data.companyName}
+            onChange={(v) => onChange('companyName', v)}
+          />
+
+          <FormInput
+            label="Company Chinese Name / 公司中文名"
+            name="companyNameChinese"
+            value={data.companyNameChinese || ''}
+            onChange={(v) => onChange('companyNameChinese', v)}
+          />
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormInput
@@ -222,6 +231,20 @@ export default function MaterialSupplierQuestionnaire({
             required
             value={data.officeAddress}
             onChange={(v) => onChange('officeAddress', v)}
+          />
+        </div>
+
+        <div className="mt-4">
+          <label className="block text-sm font-light text-gray-700 mb-1">
+            Business Description / 公司或業務簡介{' '}
+            <span className="text-gray-400">(Optional / 選填)</span>
+          </label>
+          <textarea
+            value={data.businessDescription || ''}
+            onChange={(e) => onChange('businessDescription', e.target.value)}
+            rows={4}
+            className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 sm:text-sm"
+            placeholder="Brief introduction of your company and business"
           />
         </div>
 
@@ -276,6 +299,7 @@ export default function MaterialSupplierQuestionnaire({
             name="businessRegistration"
             required
             accept=".pdf,.jpg,.jpeg,.png"
+            value={data.businessRegistration}
             onChange={(file) => onChange('businessRegistration', file)}
           />
 
@@ -283,6 +307,7 @@ export default function MaterialSupplierQuestionnaire({
             label="Company Photos / 公司形象照片"
             name="companyPhotos"
             accept=".jpg,.jpeg,.png"
+            value={data.companyPhotos}
             onChange={(file) => onChange('companyPhotos', file)}
           />
         </div>
@@ -427,31 +452,16 @@ export default function MaterialSupplierQuestionnaire({
           </p>
 
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-light text-gray-700 mb-2">
-                Upload Files / 上傳文件
-              </label>
-              <input
-                type="file"
-                accept=".pdf,.jpg,.jpeg,.png"
-                multiple
-                onChange={(e) => {
-                  const files = Array.from(e.target.files || []);
-                  onChange('companySupplementFile', files.length > 0 ? files : null);
-                }}
-                className="w-full px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Accepted formats: PDF, JPG, PNG / 支援格式：PDF、JPG、PNG
-              </p>
-              {data.companySupplementFile && (
-                <p className="text-xs text-gray-500 mt-1">
-                  {Array.isArray(data.companySupplementFile)
-                    ? `${data.companySupplementFile.length} file(s) selected / 已選擇 ${data.companySupplementFile.length} 個文件`
-                    : '1 file selected / 已選擇 1 個文件'}
-                </p>
-              )}
-            </div>
+            <MultiFileUpload
+              label="Upload Files / 上傳文件"
+              name="companySupplementFile"
+              accept=".pdf,.jpg,.jpeg,.png"
+              maxFiles={10}
+              value={data.companySupplementFile}
+              onChange={(paths) =>
+                onChange('companySupplementFile', paths.length > 0 ? paths : null)
+              }
+            />
 
             <FormInput
               label="Or enter company website / 或輸入公司網站"
@@ -658,34 +668,13 @@ export default function MaterialSupplierQuestionnaire({
                     </div>
 
                     <div className="mt-4">
-                      <label className="block text-sm font-light text-gray-700 mb-2">
-                        Product Photos / 產品照片
-                        <span className="text-xs text-gray-500 ml-2">
-                          (Max 9 photos / 最多9張)
-                        </span>
-                      </label>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        onChange={(e) => {
-                          const files = Array.from(e.target.files || []);
-                          if (files.length > 9) {
-                            alert('Maximum 9 photos allowed / 最多只能上傳9張照片');
-                            return;
-                          }
-                          updateProduct(product.id, 'photos', files);
-                        }}
-                        className="w-full px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+                      <MultiImageUpload
+                        label="Product Photos / 產品照片"
+                        name={`product-photos-${product.id}`}
+                        maxFiles={9}
+                        value={product.photos}
+                        onChange={(paths) => updateProduct(product.id, 'photos', paths)}
                       />
-                      <p className="text-xs text-gray-500 mt-1">
-                        Accepted formats: images (JPG/PNG/HEIC etc.) / 支援格式：圖片（JPG/PNG/HEIC 等）
-                      </p>
-                      {product.photos && product.photos.length > 0 && (
-                        <p className="text-xs text-gray-500 mt-1">
-                          {product.photos.length} photo(s) selected / 已選擇 {product.photos.length} 張照片
-                        </p>
-                      )}
                     </div>
 
                     <div className="mt-4">
@@ -694,28 +683,15 @@ export default function MaterialSupplierQuestionnaire({
                       </label>
 
                       <div className="space-y-3">
-                        <div>
-                          <label className="block text-xs text-gray-600 mb-1">
-                            Upload PDF / 上傳PDF文件
-                          </label>
-                          <input
-                            type="file"
-                            accept=".pdf"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0] || null;
-                              updateProduct(product.id, 'specificationFile', file);
-                            }}
-                            className="w-full px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
-                          />
-                          <p className="text-xs text-gray-500 mt-1">
-                            Accepted formats: PDF / 支援格式：PDF
-                          </p>
-                          {product.specificationFile && (
-                            <p className="text-xs text-gray-500 mt-1">
-                              {product.specificationFile.name}
-                            </p>
-                          )}
-                        </div>
+                        <FileUpload
+                          label="Upload PDF / 上傳PDF文件"
+                          name={`specification-${product.id}`}
+                          accept=".pdf"
+                          value={product.specificationFile || null}
+                          onChange={(file) =>
+                            updateProduct(product.id, 'specificationFile', file)
+                          }
+                        />
 
                         <div>
                           <label className="block text-xs text-gray-600 mb-1">
@@ -739,6 +715,7 @@ export default function MaterialSupplierQuestionnaire({
                         label="3D Model / 3D模型"
                         name={`model3D-${product.id}`}
                         accept=".obj,.fbx,.stl,.glb,.gltf"
+                        value={product.model3D}
                         onChange={(file) =>
                           updateProduct(product.id, 'model3D', file)
                         }
@@ -877,6 +854,7 @@ export default function MaterialSupplierQuestionnaire({
                       name={`project-photos-${project.id}`}
                       required
                       maxFiles={9}
+                      value={project.photos}
                       onChange={(files) =>
                         updateProjectHighlight(project.id, 'photos', files)
                       }

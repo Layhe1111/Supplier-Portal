@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabaseClient';
 
 type LoginMethod = 'email' | 'phone';
 
@@ -19,43 +20,98 @@ export default function LoginPage() {
     phone: '',
     password: '',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const normalizePhone = (countryCode: string, phone: string) => {
+    const digits = phone.replace(/\D/g, '');
+    const normalized = `${countryCode}${digits}`.replace(/[^+\d]/g, '');
+    if (!/^\+\d{6,15}$/.test(normalized)) return null;
+    return normalized;
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Store login state
-    localStorage.setItem('isLoggedIn', 'true');
-    const identifier = loginMethod === 'email' ? formData.email : `${formData.countryCode}${formData.phone}`;
-    localStorage.setItem('userIdentifier', identifier);
+  useEffect(() => {
+    const bootstrap = async () => {
+      const localLoggedIn = localStorage.getItem('isLoggedIn');
+      const localSupplier = localStorage.getItem('supplierData');
+      const { data } = await supabase.auth.getUser();
+      const user = data.user;
+      if (!user && localLoggedIn) {
+        router.replace(localSupplier ? '/dashboard' : '/register/supplier');
+        return;
+      }
+      if (!user) return;
+      const { data: suppliers } = await supabase
+        .from('suppliers')
+        .select('id')
+        .order('updated_at', { ascending: false })
+        .limit(1);
+      const supplier = suppliers?.[0];
+      if (supplier) {
+        router.replace('/dashboard');
+        return;
+      }
+      router.replace('/register/supplier');
+    };
+    bootstrap();
+  }, [router]);
 
-    // Check if user has completed supplier registration
-    const supplierData = localStorage.getItem('supplierData');
-    if (supplierData) {
-      // User has completed registration, go to dashboard
+  const redirectAfterLogin = async () => {
+    const { data: suppliers } = await supabase
+      .from('suppliers')
+      .select('id')
+      .order('updated_at', { ascending: false })
+      .limit(1);
+    const supplier = suppliers?.[0];
+    if (supplier) {
       router.push('/dashboard');
-    } else {
-      // User hasn't completed registration, redirect to registration page
-      // Temporary demo logic: use phone number to simulate account type
-      // Phone "1" = full supplier (original 3 types)
-      // Phone "2" = basic supplier (simplified form)
+      return;
+    }
+    router.push('/register/supplier');
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setIsSubmitting(true);
+
+    try {
       if (loginMethod === 'phone') {
-        if (formData.phone === '1') {
-          // Full supplier - original registration flow
-          localStorage.setItem('accountType', 'full');
-          router.push('/register/supplier');
-        } else if (formData.phone === '2') {
-          // Basic supplier - simplified registration flow
-          localStorage.setItem('accountType', 'basic');
-          router.push('/register/basic');
-        } else {
-          // Default to full supplier for other phone numbers
-          localStorage.setItem('accountType', 'full');
-          router.push('/register/supplier');
+        if (!formData.phone || !formData.password) {
+          throw new Error('Please enter phone number and password / 請輸入電話號碼與密碼');
+        }
+
+        const phone = normalizePhone(formData.countryCode, formData.phone);
+        if (!phone) {
+          throw new Error('Invalid phone number / 請輸入有效電話號碼');
+        }
+
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          phone,
+          password: formData.password,
+        });
+
+        if (signInError) {
+          throw signInError;
         }
       } else {
-        // Email login defaults to full supplier
-        localStorage.setItem('accountType', 'full');
-        router.push('/register/supplier');
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (signInError) {
+          if (signInError.message.toLowerCase().includes('email not confirmed')) {
+            throw new Error('請先前往郵箱完成驗證後再登入 / Please confirm your email before signing in.');
+          }
+          throw signInError;
+        }
       }
+
+      await redirectAfterLogin();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to sign in');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -195,11 +251,18 @@ export default function LoginPage() {
             <div>
               <button
                 type="submit"
-                className="w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-light bg-gray-900 text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors"
+                disabled={isSubmitting}
+                className="w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-light bg-gray-900 text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Sign In / 登入
+                {isSubmitting ? 'Signing in...' : 'Sign In / 登入'}
               </button>
             </div>
+
+            {error && (
+              <p className="text-center text-sm text-red-600">
+                {error}
+              </p>
+            )}
 
             <div className="text-center">
               <button

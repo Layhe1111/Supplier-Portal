@@ -138,6 +138,16 @@ export default function CommonRequirements({
             onChange={(v) => onChange('submissionDate', v)}
           />
         </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormInput
+            label="Contact Fax / 聯絡傳真"
+            name="contactFax"
+            value={data.contactFax || ''}
+            onChange={(v) => onChange('contactFax', v)}
+            placeholder="Enter fax number"
+          />
+        </div>
       </FormSection>
 
       {showInfoSharingTerms && (

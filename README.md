@@ -1,197 +1,119 @@
 # ProjectPilot Supplier Portal
 
-供應商註冊與產品管理門戶
+Supplier registration and product management portal for ProjectPilot.
 
-A minimalist supplier registration and product management portal built with Next.js.
+## Current Status / 当前状态
 
-## 項目簡介 / Overview
+- Supabase 已接入：Auth + Postgres + Storage
+- 電郵註冊採用 OTP（Resend 發送驗證碼）
+- 註冊/編輯資料提交至後端 API；草稿保存在 localStorage
+- 手機號註冊/登入已接入 Twilio Verify（短信 OTP + 密碼登入）
 
-這是一個專為供應商設計的註冊和產品管理系統，允許供應商註冊公司信息並管理產品目錄。目前為純前端實現，使用 localStorage 存儲數據，後期將接入 Supabase 作為後端。
+## Features / 核心功能
 
-This is a supplier registration and product management system designed for suppliers to register their company information and manage product catalogs. Currently implemented as a frontend-only application using localStorage, with plans to integrate Supabase as the backend.
+### Supplier Registration / 供應商註冊
+- 多類型供應商：承包商、設計師、材料供應商、基礎供應商
+- 公司與聯絡人信息
+- 類型專屬問卷（項目案例、資質、保險、設計師名單等）
+- 文件與圖片上傳（Supabase Storage）
+- 草稿保存與提交
 
-## 核心功能 / Key Features
+### Product Management / 產品管理（材料供應商）
+- 產品新增/編輯/刪除
+- SKU、類別、品牌、規格、價格、MOQ、交期等信息
+- 產品圖片、規格文件、3D 模型上傳
 
-### 供應商註冊 / Supplier Registration
-- 多類型供應商支持（材料供應商、施工方、設計師）
-- 公司基本信息管理（公司名稱、執照、註冊資本等）
-- 聯繫人信息
-- 業務範圍和品牌代理
-- 營業文件上傳
+### Dashboard / 儀表板
+- 供應商概覽
+- 產品目錄搜索與類別篩選
+- 其他供應商名錄（已提交）
 
-### 產品管理 / Product Management
-- 註冊時或註冊後添加產品
-- 完整的產品信息：SKU、名稱、類別、品牌、材質、規格
-- 價格、最小起訂量（MOQ）、交貨周期
-- 產品描述和圖片上傳
-- 產品目錄搜索和篩選
+## Tech Stack / 技術棧
 
-### 儀表板 / Dashboard
-- 產品概覽和統計
-- 按 SKU、名稱或品牌搜索產品
-- 按類別篩選產品
-- 編輯公司信息
-- 添加更多產品
+- Next.js 14 (App Router)
+- TypeScript
+- Tailwind CSS
+- Supabase (Auth + Database + Storage)
+- Resend (Email OTP)
+- Twilio Verify (SMS OTP)
+- localStorage (draft cache)
 
-### 智能功能 / Smart Features
-- 自動保存草稿（每秒）
-- 表單驗證
-- 中英文雙語界面
-- 響應式設計
-- 極簡 UI
+## Setup / 配置
 
-## 技術棧 / Technology Stack
+### Environment Variables
 
-- **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **State Management**: React Hooks
-- **Storage**: localStorage (純前端)
-- **Future Backend**: Supabase (計劃中)
-
-## 快速開始 / Quick Start
-
-### 安裝與運行 / Installation
+Create `.env.local`:
 
 ```bash
-# 克隆項目
-git clone <repository-url>
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET=supplier-files
+RESEND_API_KEY=
+RESEND_FROM_EMAIL=
+# or EMAIL_FROM as a fallback
+TWILIO_ACCOUNT_SID=
+TWILIO_AUTH_TOKEN=
+TWILIO_VERIFY_SERVICE_SID=
+```
 
-# 安裝依賴
+### Database & Storage
+
+Run the SQL in Supabase:
+
+- `supabase/schema.sql` (tables + RLS + storage bucket)
+- `supabase/storage.sql` (storage bucket + policies only, optional if schema already applied)
+
+## Development / 運行
+
+```bash
 npm install
-
-# 啟動開發服務器
 npm run dev
-
-# 訪問應用
-# 打開瀏覽器訪問 http://localhost:3000
 ```
 
-### 生產構建 / Production Build
+Open http://localhost:3000
 
-```bash
-npm run build
-npm start
-```
+## User Flow / 使用流程
 
-## 項目結構 / Project Structure
+1. 登入 / 註冊（Email OTP 或 SMS OTP）
+2. 選擇供應商類型並填寫問卷
+3. 保存草稿或提交
+4. 進入儀表板管理資料與產品
+
+## API Routes / API 端點
+
+- `POST /api/auth/send-otp`
+- `POST /api/auth/verify-otp`
+- `POST /api/auth/send-phone-otp`
+- `POST /api/auth/verify-phone-otp`
+- `POST /api/suppliers` (create/update supplier data)
+- `GET /api/suppliers/me` (load current supplier)
+- `GET /api/suppliers/basic` (supplier directory)
+- `POST /api/products` (save material supplier products)
+
+## Data Model / 數據模型（主要表）
+
+- `suppliers`
+- `supplier_company`, `supplier_contact`, `supplier_registration`, `supplier_commitments`
+- `products`, `product_files`
+- `supplier_documents`, `project_highlights`, `project_files`
+- `project_managers`, `project_manager_projects`
+- `designer_*`, `material_*`
+
+## Project Structure / 項目結構
 
 ```
 Supplier-Portal/
-├── app/
-│   ├── page.tsx                          # 登入頁面
-│   ├── register/
-│   │   └── supplier/page.tsx             # 供應商註冊頁面
-│   ├── dashboard/page.tsx                # 儀表板
-│   ├── layout.tsx                        # 根佈局
-│   └── globals.css                       # 全局樣式
-├── components/
-│   ├── FormInput.tsx                     # 輸入框組件
-│   ├── FormCheckbox.tsx                  # 複選框組件
-│   ├── FileUpload.tsx                    # 文件上傳組件
-│   ├── FormSection.tsx                   # 表單分區組件
-│   ├── ProductModal.tsx                  # 產品彈窗組件
-│   ├── MultiSelectWithSearch.tsx         # 多選搜索組件
-│   └── questionnaires/                   # 問卷組件
-│       ├── CommonRequirements.tsx        # 公共要求組件
-│       ├── MaterialSupplierQuestionnaire.tsx
-│       ├── ContractorQuestionnaire.tsx
-│       └── DesignerQuestionnaire.tsx
-├── types/
-│   └── supplier.ts                       # TypeScript 類型定義
-└── public/                               # 靜態資源
+├── app/                 # Next.js App Router pages + API routes
+├── components/          # Form components and questionnaires
+├── lib/                 # Supabase clients and upload helpers
+├── supabase/            # SQL schema and storage policies
+├── types/               # TypeScript types
+└── public/              # Static assets
 ```
 
-## 使用流程 / User Flow
+## Notes / 注意事項
 
-### 1. 登入頁面
-訪問首頁，點擊"新供應商？點此註冊"進入註冊流程。
-
-### 2. 供應商註冊
-- 選擇供應商類型（材料供應商、施工方、設計師）
-- 填寫公司基本信息
-- 填寫聯繫人信息
-- 根據供應商類型填寫專屬問卷
-- 添加產品（可選）
-- 上傳相關文件
-- 同意條款並提交
-
-### 3. 儀表板
-- 查看產品概覽和統計數據
-- 搜索和篩選產品
-- 編輯公司信息
-- 添加更多產品
-
-## 測試數據 / Sample Data
-
-### 公司信息
-```
-公司名稱: Premium Furniture Co., Ltd.
-營業執照: BL2024001234
-成立年份: 2015
-註冊資本: HKD 2,000,000
-公司地址: 香港九龍彌敦道123號A座1501室
-業務範圍: 家具、家居裝飾、建材、照明
-代理品牌: ModernLine, ClassicHome, UrbanStyle
-```
-
-### 聯繫信息
-```
-聯繫人: John Chan
-職位: 銷售經理
-電話: +852 9123 4567
-電郵: john.chan@premiumfurniture.com
-```
-
-### 示例產品
-```
-SKU: PF-SOFA-001
-產品名稱: 現代布藝沙發
-類別: 家具
-品牌: ModernLine
-材質: 優質布料、實木框架
-規格: 200cm x 90cm x 85cm
-單價: HKD 5,800
-MOQ: 10
-交貨周期: 14天
-描述: 現代設計沙發，配備高密度泡沫坐墊和可拆卸布套，適合現代生活空間。
-```
-
-## 後端集成計劃 / Backend Integration Plan
-
-項目將接入 **Supabase** 作為後端解決方案：
-
-### Supabase 功能集成
-- **Authentication**: 用戶認證和授權
-- **Database**: PostgreSQL 數據庫存儲供應商和產品數據
-- **Storage**: 文件和圖片存儲
-- **Real-time**: 實時數據更新（可選）
-
-### API 端點規劃
-```
-POST   /api/auth/register        # 供應商註冊
-POST   /api/auth/login           # 登入
-GET    /api/suppliers/:id        # 獲取供應商信息
-PUT    /api/suppliers/:id        # 更新供應商信息
-GET    /api/products              # 獲取產品列表
-POST   /api/products              # 創建產品
-PUT    /api/products/:id         # 更新產品
-DELETE /api/products/:id         # 刪除產品
-```
-
-### 數據表結構
-- `suppliers` - 供應商基本信息
-- `products` - 產品信息
-- `files` - 文件上傳記錄
-- `users` - 用戶認證信息
-
-## 注意事項 / Notes
-
-- 當前使用 localStorage 存儲數據，僅在瀏覽器本地保存
-- 清除瀏覽器緩存將重置所有數據
-- 文件上傳功能在純前端模式下為模擬實現
-- 自動保存功能每秒運行一次，防止數據丟失
-
-## License
-
-This project is proprietary software for ProjectPilot.
+- 手機號註冊使用 Twilio Verify，需在 Supabase 開啟 Phone 登入
+- 草稿保存在 localStorage，清除瀏覽器儲存會丟失未提交資料
+- 邀請碼欄位目前未做後端校驗

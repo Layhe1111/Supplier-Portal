@@ -4,6 +4,7 @@ import FormInput from '../FormInput';
 import FormSelect from '../FormSelect';
 import FormCheckbox from '../FormCheckbox';
 import FileUpload from '../FileUpload';
+import MultiFileUpload from '../MultiFileUpload';
 import MultiImageUpload from '../MultiImageUpload';
 import { ContractorFormData, ProjectManager, DesignerProject, ProjectManagerProject } from '@/types/supplier';
 
@@ -117,7 +118,7 @@ export default function ContractorQuestionnaire({
     onChange('isocertifications', nextSelected);
 
     const currentUploads = data.isoCertificateUploads || {};
-    const nextUploads: Record<string, File | null> = {};
+    const nextUploads: Record<string, string | File | null> = {};
     nextSelected.forEach((iso) => {
       nextUploads[iso] = currentUploads[iso] ?? null;
     });
@@ -164,13 +165,21 @@ export default function ContractorQuestionnaire({
     <>
       {/* Section 1: Company Profile */}
       <FormSection title="Section 1: Company Profile / 公司基本信息">
-        <FormInput
-          label="Entity Name / 公司全稱"
-          name="companyLegalName"
-          required
-          value={data.companyLegalName}
-          onChange={(v) => onChange('companyLegalName', v)}
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormInput
+            label="Company English Name / 公司英文名"
+            name="companyName"
+            value={data.companyName}
+            onChange={(v) => onChange('companyName', v)}
+          />
+
+          <FormInput
+            label="Company Chinese Name / 公司中文名"
+            name="companyNameChinese"
+            value={data.companyNameChinese || ''}
+            onChange={(v) => onChange('companyNameChinese', v)}
+          />
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormInput
@@ -265,12 +274,27 @@ export default function ContractorQuestionnaire({
           onChange={(v) => onChange('officeAddress', v)}
         />
 
+        <div className="mt-4">
+          <label className="block text-sm font-light text-gray-700 mb-1">
+            Business Description / 公司或業務簡介{' '}
+            <span className="text-gray-400">(Optional / 選填)</span>
+          </label>
+          <textarea
+            value={data.businessDescription || ''}
+            onChange={(e) => onChange('businessDescription', e.target.value)}
+            rows={4}
+            className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 sm:text-sm"
+            placeholder="Brief introduction of your company and business"
+          />
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <FileUpload
             label="Business Registration / 商業登記證"
             name="businessRegistration"
             required
             accept=".pdf,.jpg,.jpeg,.png"
+            value={data.businessRegistration}
             onChange={(file) => onChange('businessRegistration', file)}
           />
 
@@ -278,6 +302,7 @@ export default function ContractorQuestionnaire({
             label="Company Photos / 公司形象照片"
             name="companyPhotos"
             accept=".jpg,.jpeg,.png"
+            value={data.companyPhotos}
             onChange={(file) => onChange('companyPhotos', file)}
           />
         </div>
@@ -293,31 +318,16 @@ export default function ContractorQuestionnaire({
           </p>
 
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-light text-gray-700 mb-2">
-                Upload Files / 上傳文件
-              </label>
-              <input
-                type="file"
-                accept=".pdf,.jpg,.jpeg,.png"
-                multiple
-                onChange={(e) => {
-                  const files = Array.from(e.target.files || []);
-                  onChange('companySupplementFile', files.length > 0 ? files : null);
-                }}
-                className="w-full px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Accepted formats: PDF, JPG, PNG / 支援格式：PDF、JPG、PNG
-              </p>
-              {data.companySupplementFile && (
-                <p className="text-xs text-gray-500 mt-1">
-                  {Array.isArray(data.companySupplementFile)
-                    ? `${data.companySupplementFile.length} file(s) selected / 已選擇 ${data.companySupplementFile.length} 個文件`
-                    : '1 file selected / 已選擇 1 個文件'}
-                </p>
-              )}
-            </div>
+            <MultiFileUpload
+              label="Upload Files / 上傳文件"
+              name="companySupplementFile"
+              accept=".pdf,.jpg,.jpeg,.png"
+              maxFiles={10}
+              value={data.companySupplementFile}
+              onChange={(paths) =>
+                onChange('companySupplementFile', paths.length > 0 ? paths : null)
+              }
+            />
 
             <FormInput
               label="Or enter company website / 或輸入公司網站"
@@ -372,6 +382,7 @@ export default function ContractorQuestionnaire({
               name="certificateUpload"
               required
               accept=".pdf,.jpg,.jpeg,.png"
+              value={data.certificateUpload}
               onChange={(file) => onChange('certificateUpload', file)}
             />
           </div>
@@ -410,6 +421,7 @@ export default function ContractorQuestionnaire({
                           name={`iso-${option.value}-upload`}
                           required
                           accept=".pdf,.jpg,.jpeg,.png"
+                          value={data.isoCertificateUploads?.[option.value] || null}
                           onChange={(file) => {
                             onChange('isoCertificateUploads', {
                               ...(data.isoCertificateUploads || {}),
@@ -476,6 +488,7 @@ export default function ContractorQuestionnaire({
                         name={`other-cert-upload-${cert.id}`}
                         required={!!cert.name.trim()}
                         accept=".pdf,.jpg,.jpeg,.png"
+                        value={cert.file}
                         onChange={(file) => updateOtherCertification(cert.id, 'file', file)}
                       />
                     </div>
@@ -628,6 +641,7 @@ export default function ContractorQuestionnaire({
                       label="Project Photos / 項目照片"
                       name={`project-photos-${project.id}`}
                       maxFiles={9}
+                      value={project.photos}
                       onChange={(files) =>
                         updateProjectHighlight(project.id, 'photos', files)
                       }
@@ -685,6 +699,7 @@ export default function ContractorQuestionnaire({
             name="organizationChart"
             required
             accept=".pdf,.jpg,.jpeg,.png"
+            value={data.organizationChart}
             onChange={(file) => onChange('organizationChart', file)}
           />
         </div>
@@ -930,6 +945,7 @@ export default function ContractorQuestionnaire({
                     label="Project Manager CV / 項目經理簡歷"
                     name={`pm-cv-${pmIndex}`}
                     accept=".pdf,.doc,.docx"
+                    value={pm.cv}
                     onChange={(file) => {
                       const updated = [...(data.projectManagers || [])];
                       updated[pmIndex] = { ...updated[pmIndex], cv: file };
@@ -1154,6 +1170,7 @@ export default function ContractorQuestionnaire({
                     label="Insurance Certificate / 保險證明"
                     name={`insurance-file-${index}`}
                     accept=".pdf,.jpg,.jpeg,.png"
+                    value={insurance.file}
                     onChange={(file) => {
                       const updated = [...(data.insurances || [])];
                       updated[index] = { ...updated[index], file };
@@ -1203,6 +1220,7 @@ export default function ContractorQuestionnaire({
                 label="Environmental Health and Safety Document / 環境健康安全文件"
                 name="environmentalHealthSafetyFile"
                 accept=".pdf"
+                value={data.environmentalHealthSafetyFile}
                 onChange={(file) => onChange('environmentalHealthSafetyFile', file)}
               />
             </div>
@@ -1230,6 +1248,7 @@ export default function ContractorQuestionnaire({
                 name="incidentsFile"
                 required
                 accept=".pdf"
+                value={data.incidentsFile}
                 onChange={(file) => onChange('incidentsFile', file)}
               />
             </div>
@@ -1257,6 +1276,7 @@ export default function ContractorQuestionnaire({
                 name="litigationFile"
                 required
                 accept=".pdf"
+                value={data.litigationFile}
                 onChange={(file) => onChange('litigationFile', file)}
               />
             </div>

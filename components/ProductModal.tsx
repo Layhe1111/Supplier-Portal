@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import FormInput from './FormInput';
 import FileUpload from './FileUpload';
+import MultiImageUpload from './MultiImageUpload';
 import { Product } from '@/types/supplier';
 
 interface ProductModalProps {
@@ -212,34 +213,13 @@ export default function ProductModal({
             </div>
 
             <div>
-              <label className="block text-sm font-light text-gray-700 mb-2">
-                Product Photos / 產品照片
-                <span className="text-xs text-gray-500 ml-2">
-                  (Max 9 photos / 最多9張)
-                </span>
-              </label>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={(e) => {
-                  const files = Array.from(e.target.files || []);
-                  if (files.length > 9) {
-                    alert('Maximum 9 photos allowed / 最多只能上傳9張照片');
-                    return;
-                  }
-                  updateField('photos', files);
-                }}
-                className="w-full px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+              <MultiImageUpload
+                label="Product Photos / 產品照片"
+                name={`product-photos-${formData.id}`}
+                maxFiles={9}
+                value={formData.photos || []}
+                onChange={(paths) => updateField('photos', paths)}
               />
-              <p className="text-xs text-gray-500 mt-1">
-                Accepted formats: images (JPG/PNG/HEIC etc.) / 支援格式：圖片（JPG/PNG/HEIC 等）
-              </p>
-              {formData.photos && formData.photos.length > 0 && (
-                <p className="text-xs text-gray-500 mt-1">
-                  {formData.photos.length} photo(s) selected / 已選擇 {formData.photos.length} 張照片
-                </p>
-              )}
             </div>
 
             <div>
@@ -248,28 +228,13 @@ export default function ProductModal({
               </label>
 
               <div className="space-y-3">
-                <div>
-                  <label className="block text-xs text-gray-600 mb-1">
-                    Upload PDF / 上傳PDF文件
-                  </label>
-                  <input
-                    type="file"
-                    accept=".pdf"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0] || null;
-                      updateField('specificationFile', file);
-                    }}
-                    className="w-full px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Accepted formats: PDF / 支援格式：PDF
-                  </p>
-                  {formData.specificationFile && (
-                    <p className="text-xs text-gray-500 mt-1">
-                      {formData.specificationFile.name}
-                    </p>
-                  )}
-                </div>
+                <FileUpload
+                  label="Upload PDF / 上傳PDF文件"
+                  name={`specification-${formData.id}`}
+                  accept=".pdf"
+                  value={formData.specificationFile || null}
+                  onChange={(file) => updateField('specificationFile', file)}
+                />
 
                 <div>
                   <label className="block text-xs text-gray-600 mb-1">
@@ -293,6 +258,7 @@ export default function ProductModal({
                 label="3D Model / 3D模型"
                 name="model3D"
                 accept=".obj,.fbx,.stl,.glb,.gltf"
+                value={formData.model3D}
                 onChange={(file) => updateField('model3D', file)}
               />
             </div>

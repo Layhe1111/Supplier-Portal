@@ -7,10 +7,21 @@ import FormSelect from '@/components/FormSelect';
 import FormSection from '@/components/FormSection';
 import FileUpload from '@/components/FileUpload';
 import { BasicSupplierFormData } from '@/types/supplier';
+import { supabase } from '@/lib/supabaseClient';
 
-const COUNTRY_CODES = [
-  { code: '+86', name: '中國 China', flag: '🇨🇳' },
-  { code: '+852', name: '香港 Hong Kong', flag: '🇭🇰' },
+const PHONE_CODE_OPTIONS = [
+  '+852',
+  '+86',
+  '+853',
+  '+886',
+  '+65',
+  '+60',
+  '+81',
+  '+82',
+  '+44',
+  '+1',
+  '+61',
+  '+971',
 ];
 
 const COUNTRY_OPTIONS = [
@@ -43,25 +54,173 @@ export default function BasicSupplierRegistrationPage() {
     companyName: '',
     companyNameChinese: '',
     country: '',
-    companyAddress: '',
+    officeAddress: '',
     businessType: '',
-    contactPhone: '',
-    contactPhoneCode: '+86',
-    contactEmail: '',
+    submitterName: '',
+    submitterPosition: '',
+    submitterPhone: '',
+    submitterPhoneCode: '+852',
+    submitterEmail: '',
     contactFax: '',
     businessDescription: '',
-    companyWebsite: '',
+    companySupplementLink: '',
     companyLogo: null,
-    submissionDate: new Date().toISOString(),
+    submissionDate: new Date().toISOString().split('T')[0],
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
-  // Check if user is logged in
+  // Check if user is logged in (Supabase auth) and load any existing local draft
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem('isLoggedIn');
-    if (!isLoggedIn) {
-      router.push('/');
-      return;
-    }
+    const bootstrap = async () => {
+      const normalizeBasicSupplierData = (raw: any) => {
+        if (!raw || typeof raw !== 'object') {
+          return { normalized: raw as BasicSupplierFormData, changed: false };
+        }
+
+        const normalized = { ...raw } as Record<string, any>;
+        let changed = false;
+
+        if (!normalized.officeAddress && normalized.companyAddress) {
+          normalized.officeAddress = normalized.companyAddress;
+          changed = true;
+        }
+
+        if (!normalized.submitterPhone && normalized.contactPhone) {
+          normalized.submitterPhone = normalized.contactPhone;
+          changed = true;
+        }
+
+        if (!normalized.submitterPhoneCode && normalized.contactPhoneCode) {
+          normalized.submitterPhoneCode = normalized.contactPhoneCode;
+          changed = true;
+        }
+
+        if (!normalized.submitterEmail && normalized.contactEmail) {
+          normalized.submitterEmail = normalized.contactEmail;
+          changed = true;
+        }
+
+        if (!normalized.companySupplementLink && normalized.companyWebsite) {
+          normalized.companySupplementLink = normalized.companyWebsite;
+          changed = true;
+        }
+
+        if (!normalized.companyName && normalized.companyLegalName) {
+          normalized.companyName = normalized.companyLegalName;
+          changed = true;
+        }
+
+        if (normalized.companyName == null) {
+          normalized.companyName = '';
+          changed = true;
+        }
+
+        if (normalized.companyNameChinese == null) {
+          normalized.companyNameChinese = '';
+          changed = true;
+        }
+
+        if (normalized.officeAddress == null) {
+          normalized.officeAddress = '';
+          changed = true;
+        }
+
+        if (normalized.country == null) {
+          normalized.country = '';
+          changed = true;
+        }
+
+        if (normalized.businessType == null) {
+          normalized.businessType = '';
+          changed = true;
+        }
+
+        if (normalized.submitterName == null) {
+          normalized.submitterName = '';
+          changed = true;
+        }
+
+        if (normalized.submitterPosition == null) {
+          normalized.submitterPosition = '';
+          changed = true;
+        }
+
+        if (normalized.submitterPhone == null) {
+          normalized.submitterPhone = '';
+          changed = true;
+        }
+
+        if (normalized.submitterPhoneCode == null) {
+          normalized.submitterPhoneCode = '+852';
+          changed = true;
+        }
+
+        if (normalized.submitterEmail == null) {
+          normalized.submitterEmail = '';
+          changed = true;
+        }
+
+        if (typeof normalized.submissionDate === 'string' && normalized.submissionDate.includes('T')) {
+          normalized.submissionDate = normalized.submissionDate.split('T')[0];
+          changed = true;
+        }
+
+        if (!normalized.submissionDate) {
+          normalized.submissionDate = new Date().toISOString().split('T')[0];
+          changed = true;
+        }
+
+        return { normalized: normalized as BasicSupplierFormData, changed };
+      };
+
+      const localLoggedIn = localStorage.getItem('isLoggedIn');
+      const { data } = await supabase.auth.getUser();
+      if (!data.user && !localLoggedIn) {
+        router.replace('/');
+        return;
+      }
+
+      let serverSupplier: BasicSupplierFormData | null = null;
+      if (data.user) {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const token = sessionData.session?.access_token;
+        if (token) {
+          const res = await fetch('/api/suppliers/me?type=basic', {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (res.ok) {
+            const body = await res.json().catch(() => ({}));
+            serverSupplier = body.supplier || null;
+          }
+        }
+      }
+
+      if (serverSupplier) {
+        const { normalized, changed } = normalizeBasicSupplierData(serverSupplier);
+        if (changed) {
+          localStorage.setItem('supplierData', JSON.stringify(normalized));
+        }
+        setFormData(normalized as BasicSupplierFormData);
+      } else {
+        const local = localStorage.getItem('supplierData');
+        if (local) {
+          try {
+            const parsed = JSON.parse(local);
+            if (parsed.supplierType === 'basic') {
+              const { normalized, changed } = normalizeBasicSupplierData(parsed);
+              if (changed) {
+                localStorage.setItem('supplierData', JSON.stringify(normalized));
+              }
+              setFormData(normalized as BasicSupplierFormData);
+            }
+          } catch (err) {
+            console.error('Failed to parse local supplier data', err);
+          }
+        }
+      }
+    };
+    bootstrap();
   }, [router]);
 
   const handleInputChange = (field: keyof BasicSupplierFormData, value: string | File | null) => {
@@ -71,38 +230,66 @@ export default function BasicSupplierRegistrationPage() {
     }));
   };
 
-  // Check if Chinese name is required based on country
-  const requiresChineseName = ['Hong Kong', 'China', 'Macau', 'Taiwan', 'Singapore'].includes(formData.country);
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
 
-    // Validate required fields
     if (
-      !formData.companyName ||
       !formData.country ||
-      !formData.companyAddress ||
+      !formData.officeAddress ||
       !formData.businessType ||
-      !formData.contactPhone ||
-      !formData.contactEmail ||
-      !formData.contactFax
+      !formData.submitterName ||
+      !formData.submitterPosition ||
+      !formData.submitterPhone ||
+      !formData.submitterEmail ||
+      !formData.submissionDate
     ) {
-      alert('Please fill in all required fields / 請填寫所有必填項');
+      setError('Please fill in all required fields / 請填寫所有必填項');
       return;
     }
 
-    // Validate Chinese name if required
-    if (requiresChineseName && !formData.companyNameChinese) {
-      alert('Please fill in the company Chinese name / 請填寫公司中文名');
+    if (!formData.companyName?.trim() && !formData.companyNameChinese?.trim()) {
+      setError('Please provide a company name in English or Chinese / 請至少填寫公司英文名或中文名');
       return;
     }
 
-    // Save supplier data
-    localStorage.setItem('supplierData', JSON.stringify(formData));
-    localStorage.setItem('isLoggedIn', 'true');
+    setIsSubmitting(true);
 
-    alert('Registration successful! / 註冊成功！');
-    router.push('/dashboard');
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) {
+        throw new Error('Please sign in to save to database / 請先登入再提交資料');
+      }
+
+      const res = await fetch('/api/suppliers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          supplierType: 'basic',
+          status: 'submitted',
+          data: formData,
+        }),
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || 'Failed to save supplier');
+      }
+
+      // Save supplier data locally
+      localStorage.setItem('supplierData', JSON.stringify(formData));
+      localStorage.setItem('isLoggedIn', 'true');
+
+      router.push('/dashboard');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to submit');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -124,25 +311,21 @@ export default function BasicSupplierRegistrationPage() {
               <div className="md:col-span-2">
                 <FormInput
                   label="Company English Name / 公司英文名"
-                  required
                   value={formData.companyName}
                   onChange={(value) => handleInputChange('companyName', value)}
                   placeholder="Enter company name"
                 />
               </div>
 
-              {/* Company Chinese Name (conditional) */}
-              {requiresChineseName && (
-                <div className="md:col-span-2">
-                  <FormInput
-                    label="Company Chinese Name / 公司中文名"
-                    required
-                    value={formData.companyNameChinese || ''}
-                    onChange={(value) => handleInputChange('companyNameChinese', value)}
-                    placeholder="請輸入公司中文名稱"
-                  />
-                </div>
-              )}
+              {/* Company Chinese Name */}
+              <div className="md:col-span-2">
+                <FormInput
+                  label="Company Chinese Name / 公司中文名"
+                  value={formData.companyNameChinese || ''}
+                  onChange={(value) => handleInputChange('companyNameChinese', value)}
+                  placeholder="請輸入公司中文名稱"
+                />
+              </div>
 
               {/* Country */}
               <div>
@@ -170,10 +353,10 @@ export default function BasicSupplierRegistrationPage() {
               {/* Company Address */}
               <div className="md:col-span-2">
                 <FormInput
-                  label="Company Address / 公司地址"
+                  label="Office Address / 辦公地址"
                   required
-                  value={formData.companyAddress}
-                  onChange={(value) => handleInputChange('companyAddress', value)}
+                  value={formData.officeAddress}
+                  onChange={(value) => handleInputChange('officeAddress', value)}
                   placeholder="Enter full company address"
                 />
               </div>
@@ -196,10 +379,10 @@ export default function BasicSupplierRegistrationPage() {
               {/* Company Website (Optional) */}
               <div className="md:col-span-2">
                 <FormInput
-                  label="Company Website / 公司網址"
-                  value={formData.companyWebsite || ''}
-                  onChange={(value) => handleInputChange('companyWebsite', value)}
-                  placeholder="https://www.example.com"
+                  label="Or enter company website / 或輸入公司網站"
+                  value={formData.companySupplementLink || ''}
+                  onChange={(value) => handleInputChange('companySupplementLink', value)}
+                  placeholder="https://..."
                   type="url"
                 />
                 <p className="mt-1 text-xs text-gray-500">Optional / 選填</p>
@@ -213,65 +396,87 @@ export default function BasicSupplierRegistrationPage() {
                 </label>
                 <FileUpload
                   accept="image/*"
-                  onChange={(file) => handleInputChange('companyLogo', file)}
+                  onChange={(filePath) => handleInputChange('companyLogo', filePath)}
                   label="Upload company logo (PNG, JPG, max 5MB)"
+                  name="companyLogo"
+                  value={formData.companyLogo}
                 />
               </div>
             </div>
           </FormSection>
 
-          <FormSection title="Contact Information / 聯絡信息">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Contact Phone */}
+          <FormSection title="Contact Information / 聯絡人資料">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormInput
+                label="Contact Person / 聯絡人"
+                required
+                value={formData.submitterName}
+                onChange={(value) => handleInputChange('submitterName', value)}
+              />
+
+              <FormInput
+                label="Position / 職位"
+                required
+                value={formData.submitterPosition}
+                onChange={(value) => handleInputChange('submitterPosition', value)}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-light text-gray-700 mb-1">
-                  Contact Phone / 聯絡電話 <span className="text-red-500">*</span>
+                  Contact Number / 聯繫電話 <span className="text-red-500">*</span>
                 </label>
-                <div className="flex space-x-2">
+                <div className="flex gap-2">
                   <select
-                    value={formData.contactPhoneCode}
-                    onChange={(e) => handleInputChange('contactPhoneCode', e.target.value)}
-                    className="appearance-none px-3 py-2 border border-gray-300 text-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 sm:text-sm"
+                    value={formData.submitterPhoneCode}
+                    onChange={(e) => handleInputChange('submitterPhoneCode', e.target.value)}
+                    className="w-28 px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
                   >
-                    {COUNTRY_CODES.map((country) => (
-                      <option key={country.code} value={country.code}>
-                        {country.flag} {country.code}
+                    {PHONE_CODE_OPTIONS.map((code) => (
+                      <option key={code} value={code}>
+                        {code}
                       </option>
                     ))}
                   </select>
                   <input
                     type="tel"
                     required
-                    value={formData.contactPhone}
-                    onChange={(e) => handleInputChange('contactPhone', e.target.value)}
-                    className="appearance-none relative block flex-1 px-3 py-2 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 sm:text-sm"
-                    placeholder="1234 5678"
+                    value={formData.submitterPhone}
+                    onChange={(e) => handleInputChange('submitterPhone', e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+                    placeholder="e.g., 91234567"
                   />
                 </div>
               </div>
 
-              {/* Contact Email */}
-              <div>
-                <FormInput
-                  label="Contact Email / 聯絡電郵"
-                  required
-                  type="email"
-                  value={formData.contactEmail}
-                  onChange={(value) => handleInputChange('contactEmail', value)}
-                  placeholder="contact@company.com"
-                />
-              </div>
+              <FormInput
+                label="Email / 電郵"
+                required
+                type="email"
+                value={formData.submitterEmail}
+                onChange={(value) => handleInputChange('submitterEmail', value)}
+                placeholder="contact@company.com"
+              />
+            </div>
 
-              {/* Contact Fax */}
-              <div className="md:col-span-2">
-                <FormInput
-                  label="Contact Fax / 聯絡傳真"
-                  required
-                  value={formData.contactFax}
-                  onChange={(value) => handleInputChange('contactFax', value)}
-                  placeholder="Enter fax number"
-                />
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormInput
+                label="Submission Date / 提交日期"
+                required
+                type="date"
+                value={formData.submissionDate}
+                onChange={(value) => handleInputChange('submissionDate', value)}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormInput
+                label="Contact Fax / 聯絡傳真"
+                value={formData.contactFax || ''}
+                onChange={(value) => handleInputChange('contactFax', value)}
+                placeholder="Enter fax number"
+              />
             </div>
           </FormSection>
 
@@ -286,11 +491,18 @@ export default function BasicSupplierRegistrationPage() {
             </button>
             <button
               type="submit"
+              disabled={isSubmitting}
               className="px-6 py-2.5 border border-transparent text-sm font-light bg-gray-900 text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors"
             >
-              Submit / 提交
+              {isSubmitting ? 'Submitting...' : 'Submit / 提交'}
             </button>
           </div>
+
+          {error && (
+            <p className="text-sm text-red-600 text-right">
+              {error}
+            </p>
+          )}
         </form>
       </div>
     </div>

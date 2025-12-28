@@ -3,6 +3,7 @@ import FormSection from '../FormSection';
 import FormInput from '../FormInput';
 import FormSelect from '../FormSelect';
 import FileUpload from '../FileUpload';
+import MultiFileUpload from '../MultiFileUpload';
 import MultiImageUpload from '../MultiImageUpload';
 import MultiSelectWithSearch from '../MultiSelectWithSearch';
 import DesignerDBSection from './DesignerDBSection';
@@ -503,13 +504,21 @@ export default function DesignerQuestionnaire({
     <>
       {/* Section 1: Design Company Overview */}
       <FormSection title="Section 1: Design Company Overview / 設計公司概況">
-        <FormInput
-          label="Entity Name / 公司全稱"
-          name="companyLegalName"
-          required
-          value={data.companyLegalName}
-          onChange={(v) => onChange('companyLegalName', v)}
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormInput
+            label="Company English Name / 公司英文名"
+            name="companyName"
+            value={data.companyName}
+            onChange={(v) => onChange('companyName', v)}
+          />
+
+          <FormInput
+            label="Company Chinese Name / 公司中文名"
+            name="companyNameChinese"
+            value={data.companyNameChinese || ''}
+            onChange={(v) => onChange('companyNameChinese', v)}
+          />
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormInput
@@ -547,6 +556,20 @@ export default function DesignerQuestionnaire({
             required
             value={data.officeAddress}
             onChange={(v) => onChange('officeAddress', v)}
+          />
+        </div>
+
+        <div className="mt-4">
+          <label className="block text-sm font-light text-gray-700 mb-1">
+            Business Description / 公司或業務簡介{' '}
+            <span className="text-gray-400">(Optional / 選填)</span>
+          </label>
+          <textarea
+            value={data.businessDescription || ''}
+            onChange={(e) => onChange('businessDescription', e.target.value)}
+            rows={4}
+            className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 sm:text-sm"
+            placeholder="Brief introduction of your company and business"
           />
         </div>
 
@@ -601,6 +624,7 @@ export default function DesignerQuestionnaire({
             name="businessRegistration"
             required
             accept=".pdf,.jpg,.jpeg,.png"
+            value={data.businessRegistration}
             onChange={(file) => onChange('businessRegistration', file)}
           />
 
@@ -608,6 +632,7 @@ export default function DesignerQuestionnaire({
             label="Company Photos / 公司形象照片"
             name="companyPhotos"
             accept=".jpg,.jpeg,.png"
+            value={data.companyPhotos}
             onChange={(file) => onChange('companyPhotos', file)}
           />
         </div>
@@ -778,6 +803,7 @@ export default function DesignerQuestionnaire({
                       label="Project Photos / 項目照片"
                       name={`highlight-photos-${project.id}`}
                       maxFiles={9}
+                      value={project.photos}
                       onChange={(files) => updateDesignHighlight(project.id, 'photos', files)}
                     />
                   </div>
@@ -798,31 +824,16 @@ export default function DesignerQuestionnaire({
           </p>
 
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-light text-gray-700 mb-2">
-                Upload Files / 上傳文件
-              </label>
-              <input
-                type="file"
-                accept=".pdf,.jpg,.jpeg,.png"
-                multiple
-                onChange={(e) => {
-                  const files = Array.from(e.target.files || []);
-                  onChange('companySupplementFile', files.length > 0 ? files : null);
-                }}
-                className="w-full px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Accepted formats: PDF, JPG, PNG / 支援格式：PDF、JPG、PNG
-              </p>
-              {data.companySupplementFile && (
-                <p className="text-xs text-gray-500 mt-1">
-                  {Array.isArray(data.companySupplementFile)
-                    ? `${data.companySupplementFile.length} file(s) selected / 已選擇 ${data.companySupplementFile.length} 個文件`
-                    : '1 file selected / 已選擇 1 個文件'}
-                </p>
-              )}
-            </div>
+            <MultiFileUpload
+              label="Upload Files / 上傳文件"
+              name="companySupplementFile"
+              accept=".pdf,.jpg,.jpeg,.png"
+              maxFiles={10}
+              value={data.companySupplementFile}
+              onChange={(paths) =>
+                onChange('companySupplementFile', paths.length > 0 ? paths : null)
+              }
+            />
 
             <FormInput
               label="Or enter company website / 或輸入公司網站"
@@ -1035,6 +1046,7 @@ export default function DesignerQuestionnaire({
             name="organizationChart"
             required
             accept=".pdf,.jpg,.jpeg,.png"
+            value={data.organizationChart}
             onChange={(file) => onChange('organizationChart', file)}
           />
 
@@ -1107,6 +1119,7 @@ export default function DesignerQuestionnaire({
                         name={`designer-cv-${designer.id}`}
                         required={false}
                         accept=".pdf,.jpg,.jpeg,.png"
+                        value={designer.cv}
                         onChange={(file) => updateDesigner(designer.id, 'cv', file)}
                       />
                     </div>
@@ -1236,6 +1249,7 @@ export default function DesignerQuestionnaire({
                                   label="Project Photos / 項目照片"
                                   name={`project-photos-${project.id}`}
                                   maxFiles={9}
+                                  value={project.photos}
                                   onChange={(files) =>
                                     updateProject(designer.id, project.id, 'photos', files)
                                   }

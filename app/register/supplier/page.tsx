@@ -8,6 +8,7 @@ import {
   DesignerFormData,
   MaterialSupplierFormData,
 } from '@/types/supplier';
+import { supabase } from '@/lib/supabaseClient';
 import ContractorQuestionnaire from '@/components/questionnaires/ContractorQuestionnaire';
 import DesignerQuestionnaire from '@/components/questionnaires/DesignerQuestionnaire';
 import MaterialSupplierQuestionnaire from '@/components/questionnaires/MaterialSupplierQuestionnaire';
@@ -20,32 +21,113 @@ export default function SupplierRegistrationPage() {
   >(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [supplierId, setSupplierId] = useState<string | null>(null);
 
   // Initialize form data based on supplier type
   const [formData, setFormData] = useState<SupplierFormData | null>(null);
 
   // Check if user is logged in and load existing data if in edit mode
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem('isLoggedIn');
-    if (!isLoggedIn) {
-      router.push('/');
-      return;
-    }
+    const bootstrap = async () => {
+      const normalizeSupplierData = (raw: any) => {
+        if (!raw || typeof raw !== 'object') {
+          return { normalized: raw as SupplierFormData, changed: false };
+        }
 
-    // Check if there's existing supplier data (edit mode)
-    const existingData = localStorage.getItem('supplierData');
-    if (existingData) {
-      try {
-        const parsed = JSON.parse(existingData);
-        setSupplierType(parsed.supplierType);
-        setFormData(parsed);
-        setIsEditMode(true);
-      } catch (error) {
-        console.error('Failed to load existing data:', error);
+        const normalized = { ...raw } as Record<string, any>;
+        let changed = false;
+
+        if (!normalized.companyName && normalized.companyLegalName) {
+          normalized.companyName = normalized.companyLegalName;
+          changed = true;
+        }
+
+        if (normalized.companyName == null) {
+          normalized.companyName = '';
+          changed = true;
+        }
+
+        if (normalized.companyNameChinese == null) {
+          normalized.companyNameChinese = '';
+          changed = true;
+        }
+
+        if (typeof normalized.submissionDate === 'string' && normalized.submissionDate.includes('T')) {
+          normalized.submissionDate = normalized.submissionDate.split('T')[0];
+          changed = true;
+        }
+
+        return { normalized: normalized as SupplierFormData, changed };
+      };
+
+      const localLoggedIn = localStorage.getItem('isLoggedIn');
+      const { data } = await supabase.auth.getUser();
+      if (!data.user && !localLoggedIn) {
+        router.replace('/');
+        return;
       }
-    }
 
-    setIsCheckingAuth(false);
+      let serverSupplier: SupplierFormData | null = null;
+      let serverSupplierId: string | null = null;
+
+      if (data.user) {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const token = sessionData.session?.access_token;
+        if (token) {
+          const res = await fetch('/api/suppliers/me', {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (res.ok) {
+            const body = await res.json().catch(() => ({}));
+            serverSupplier = body.supplier || null;
+            serverSupplierId = body.supplierId || null;
+          }
+        }
+      }
+
+      if (serverSupplier) {
+        if (serverSupplier.supplierType === 'basic') {
+          router.replace('/register/basic');
+          return;
+        }
+        const { normalized, changed } = normalizeSupplierData(serverSupplier);
+        if (changed) {
+          localStorage.setItem('supplierData', JSON.stringify(normalized));
+        }
+        setSupplierType(normalized.supplierType);
+        setFormData(normalized as SupplierFormData);
+        setIsEditMode(true);
+        setSupplierId(serverSupplierId || 'local');
+      } else {
+        const local = localStorage.getItem('supplierData');
+        if (local) {
+          try {
+            const parsed = JSON.parse(local);
+            if (parsed.supplierType === 'basic') {
+              router.replace('/register/basic');
+              return;
+            }
+            if (parsed.supplierType) {
+              const { normalized, changed } = normalizeSupplierData(parsed);
+              if (changed) {
+                localStorage.setItem('supplierData', JSON.stringify(normalized));
+              }
+              setSupplierType(normalized.supplierType);
+              setFormData(normalized as SupplierFormData);
+              setIsEditMode(true);
+              setSupplierId('local');
+            }
+          } catch (err) {
+            console.error('Failed to parse local supplier data', err);
+          }
+        }
+      }
+
+      setIsCheckingAuth(false);
+    };
+    bootstrap();
   }, [router]);
 
   // Initialize form data when supplier type is selected
@@ -65,6 +147,7 @@ export default function SupplierRegistrationPage() {
         submitterPhoneCode: '+852',
         submitterPhone: '',
         submitterEmail: '',
+        contactFax: '',
         submissionDate: new Date().toISOString().split('T')[0],
       };
 
@@ -72,12 +155,14 @@ export default function SupplierRegistrationPage() {
         const contractorData: ContractorFormData = {
           supplierType: 'contractor',
           ...commonFields,
-          companyLegalName: '',
+          companyName: '',
+          companyNameChinese: '',
           yearEstablished: '',
           registeredCapital: '',
           numberOfEmployees: '',
           country: '',
           officeAddress: '',
+          businessDescription: '',
           hkWorkEligibleEmployees: '',
           companySupplementFile: null,
           companySupplementLink: '',
@@ -126,11 +211,13 @@ export default function SupplierRegistrationPage() {
         const designerData: DesignerFormData = {
           supplierType: 'designer',
           ...commonFields,
-          companyLegalName: '',
+          companyName: '',
+          companyNameChinese: '',
           yearEstablished: '',
           registeredCapital: '',
           country: '',
           officeAddress: '',
+          businessDescription: '',
           hkWorkEligibleEmployees: '',
           designAwards: [''],
           designTeamSize: '',
@@ -190,11 +277,13 @@ export default function SupplierRegistrationPage() {
         const materialData: MaterialSupplierFormData = {
           supplierType: 'material',
           ...commonFields,
-          companyLegalName: '',
+          companyName: '',
+          companyNameChinese: '',
           yearEstablished: '',
           registeredCapital: '',
           country: '',
           officeAddress: '',
+          businessDescription: '',
           hkWorkEligibleEmployees: '',
           companyType: [],
           representedBrands: [''],
@@ -213,40 +302,6 @@ export default function SupplierRegistrationPage() {
     }
   }, [supplierType, formData]);
 
-  // Auto-save draft
-  useEffect(() => {
-    if (formData) {
-      const timer = setTimeout(() => {
-        const draftData = {
-          supplierType,
-          formData: JSON.stringify(formData, (key, value) => {
-            if (value instanceof File) return null;
-            return value;
-          }),
-        };
-        localStorage.setItem('supplierDraft', JSON.stringify(draftData));
-      }, 1000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [formData, supplierType]);
-
-  // Load draft on mount
-  useEffect(() => {
-    const draft = localStorage.getItem('supplierDraft');
-    if (draft) {
-      try {
-        const parsed = JSON.parse(draft);
-        if (parsed.supplierType && parsed.formData) {
-          setSupplierType(parsed.supplierType);
-          setFormData(JSON.parse(parsed.formData));
-        }
-      } catch (error) {
-        console.error('Failed to load draft:', error);
-      }
-    }
-  }, []);
-
   const updateField = <T extends SupplierFormData>(
     field: keyof T,
     value: any
@@ -254,34 +309,95 @@ export default function SupplierRegistrationPage() {
     setFormData((prev) => (prev ? { ...prev, [field]: value } : prev));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const upsertSupplier = async (status: 'draft' | 'submitted') => {
+    if (!formData || !supplierType) return null;
+
+    const payload = {
+      ...formData,
+      supplierType,
+      status,
+    } as SupplierFormData;
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData.session?.access_token;
+    if (!token) {
+      throw new Error('Please sign in to save to database / 請先登入再提交資料');
+    }
+
+    const res = await fetch('/api/suppliers', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        supplierType,
+        status,
+        data: payload,
+      }),
+    });
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.error || 'Failed to save supplier');
+    }
+
+    const body = await res.json().catch(() => ({}));
+    const savedId = body.supplierId || supplierId || `local-${Date.now()}`;
+    localStorage.setItem('supplierData', JSON.stringify(payload));
+    localStorage.setItem('isLoggedIn', 'true');
+    setSupplierId(savedId);
+    return savedId;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
 
     if (!formData) return;
 
-    // Validate common requirements
+    if (!formData.companyName?.trim() && !formData.companyNameChinese?.trim()) {
+      setError('Please provide a company name in English or Chinese / 請至少填寫公司英文名或中文名');
+      return;
+    }
+
     if (
       !formData.guaranteeInfoTrue ||
       !formData.acceptQualitySupervision ||
       !formData.agreeInfoSharing
     ) {
-      alert(
-        'Please accept all quality commitments / 請接受所有質量承諾'
-      );
+      setError('Please accept all quality commitments / 請接受所有質量承諾');
       return;
     }
 
-    localStorage.setItem('supplierData', JSON.stringify(formData));
-    localStorage.setItem('isLoggedIn', 'true');
-    localStorage.removeItem('supplierDraft');
+    setIsSubmitting(true);
+    try {
+      await upsertSupplier('submitted');
+      router.push('/dashboard');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to submit');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
-    router.push('/dashboard');
+  const handleSaveDraft = async () => {
+    if (!formData) return;
+    setError('');
+    setIsSubmitting(true);
+    try {
+      await upsertSupplier('draft');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save draft');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleReset = () => {
     setSupplierType(null);
     setFormData(null);
-    localStorage.removeItem('supplierDraft');
+    setSupplierId(null);
   };
 
   // Show loading while checking authentication
@@ -355,6 +471,21 @@ export default function SupplierRegistrationPage() {
                   Building materials and furniture supply
                   <br />
                   建材與家具供應
+                </p>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => router.push('/register/basic')}
+                className="w-full p-6 border-2 border-gray-300 hover:border-gray-900 hover:bg-gray-50 transition-all text-left group"
+              >
+                <h3 className="text-lg font-medium text-gray-900 group-hover:text-gray-900">
+                  Basic Supplier / 基礎供應商
+                </h3>
+                <p className="mt-2 text-sm text-gray-600">
+                  Basic company and contact information
+                  <br />
+                  基礎公司與聯絡信息
                 </p>
               </button>
             </div>
@@ -435,27 +566,33 @@ export default function SupplierRegistrationPage() {
             <div className={`flex gap-4 ${isEditMode ? 'ml-auto' : ''}`}>
               <button
                 type="button"
-                onClick={() => {
-                  router.push('/dashboard');
-                }}
-                className="px-6 py-2.5 border border-gray-300 text-sm font-light text-gray-700 hover:bg-gray-50 transition-colors"
+                onClick={handleSaveDraft}
+                disabled={isSubmitting}
+                className="px-6 py-2.5 border border-gray-300 text-sm font-light text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Save Draft / 保存草稿
+                {isSubmitting ? 'Saving...' : 'Save Draft / 保存草稿'}
               </button>
 
               <button
                 type="submit"
                 disabled={
+                  isSubmitting ||
                   !formData.guaranteeInfoTrue ||
                   !formData.acceptQualitySupervision ||
                   !formData.agreeInfoSharing
                 }
                 className="px-6 py-2.5 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
               >
-                {isEditMode ? 'Update / 更新' : 'Submit / 提交'}
+                {isSubmitting ? 'Submitting...' : isEditMode ? 'Update / 更新' : 'Submit / 提交'}
               </button>
             </div>
           </div>
+
+          {error && (
+            <p className="text-sm text-red-600 mt-4">
+              {error}
+            </p>
+          )}
         </form>
       </div>
     </div>

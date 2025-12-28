@@ -91,7 +91,7 @@ export default function DesignerDBSection({
     onChange('dbIsocertifications', nextSelected);
 
     const currentUploads = data.dbIsoCertificateUploads || {};
-    const nextUploads: Record<string, File | null> = {};
+    const nextUploads: Record<string, string | File | null> = {};
     nextSelected.forEach((iso) => {
       nextUploads[iso] = currentUploads[iso] ?? null;
     });
@@ -217,6 +217,7 @@ export default function DesignerDBSection({
               name="dbCertificateUpload"
               required
               accept=".pdf,.jpg,.jpeg,.png"
+              value={data.dbCertificateUpload}
               onChange={(file) => onChange('dbCertificateUpload', file)}
             />
           </div>
@@ -255,6 +256,7 @@ export default function DesignerDBSection({
                           name={`db-iso-${option.value}-upload`}
                           required
                           accept=".pdf,.jpg,.jpeg,.png"
+                          value={data.dbIsoCertificateUploads?.[option.value] || null}
                           onChange={(file) => {
                             onChange('dbIsoCertificateUploads', {
                               ...(data.dbIsoCertificateUploads || {}),
@@ -321,6 +323,7 @@ export default function DesignerDBSection({
                         name={`db-other-cert-upload-${cert.id}`}
                         required={!!cert.name.trim()}
                         accept=".pdf,.jpg,.jpeg,.png"
+                        value={cert.file}
                         onChange={(file) => updateDbOtherCertification(cert.id, 'file', file)}
                       />
                     </div>
@@ -473,6 +476,7 @@ export default function DesignerDBSection({
                       label="Project Photos / 項目照片"
                       name={`db-project-photos-${project.id}`}
                       maxFiles={9}
+                      value={project.photos}
                       onChange={(files) =>
                         updateDbProjectHighlight(project.id, 'photos', files)
                       }
@@ -530,6 +534,7 @@ export default function DesignerDBSection({
             name="dbOrganizationChart"
             required
             accept=".pdf,.jpg,.jpeg,.png"
+            value={data.dbOrganizationChart}
             onChange={(file) => onChange('dbOrganizationChart', file)}
           />
         </div>
@@ -751,6 +756,7 @@ export default function DesignerDBSection({
                     label="Project Manager CV / 項目經理簡歷"
                     name={`db-pm-cv-${pmIndex}`}
                     accept=".pdf,.doc,.docx"
+                    value={pm.cv}
                     onChange={(file) => {
                       const updated = [...(data.dbProjectManagers || [])];
                       updated[pmIndex] = { ...updated[pmIndex], cv: file };
@@ -937,6 +943,7 @@ export default function DesignerDBSection({
                     label="Insurance Certificate / 保險證明"
                     name={`db-insurance-file-${index}`}
                     accept=".pdf,.jpg,.jpeg,.png"
+                    value={insurance.file}
                     onChange={(file) => updateDbInsurance(insurance.id, 'file', file)}
                   />
                 </div>
@@ -973,6 +980,7 @@ export default function DesignerDBSection({
                 label="Environmental Health and Safety Document / 環境健康安全文件"
                 name="dbEnvironmentalHealthSafetyFile"
                 accept=".pdf"
+                value={data.dbEnvironmentalHealthSafetyFile}
                 onChange={(file) => onChange('dbEnvironmentalHealthSafetyFile', file)}
               />
             </div>
@@ -1000,6 +1008,7 @@ export default function DesignerDBSection({
                 name="dbIncidentsFile"
                 required
                 accept=".pdf"
+                value={data.dbIncidentsFile}
                 onChange={(file) => onChange('dbIncidentsFile', file)}
               />
             </div>
@@ -1027,6 +1036,7 @@ export default function DesignerDBSection({
                 name="dbLitigationFile"
                 required
                 accept=".pdf"
+                value={data.dbLitigationFile}
                 onChange={(file) => onChange('dbLitigationFile', file)}
               />
             </div>

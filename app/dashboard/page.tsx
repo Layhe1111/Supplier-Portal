@@ -2,100 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { SupplierFormData, Product, MaterialSupplierFormData, BasicSupplierFormData } from '@/types/supplier';
+import { SupplierFormData, Product, SupplierDirectoryEntry } from '@/types/supplier';
 import ProductModal from '@/components/ProductModal';
-
-// Mock basic supplier data
-const mockBasicSuppliers: BasicSupplierFormData[] = [
-  {
-    supplierType: 'basic',
-    companyName: 'Essex Building Materials Ltd',
-    companyNameChinese: '中宜建材有限公司',
-    country: 'Hong Kong',
-    companyAddress: 'Room 11, 8/F, Vanta Industrial Centre, 21-33 Tai Lin Pai Road, Kwai Chung, N.T., Hong Kong',
-    businessType: 'Advertising',
-    contactPhone: '2301 1696',
-    contactPhoneCode: '+852',
-    contactEmail: 'info@essex.hk',
-    contactFax: '2739 7078',
-    businessDescription: 'Professional advertising and marketing solutions',
-    submissionDate: new Date().toISOString(),
-  },
-  {
-    supplierType: 'basic',
-    companyName: 'Golden Dragon Construction Co',
-    companyNameChinese: '金龍建築有限公司',
-    country: 'Hong Kong',
-    companyAddress: 'Unit 5, 12/F, Metro Centre II, 21 Lam Hing Street, Kowloon Bay, Hong Kong',
-    businessType: 'Construction',
-    contactPhone: '2345 6789',
-    contactPhoneCode: '+852',
-    contactEmail: 'info@goldendragon.hk',
-    contactFax: '2345 6790',
-    businessDescription: 'Full-service construction and renovation',
-    submissionDate: new Date().toISOString(),
-  },
-  {
-    supplierType: 'basic',
-    companyName: 'Harmony Interior Design Studio',
-    companyNameChinese: '和諧室內設計工作室',
-    country: 'Hong Kong',
-    companyAddress: '18/F, Tower A, Southmark, 11 Yip Hing Street, Wong Chuk Hang, Hong Kong',
-    businessType: 'Interior Design',
-    contactPhone: '2567 8901',
-    contactPhoneCode: '+852',
-    contactEmail: 'contact@harmony-design.hk',
-    contactFax: '2567 8902',
-    businessDescription: 'Creative interior design and space planning',
-    submissionDate: new Date().toISOString(),
-  },
-  {
-    supplierType: 'basic',
-    companyName: 'Pacific Furniture Trading',
-    companyNameChinese: '太平洋傢俬貿易公司',
-    country: 'Hong Kong',
-    companyAddress: 'Shop 3-5, G/F, Wing Lee Industrial Building, 35-37 Au Pui Wan Street, Fo Tan, N.T., Hong Kong',
-    businessType: 'Furniture Supply',
-    contactPhone: '2789 0123',
-    contactPhoneCode: '+852',
-    contactEmail: 'sales@pacificfurniture.hk',
-    contactFax: '2789 0124',
-    businessDescription: 'Import and distribution of quality furniture',
-    submissionDate: new Date().toISOString(),
-  },
-  {
-    supplierType: 'basic',
-    companyName: 'Smart Home Technology Ltd',
-    companyNameChinese: '智慧家居科技有限公司',
-    country: 'Hong Kong',
-    companyAddress: 'Unit 1208, 12/F, Tsuen Wan Industrial Centre, 220-248 Texaco Road, Tsuen Wan, N.T., Hong Kong',
-    businessType: 'Smart Home Solutions',
-    contactPhone: '2890 1234',
-    contactPhoneCode: '+852',
-    contactEmail: 'info@smarthome.hk',
-    contactFax: '2890 1235',
-    businessDescription: 'Smart home automation and integration',
-    submissionDate: new Date().toISOString(),
-  },
-  {
-    supplierType: 'basic',
-    companyName: 'Green Earth Landscaping',
-    companyNameChinese: '綠色地球園藝公司',
-    country: 'Hong Kong',
-    companyAddress: 'Flat A, 3/F, Block 2, Greenfield Garden, 8 Ma Tau Kok Road, Kowloon, Hong Kong',
-    businessType: 'Landscaping',
-    contactPhone: '2901 2345',
-    contactPhoneCode: '+852',
-    contactEmail: 'contact@greenearth.hk',
-    contactFax: '2901 2346',
-    businessDescription: 'Landscape design and maintenance services',
-    submissionDate: new Date().toISOString(),
-  },
-];
+import { supabase } from '@/lib/supabaseClient';
 
 export default function DashboardPage() {
   const router = useRouter();
   const [userData, setUserData] = useState<SupplierFormData | null>(null);
+  const [supplierId, setSupplierId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -104,23 +18,101 @@ export default function DashboardPage() {
   const [editingIndex, setEditingIndex] = useState<number | undefined>(undefined);
   const [showBasicSuppliers, setShowBasicSuppliers] = useState(false);
   const [basicSupplierSearch, setBasicSupplierSearch] = useState('');
+  const [basicSuppliers, setBasicSuppliers] = useState<SupplierDirectoryEntry[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [error, setError] = useState('');
+
+  const persistProducts = (nextProducts: Product[]) => {
+    const local = localStorage.getItem('supplierData');
+    if (!local) return;
+    try {
+      const parsed = JSON.parse(local);
+      if (parsed?.supplierType !== 'material') return;
+      localStorage.setItem(
+        'supplierData',
+        JSON.stringify({ ...parsed, products: nextProducts })
+      );
+    } catch (err) {
+      console.error('Failed to update local product cache', err);
+    }
+  };
+
+  const syncProducts = async (nextProducts: Product[]) => {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData.session?.access_token;
+    if (!token) {
+      throw new Error('Please sign in to save products / 請先登入再保存產品');
+    }
+
+    const res = await fetch('/api/products', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ products: nextProducts }),
+    });
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.error || 'Failed to save products');
+    }
+  };
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem('isLoggedIn');
-    if (!isLoggedIn) {
-      router.push('/');
-      return;
-    }
+    const loadData = async () => {
+      setIsLoading(true);
+      setError('');
 
-    const data = localStorage.getItem('supplierData');
-    if (!data) {
-      // User is logged in but hasn't completed registration
-      router.push('/register/supplier');
-      return;
-    }
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) {
+        setIsLoading(false);
+        router.replace('/');
+        return;
+      }
 
-    setUserData(JSON.parse(data));
-    setIsLoading(false);
+      try {
+        const [meRes, basicRes] = await Promise.all([
+          fetch('/api/suppliers/me', {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch('/api/suppliers/basic', {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+
+        if (!meRes.ok) {
+          const body = await meRes.json().catch(() => ({}));
+          throw new Error(body.error || 'Failed to load supplier data');
+        }
+
+        const meBody = await meRes.json();
+        if (!meBody.supplier) {
+          setIsLoading(false);
+          router.replace('/register/supplier');
+          return;
+        }
+
+        const supplier = meBody.supplier as SupplierFormData;
+        setUserData(supplier);
+        setSupplierId(meBody.supplierId || null);
+        setProducts(supplier.supplierType === 'material' ? supplier.products || [] : []);
+
+        if (basicRes.ok) {
+          const basicBody = await basicRes.json().catch(() => ({ suppliers: [] }));
+          setBasicSuppliers(basicBody.suppliers || []);
+        } else {
+          setBasicSuppliers([]);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load data');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
   }, [router]);
 
   const handleAddProduct = () => {
@@ -135,46 +127,40 @@ export default function DashboardPage() {
     setIsModalOpen(true);
   };
 
-  const handleSaveProduct = (product: Product) => {
+  const handleSaveProduct = async (product: Product) => {
     if (!userData || userData.supplierType !== 'material') return;
 
-    let updatedProducts: Product[];
-    if (editingProduct) {
-      // Edit existing product
-      updatedProducts = userData.products.map((p) =>
-        p.id === product.id ? product : p
-      );
-    } else {
-      // Add new product
-      updatedProducts = [...userData.products, product];
+    setError('');
+    const mapped: Product = { ...product };
+    const exists = products.find((p) => p.id === product.id);
+    const nextProducts = exists
+      ? products.map((p) => (p.id === product.id ? mapped : p))
+      : [mapped, ...products];
+
+    try {
+      await syncProducts(nextProducts);
+      setProducts(nextProducts);
+      persistProducts(nextProducts);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save products');
     }
-
-    const updatedData = {
-      ...userData,
-      products: updatedProducts,
-    };
-
-    localStorage.setItem('supplierData', JSON.stringify(updatedData));
-    setUserData(updatedData as MaterialSupplierFormData);
   };
 
-  const handleDeleteProduct = (id: string) => {
+  const handleDeleteProduct = async (id: string) => {
     if (!userData || userData.supplierType !== 'material') return;
 
     if (confirm('Are you sure you want to delete this product? / 確定要刪除此產品嗎？')) {
-      const updatedProducts = userData.products.filter((p) => p.id !== id);
-      const updatedData = {
-        ...userData,
-        products: updatedProducts,
-      };
-
-      localStorage.setItem('supplierData', JSON.stringify(updatedData));
-      setUserData(updatedData as MaterialSupplierFormData);
+      setError('');
+      const nextProducts = products.filter((p) => p.id !== id);
+      try {
+        await syncProducts(nextProducts);
+        setProducts(nextProducts);
+        persistProducts(nextProducts);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to save products');
+      }
     }
   };
-
-  // Get products (only for material suppliers)
-  const products = userData?.supplierType === 'material' ? userData.products : [];
 
   // Get unique categories
   const categories = products.length > 0
@@ -195,7 +181,7 @@ export default function DashboardPage() {
   });
 
   // Filter basic suppliers
-  const filteredBasicSuppliers = mockBasicSuppliers.filter((supplier) => {
+  const filteredBasicSuppliers = basicSuppliers.filter((supplier) => {
     const searchLower = basicSupplierSearch.toLowerCase();
     return (
       supplier.companyName.toLowerCase().includes(searchLower) ||
@@ -216,6 +202,11 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-gray-50">
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {error && (
+          <div className="mb-4 rounded border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
         {/* Welcome Section */}
         <div className="bg-white border border-gray-200 p-8 mb-8">
           <h2 className="text-xl font-light text-gray-900 mb-4">
@@ -225,7 +216,12 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Company / 公司</p>
-                <p className="text-base text-gray-900">{userData.companyLegalName}</p>
+                <p className="text-base text-gray-900">
+                  {(userData as any).companyName ||
+                    (userData as any).companyNameChinese ||
+                    (userData as any).companyLegalName ||
+                    '-'}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-gray-600 mb-1">Supplier Type / 供應商類型</p>
@@ -233,22 +229,30 @@ export default function DashboardPage() {
                   {userData.supplierType === 'contractor' && 'Contractor / 承包商'}
                   {userData.supplierType === 'designer' && 'Designer / 設計師'}
                   {userData.supplierType === 'material' && 'Material Supplier / 材料供應商'}
+                  {userData.supplierType === 'basic' && 'Basic Supplier / 基礎供應商'}
                 </p>
               </div>
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">Contact / 聯繫人</p>
-                  <p className="text-base text-gray-900">{userData.submitterName}</p>
-                </div>
-                <button
-                  onClick={() => setShowBasicSuppliers(!showBasicSuppliers)}
-                  className="ml-4 px-4 py-2 text-sm border border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition-colors whitespace-nowrap"
-                >
-                  {showBasicSuppliers ? '返回' : '查看其他供應商，設計師，施工方'}
-                </button>
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Contact / 聯繫人</p>
+                <p className="text-base text-gray-900">
+                  {(userData as any).submitterName ||
+                    (userData as any).submitterEmail ||
+                    (userData as any).contactEmail ||
+                    '-'}
+                </p>
               </div>
             </div>
           )}
+        </div>
+
+        {/* Actions */}
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={() => setShowBasicSuppliers(!showBasicSuppliers)}
+            className="px-6 py-2.5 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
+          >
+            {showBasicSuppliers ? 'Back / 返回' : 'View Other Suppliers / 查看其他供應商'}
+          </button>
         </div>
 
         {/* Product Statistics - Only show for material suppliers */}
@@ -417,13 +421,13 @@ export default function DashboardPage() {
                           {product.brand}
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                          HKD {parseInt(product.unitPrice).toLocaleString()}
+                          {product.unitPrice ? `HKD ${parseInt(product.unitPrice).toLocaleString()}` : '-'}
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                           {product.moq}
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                          {product.leadTime} days
+                          {product.leadTime ? `${product.leadTime} days` : '-'}
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                           <div className="flex gap-2">
@@ -498,19 +502,21 @@ export default function DashboardPage() {
 
                     {/* Address */}
                     <p className="text-sm text-gray-600 mb-3">
-                      {supplier.companyAddress}
+                      {supplier.officeAddress}
                     </p>
 
                     {/* Contact Information */}
                     <div className="space-y-1 text-sm text-gray-700">
                       <p>
-                        <span className="font-medium">T:</span> ({supplier.contactPhoneCode}) {supplier.contactPhone}
+                        <span className="font-medium">T:</span> ({supplier.submitterPhoneCode}) {supplier.submitterPhone}
                       </p>
+                      {supplier.contactFax && (
+                        <p>
+                          <span className="font-medium">F:</span> ({supplier.submitterPhoneCode}) {supplier.contactFax}
+                        </p>
+                      )}
                       <p>
-                        <span className="font-medium">F:</span> ({supplier.contactPhoneCode}) {supplier.contactFax}
-                      </p>
-                      <p>
-                        <span className="font-medium">E:</span> {supplier.contactEmail}
+                        <span className="font-medium">E:</span> {supplier.submitterEmail}
                       </p>
                     </div>
 
@@ -534,8 +540,8 @@ export default function DashboardPage() {
             )}
 
             <div className="mt-4 text-sm text-gray-600">
-              Showing {filteredBasicSuppliers.length} of {mockBasicSuppliers.length} suppliers
-              / 顯示 {filteredBasicSuppliers.length} / {mockBasicSuppliers.length} 個供應商
+              Showing {filteredBasicSuppliers.length} of {basicSuppliers.length} suppliers
+              / 顯示 {filteredBasicSuppliers.length} / {basicSuppliers.length} 個供應商
             </div>
           </div>
         )}

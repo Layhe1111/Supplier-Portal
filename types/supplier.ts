@@ -1,3 +1,6 @@
+export type UploadValue = File | string;
+export type UploadList = UploadValue[];
+
 // Common Product Interface
 export interface Product {
   id: string;
@@ -13,10 +16,10 @@ export interface Product {
   origin: string; // New field: place of origin/production (required)
   leadTime: string;
   currentStock?: string; // New field: current inventory
-  photos?: File[]; // New field: product photos (max 9)
-  specificationFile?: File | null; // New field: specification PDF
+  photos?: UploadList; // New field: product photos (max 9)
+  specificationFile?: UploadValue | null; // New field: specification PDF
   specificationLink?: string; // New field: specification URL
-  model3D: File | null;
+  model3D: UploadValue | null;
 }
 
 // Project Manager Project Interface
@@ -40,7 +43,7 @@ export interface ProjectManager {
   address: string;
   area: string;
   projects: ProjectManagerProject[];
-  cv: File | null;
+  cv: UploadValue | null;
 }
 
 // Insurance Interface
@@ -49,14 +52,14 @@ export interface Insurance {
   type: string;
   provider: string;
   expiryDate: string;
-  file: File | null;
+  file: UploadValue | null;
 }
 
 // Certification item for dynamic lists
 export interface CertificationItem {
   id: string;
   name: string;
-  file: File | null;
+  file: UploadValue | null;
 }
 
 // Designer Project Interface
@@ -69,7 +72,7 @@ export interface DesignerProject {
   renovationType: 'newFitout' | 'remodel' | '';
   projectTypes?: string[]; // Project types for each project highlight
   projectHighlight?: boolean; // Flag to mark the project as a highlight
-  photos: File[];
+  photos: UploadList;
 }
 
 // Designer Personnel Interface
@@ -77,15 +80,15 @@ export interface Designer {
   id: string;
   name: string;
   experience: string;
-  cv: File | null;
+  cv: UploadValue | null;
   projects: DesignerProject[];
 }
 
 // Common Requirements for all suppliers
 export interface CommonRequirements {
   // Document Upload
-  businessRegistration: File | null;
-  companyPhotos: File | null;
+  businessRegistration: UploadValue | null;
+  companyPhotos: UploadValue | null;
   hkBusinessRegistrationNumber: string;
   cnBusinessRegistrationNumber: string;
   cnUnifiedSocialCreditCode: string;
@@ -101,6 +104,7 @@ export interface CommonRequirements {
   submitterPhoneCode: string;
   submitterPhone: string;
   submitterEmail: string;
+  contactFax?: string;
   submissionDate: string;
 }
 
@@ -109,22 +113,24 @@ export interface ContractorFormData extends CommonRequirements {
   supplierType: 'contractor';
 
   // Section 1: Company Profile
-  companyLegalName: string;
+  companyName: string;
+  companyNameChinese?: string;
   yearEstablished: string;
   registeredCapital: string;
   numberOfEmployees: string;
   country: string;
   officeAddress: string;
-  companySupplementFile: File[] | null; // Company supplementary information (PDF)
+  businessDescription?: string;
+  companySupplementFile: UploadList | null; // Company supplementary information (PDF)
   companySupplementLink: string; // Company supplementary information (Link)
   hkWorkEligibleEmployees: string;
 
   // Section 2: Certifications
   constructionGrade: string;
   licenseNumber: string;
-  certificateUpload: File | null;
+  certificateUpload: UploadValue | null;
   isocertifications: string[]; // ['9001', '14001', '45001']
-  isoCertificateUploads: Record<string, File | null>;
+  isoCertificateUploads: Record<string, UploadValue | null>;
   otherCertifications: CertificationItem[];
 
   // Section 3: Construction Capability
@@ -136,7 +142,7 @@ export interface ContractorFormData extends CommonRequirements {
 
   // Section 5: Personnel
   projectManagers: ProjectManager[];
-  organizationChart: File | null;
+  organizationChart: UploadValue | null;
   hasSafetyOfficer: 'yes' | 'no' | '';
   numberOfSafetyOfficers: string;
   hasConstructionManager: 'yes' | 'no' | '';
@@ -148,11 +154,11 @@ export interface ContractorFormData extends CommonRequirements {
   // Section 6: Compliance and Governance
   insurances: Insurance[];
   hasEnvironmentalHealthSafety: 'yes' | 'no' | '';
-  environmentalHealthSafetyFile: File | null;
+  environmentalHealthSafetyFile: UploadValue | null;
   hasIncidentsPast3Years: 'yes' | 'no' | '';
-  incidentsFile: File | null;
+  incidentsFile: UploadValue | null;
   hasLitigationPast3Years: 'yes' | 'no' | '';
-  litigationFile: File | null;
+  litigationFile: UploadValue | null;
 }
 
 // Designer Form Data
@@ -160,17 +166,19 @@ export interface DesignerFormData extends CommonRequirements {
   supplierType: 'designer';
 
   // Section 1: Design Company Overview
-  companyLegalName: string;
+  companyName: string;
+  companyNameChinese?: string;
   yearEstablished: string;
   registeredCapital: string;
   country: string;
   officeAddress: string;
+  businessDescription?: string;
   hkWorkEligibleEmployees: string;
   designAwards: string[]; // Design awards (array)
   designTeamSize: string;
   feeStructure: string[]; // ['byArea', 'byProject', 'byPeriod', 'other']
   designHighlights: DesignerProject[]; // Key design highlights
-  companySupplementFile: File[] | null; // Company supplementary information (PDF)
+  companySupplementFile: UploadList | null; // Company supplementary information (PDF)
   companySupplementLink: string; // Company supplementary information (Link)
 
   // Section 2: Design Specialization
@@ -181,7 +189,7 @@ export interface DesignerFormData extends CommonRequirements {
 
   // Section 3: Personnel Information
   designers: Designer[];
-  organizationChart: File | null;
+  organizationChart: UploadValue | null;
 
   // Section 4: Design & Build Capability
   canDoDesignBuild: 'yes' | 'no' | '';
@@ -189,9 +197,9 @@ export interface DesignerFormData extends CommonRequirements {
   // D&B Contractor Information (same as ContractorFormData)
   dbConstructionGrade: string;
   dbLicenseNumber: string;
-  dbCertificateUpload: File | null;
+  dbCertificateUpload: UploadValue | null;
   dbIsocertifications: string[];
-  dbIsoCertificateUploads: Record<string, File | null>;
+  dbIsoCertificateUploads: Record<string, UploadValue | null>;
   dbOtherCertifications: CertificationItem[];
   dbProjectTypes: string[];
   dbProjectHighlights: DesignerProject[];
@@ -199,7 +207,7 @@ export interface DesignerFormData extends CommonRequirements {
   dbMaxConcurrentProjects: string;
   dbLargestProjectValue: string;
   dbProjectManagers: ProjectManager[];
-  dbOrganizationChart: File | null;
+  dbOrganizationChart: UploadValue | null;
   dbHasSafetyOfficer: 'yes' | 'no' | '';
   dbNumberOfSafetyOfficers: string;
   dbHasConstructionManager: 'yes' | 'no' | '';
@@ -209,11 +217,11 @@ export interface DesignerFormData extends CommonRequirements {
   dbCnHkProjectCompliance: boolean;
   dbInsurances: Insurance[];
   dbHasEnvironmentalHealthSafety: 'yes' | 'no' | '';
-  dbEnvironmentalHealthSafetyFile: File | null;
+  dbEnvironmentalHealthSafetyFile: UploadValue | null;
   dbHasIncidentsPast3Years: 'yes' | 'no' | '';
-  dbIncidentsFile: File | null;
+  dbIncidentsFile: UploadValue | null;
   dbHasLitigationPast3Years: 'yes' | 'no' | '';
-  dbLitigationFile: File | null;
+  dbLitigationFile: UploadValue | null;
 }
 
 // Material/Furniture Supplier Form Data
@@ -221,16 +229,18 @@ export interface MaterialSupplierFormData extends CommonRequirements {
   supplierType: 'material';
 
   // Section 1: Supplier Basic Information
-  companyLegalName: string;
+  companyName: string;
+  companyNameChinese?: string;
   yearEstablished: string;
   registeredCapital: string;
   country: string;
   officeAddress: string;
+  businessDescription?: string;
   hkWorkEligibleEmployees: string;
   companyType: string[]; // ['manufacturer', 'agent', 'distributor']
   representedBrands: string[];
   warehouses: { address: string; capacity: string }[];
-  companySupplementFile: File[] | null; // Company supplementary information (PDF)
+  companySupplementFile: UploadList | null; // Company supplementary information (PDF)
   companySupplementLink: string; // Company supplementary information (Link)
 
   // Section 2: Product Management System
@@ -246,27 +256,48 @@ export interface MaterialSupplierFormData extends CommonRequirements {
   freeShippingToHK: 'yes' | 'no' | '';
 }
 
-// Basic Supplier Form Data (for suppliers without invitation code)
+// Basic Supplier Form Data
 export interface BasicSupplierFormData {
   supplierType: 'basic';
 
   // Required fields
   companyName: string;
-  companyNameChinese?: string; // Required for HK, China, Macau, Taiwan, Singapore
+  companyNameChinese?: string; // Optional
   country: string;
-  companyAddress: string;
+  officeAddress: string;
   businessType: string;
-  contactPhone: string;
-  contactPhoneCode: string;
-  contactEmail: string;
-  contactFax: string;
+  submitterName: string;
+  submitterPosition: string;
+  submitterPhone: string;
+  submitterPhoneCode: string;
+  submitterEmail: string;
+  contactFax?: string;
 
   // Optional fields
   businessDescription?: string;
-  companyWebsite?: string;
-  companyLogo?: File | null;
+  companySupplementLink?: string;
+  companyLogo?: UploadValue | null;
 
   // Metadata
+  submissionDate: string;
+}
+
+export interface SupplierDirectoryEntry {
+  supplierType: 'basic' | 'contractor' | 'designer' | 'material';
+  companyName: string;
+  companyNameChinese?: string;
+  country: string;
+  officeAddress: string;
+  businessType: string;
+  submitterName: string;
+  submitterPosition: string;
+  submitterPhone: string;
+  submitterPhoneCode: string;
+  submitterEmail: string;
+  contactFax?: string;
+  businessDescription?: string;
+  companySupplementLink?: string;
+  companyLogo?: UploadValue | null;
   submissionDate: string;
 }
 

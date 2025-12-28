@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabaseClient';
 
 export default function Header() {
   const router = useRouter();
@@ -37,12 +38,16 @@ export default function Header() {
   ];
 
   useEffect(() => {
-    // Check login status
-    const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    setIsLoggedIn(loggedIn);
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getUser();
+      const localLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      setIsLoggedIn(!!data.user || localLoggedIn);
+    };
+    checkSession();
   }, [pathname]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     localStorage.removeItem('isLoggedIn');
     setIsLoggedIn(false);
     router.push('/');
@@ -51,6 +56,12 @@ export default function Header() {
   const handleEditProfile = () => {
     router.push('/register/supplier');
   };
+
+  const handleViewSuppliers = () => {
+    router.push('/suppliers');
+  };
+
+  const showViewSuppliers = !isLoggedIn && pathname === '/';
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200">
@@ -77,9 +88,19 @@ export default function Header() {
             </div>
           </div>
 
-          {/* Actions - Only show when logged in */}
-          {isLoggedIn && (
-            <div className="flex items-center gap-4">
+          {/* Actions */}
+          <div className="flex items-center gap-4">
+            {showViewSuppliers && (
+              <button
+                onClick={handleViewSuppliers}
+                className="px-4 py-2 text-sm font-light text-gray-700 hover:text-gray-900 border border-gray-300 hover:bg-gray-50 transition-colors"
+              >
+                View Suppliers / 查看供應商
+              </button>
+            )}
+
+            {isLoggedIn && (
+              <>
               {/* Notification Bell */}
               <div className="relative">
                 <button
@@ -182,8 +203,9 @@ export default function Header() {
               >
                 Logout / 登出
               </button>
-            </div>
-          )}
+              </>
+            )}
+          </div>
         </div>
       </div>
     </header>
