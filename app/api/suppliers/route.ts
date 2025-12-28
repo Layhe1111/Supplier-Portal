@@ -407,14 +407,18 @@ const saveMaterialLists = async (supplierId: string, data: any) => {
   }));
   await replaceRows('material_represented_brands', { supplier_id: supplierId }, representedBrands);
 
-  const warehouses = (Array.isArray(data.warehouses) ? data.warehouses : [])
+  const warehouses = (Array.isArray(data.warehouses) ? data.warehouses : []) as Array<{
+    address?: unknown;
+    capacity?: unknown;
+  }>;
+  const warehouseRows = warehouses
     .filter((warehouse) => hasAnyText(warehouse?.address, warehouse?.capacity))
     .map((warehouse) => ({
       supplier_id: supplierId,
       address: toText(warehouse.address),
       capacity: toText(warehouse.capacity),
     }));
-  await replaceRows('material_warehouses', { supplier_id: supplierId }, warehouses);
+  await replaceRows('material_warehouses', { supplier_id: supplierId }, warehouseRows);
 };
 
 const saveProducts = async (supplierId: string, products: unknown) => {
@@ -549,6 +553,9 @@ export async function POST(request: Request) {
         .select('id')
         .single();
       ensureOk(insertSupplier, 'Insert suppliers');
+      if (!insertSupplier.data?.id) {
+        throw new Error('Insert suppliers: missing id');
+      }
       supplierId = insertSupplier.data.id;
     } else {
       const updateSupplier = await supabaseAdmin

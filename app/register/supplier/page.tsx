@@ -14,6 +14,11 @@ import DesignerQuestionnaire from '@/components/questionnaires/DesignerQuestionn
 import MaterialSupplierQuestionnaire from '@/components/questionnaires/MaterialSupplierQuestionnaire';
 import CommonRequirements from '@/components/questionnaires/CommonRequirements';
 
+type NonBasicSupplierFormData =
+  | ContractorFormData
+  | DesignerFormData
+  | MaterialSupplierFormData;
+
 export default function SupplierRegistrationPage() {
   const router = useRouter();
   const [supplierType, setSupplierType] = useState<
@@ -26,14 +31,14 @@ export default function SupplierRegistrationPage() {
   const [supplierId, setSupplierId] = useState<string | null>(null);
 
   // Initialize form data based on supplier type
-  const [formData, setFormData] = useState<SupplierFormData | null>(null);
+  const [formData, setFormData] = useState<NonBasicSupplierFormData | null>(null);
 
   // Check if user is logged in and load existing data if in edit mode
   useEffect(() => {
     const bootstrap = async () => {
       const normalizeSupplierData = (raw: any) => {
         if (!raw || typeof raw !== 'object') {
-          return { normalized: raw as SupplierFormData, changed: false };
+          return { normalized: raw as NonBasicSupplierFormData, changed: false };
         }
 
         const normalized = { ...raw } as Record<string, any>;
@@ -59,7 +64,7 @@ export default function SupplierRegistrationPage() {
           changed = true;
         }
 
-        return { normalized: normalized as SupplierFormData, changed };
+        return { normalized: normalized as NonBasicSupplierFormData, changed };
       };
 
       const localLoggedIn = localStorage.getItem('isLoggedIn');
@@ -97,7 +102,7 @@ export default function SupplierRegistrationPage() {
           localStorage.setItem('supplierData', JSON.stringify(normalized));
         }
         setSupplierType(normalized.supplierType);
-        setFormData(normalized as SupplierFormData);
+        setFormData(normalized);
         setIsEditMode(true);
         setSupplierId(serverSupplierId || 'local');
       } else {
@@ -115,7 +120,7 @@ export default function SupplierRegistrationPage() {
                 localStorage.setItem('supplierData', JSON.stringify(normalized));
               }
               setSupplierType(normalized.supplierType);
-              setFormData(normalized as SupplierFormData);
+              setFormData(normalized);
               setIsEditMode(true);
               setSupplierId('local');
             }
@@ -302,7 +307,7 @@ export default function SupplierRegistrationPage() {
     }
   }, [supplierType, formData]);
 
-  const updateField = <T extends SupplierFormData>(
+  const updateField = <T extends NonBasicSupplierFormData>(
     field: keyof T,
     value: any
   ) => {
@@ -312,11 +317,7 @@ export default function SupplierRegistrationPage() {
   const upsertSupplier = async (status: 'draft' | 'submitted') => {
     if (!formData || !supplierType) return null;
 
-    const payload = {
-      ...formData,
-      supplierType,
-      status,
-    } as SupplierFormData;
+    const payload: SupplierFormData = formData;
 
     const { data: sessionData } = await supabase.auth.getSession();
     const token = sessionData.session?.access_token;

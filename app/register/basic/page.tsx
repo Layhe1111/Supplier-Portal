@@ -311,6 +311,7 @@ export default function BasicSupplierRegistrationPage() {
               <div className="md:col-span-2">
                 <FormInput
                   label="Company English Name / 公司英文名"
+                  name="companyName"
                   value={formData.companyName}
                   onChange={(value) => handleInputChange('companyName', value)}
                   placeholder="Enter company name"
@@ -321,6 +322,7 @@ export default function BasicSupplierRegistrationPage() {
               <div className="md:col-span-2">
                 <FormInput
                   label="Company Chinese Name / 公司中文名"
+                  name="companyNameChinese"
                   value={formData.companyNameChinese || ''}
                   onChange={(value) => handleInputChange('companyNameChinese', value)}
                   placeholder="請輸入公司中文名稱"
@@ -343,6 +345,7 @@ export default function BasicSupplierRegistrationPage() {
               <div>
                 <FormInput
                   label="Business Type / 業務類型"
+                  name="businessType"
                   required
                   value={formData.businessType}
                   onChange={(value) => handleInputChange('businessType', value)}
@@ -354,6 +357,7 @@ export default function BasicSupplierRegistrationPage() {
               <div className="md:col-span-2">
                 <FormInput
                   label="Office Address / 辦公地址"
+                  name="officeAddress"
                   required
                   value={formData.officeAddress}
                   onChange={(value) => handleInputChange('officeAddress', value)}
@@ -380,6 +384,7 @@ export default function BasicSupplierRegistrationPage() {
               <div className="md:col-span-2">
                 <FormInput
                   label="Or enter company website / 或輸入公司網站"
+                  name="companySupplementLink"
                   value={formData.companySupplementLink || ''}
                   onChange={(value) => handleInputChange('companySupplementLink', value)}
                   placeholder="https://..."
@@ -409,6 +414,7 @@ export default function BasicSupplierRegistrationPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormInput
                 label="Contact Person / 聯絡人"
+                name="submitterName"
                 required
                 value={formData.submitterName}
                 onChange={(value) => handleInputChange('submitterName', value)}
@@ -416,6 +422,7 @@ export default function BasicSupplierRegistrationPage() {
 
               <FormInput
                 label="Position / 職位"
+                name="submitterPosition"
                 required
                 value={formData.submitterPosition}
                 onChange={(value) => handleInputChange('submitterPosition', value)}
@@ -452,6 +459,7 @@ export default function BasicSupplierRegistrationPage() {
 
               <FormInput
                 label="Email / 電郵"
+                name="submitterEmail"
                 required
                 type="email"
                 value={formData.submitterEmail}
@@ -463,6 +471,7 @@ export default function BasicSupplierRegistrationPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormInput
                 label="Submission Date / 提交日期"
+                name="submissionDate"
                 required
                 type="date"
                 value={formData.submissionDate}
@@ -473,6 +482,7 @@ export default function BasicSupplierRegistrationPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormInput
                 label="Contact Fax / 聯絡傳真"
+                name="contactFax"
                 value={formData.contactFax || ''}
                 onChange={(value) => handleInputChange('contactFax', value)}
                 placeholder="Enter fax number"

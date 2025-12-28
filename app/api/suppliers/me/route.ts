@@ -339,10 +339,10 @@ export async function GET(request: Request) {
         file: row.file_path ?? null,
       }));
 
-    const company = companyResult.data || {};
-    const registration = registrationResult.data || {};
-    const contact = contactResult.data || {};
-    const commitments = commitmentsResult.data || {};
+    const company = (companyResult.data || {}) as Record<string, any>;
+    const registration = (registrationResult.data || {}) as Record<string, any>;
+    const contact = (contactResult.data || {}) as Record<string, any>;
+    const commitments = (commitmentsResult.data || {}) as Record<string, any>;
 
     const submissionDate =
       toDateString(contact.submission_date) || new Date().toISOString().split('T')[0];
@@ -407,7 +407,7 @@ export async function GET(request: Request) {
         );
       }
 
-      const contractorProfile = contractorResult.data || {};
+      const contractorProfile = (contractorResult.data || {}) as Record<string, any>;
       const { isoCodes, isoUploads, otherCerts } = mapCertifications('contractor');
       const insurances = mapInsurances('contractor');
       const supplementFiles = getDocList('contractor', 'company_brochure');
@@ -531,8 +531,8 @@ export async function GET(request: Request) {
         );
       }
 
-      const designerProfile = designerProfileResult.data || {};
-      const designerDbProfile = designerDbProfileResult.data || {};
+      const designerProfile = (designerProfileResult.data || {}) as Record<string, any>;
+      const designerDbProfile = (designerDbProfileResult.data || {}) as Record<string, any>;
       const awards = (awardsResult.data || []).map((row: any) => row.award).filter(Boolean);
       const feeStructures = (feeResult.data || []).map((row: any) => row.fee_type).filter(Boolean);
       const styles = (stylesResult.data || []).map((row: any) => row.style).filter(Boolean);
@@ -800,7 +800,7 @@ export async function GET(request: Request) {
         };
       });
 
-      const materialProfile = materialProfileResult.data || {};
+      const materialProfile = (materialProfileResult.data || {}) as Record<string, any>;
       const companyTypes = (companyTypesResult.data || [])
         .map((row: any) => row.company_type)
         .filter(Boolean);

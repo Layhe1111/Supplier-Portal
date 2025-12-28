@@ -10,9 +10,7 @@ export default function AuthCallbackPage() {
 
   useEffect(() => {
     const process = async () => {
-      const { data, error } = await supabase.auth.getSessionFromUrl({
-        storeSession: true,
-      });
+      const { data, error } = await supabase.auth.getSession();
 
       if (error) {
         setMessage(error.message || '驗證失敗，請重試登入。');
