@@ -75,11 +75,36 @@ function todayDate() {
   return new Date().toISOString().split('T')[0];
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function ensureOk(result, context) {
   if (result.error) {
     throw new Error(`${context}: ${result.error.message}`);
   }
   return result;
+}
+
+async function queryWithRetry(makeRequest, context, retries = 6) {
+  for (let attempt = 1; attempt <= retries; attempt += 1) {
+    try {
+      const result = await makeRequest();
+      if (result.error) {
+        if (attempt === retries) {
+          throw new Error(`${context}: ${result.error.message}`);
+        }
+      } else {
+        return result;
+      }
+    } catch (err) {
+      if (attempt === retries) {
+        throw err;
+      }
+    }
+    await sleep(1000 * attempt);
+  }
+  throw new Error(`${context}: failed after retries`);
 }
 
 function mergeEntry(target, source) {
@@ -165,32 +190,41 @@ async function fetchExistingBasicSuppliers() {
     };
   }
 
-  const [companyResult, contactResult] = await Promise.all([
-    supabase
-      .from('supplier_company')
-      .select(
-        'supplier_id, company_name_en, company_name_zh, country, office_address, business_type, business_description, company_supplement_link, company_logo_path'
-      )
-      .in('supplier_id', supplierIds),
-    supabase
-      .from('supplier_contact')
-      .select(
-        'supplier_id, contact_name, contact_position, contact_phone_code, contact_phone, contact_email, contact_fax, submission_date'
-      )
-      .in('supplier_id', supplierIds),
-  ]);
-  await ensureOk(companyResult, 'Fetch supplier_company');
-  await ensureOk(contactResult, 'Fetch supplier_contact');
-
+  const chunkSize = 200;
   const companyMap = new Map();
-  (companyResult.data || []).forEach((row) => {
-    companyMap.set(row.supplier_id, row);
-  });
-
   const contactMap = new Map();
-  (contactResult.data || []).forEach((row) => {
-    contactMap.set(row.supplier_id, row);
-  });
+
+  for (let i = 0; i < supplierIds.length; i += chunkSize) {
+    const chunk = supplierIds.slice(i, i + chunkSize);
+    const companyResult = await queryWithRetry(
+      () =>
+        supabase
+          .from('supplier_company')
+          .select(
+            'supplier_id, company_name_en, company_name_zh, country, office_address, business_type, business_description, company_supplement_link, company_logo_path'
+          )
+          .in('supplier_id', chunk),
+      'Fetch supplier_company'
+    );
+    const contactResult = await queryWithRetry(
+      () =>
+        supabase
+          .from('supplier_contact')
+          .select(
+            'supplier_id, contact_name, contact_position, contact_phone_code, contact_phone, contact_email, contact_fax, submission_date'
+          )
+          .in('supplier_id', chunk),
+      'Fetch supplier_contact'
+    );
+
+    (companyResult.data || []).forEach((row) => {
+      companyMap.set(row.supplier_id, row);
+    });
+
+    (contactResult.data || []).forEach((row) => {
+      contactMap.set(row.supplier_id, row);
+    });
+  }
 
   return { suppliers, companyMap, contactMap };
 }

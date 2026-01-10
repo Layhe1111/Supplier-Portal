@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
 export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
 
 const BUSINESS_TYPE_LABELS: Record<string, string> = {
   contractor: 'Contractor / 承包商',
@@ -161,6 +162,22 @@ export async function GET(request: Request) {
       const supplierIds = companyRows.map((row) => row.supplier_id);
 
       if (supplierIds.length === 0) {
+        if (debug) {
+          return NextResponse.json({
+            suppliers: [],
+            totalCount: supplierCountExact ?? 0,
+            debug: {
+              supabaseHost: getSupabaseHost(),
+              ...getServiceRoleInfo(),
+              supplierCount: 0,
+              supplierCountExact,
+              companyCount: (companyRows || []).length,
+              contactCount: 0,
+            },
+          }, {
+            headers: { 'Cache-Control': 'no-store' },
+          });
+        }
         return NextResponse.json({
           suppliers: [],
           totalCount: supplierCountExact ?? 0,
@@ -201,6 +218,22 @@ export async function GET(request: Request) {
 
     const supplierIds = supplierRows.map((row) => row.id);
     if (supplierIds.length === 0) {
+      if (debug) {
+        return NextResponse.json({
+          suppliers: [],
+          totalCount: supplierCountExact ?? 0,
+          debug: {
+            supabaseHost: getSupabaseHost(),
+            ...getServiceRoleInfo(),
+            supplierCount: 0,
+            supplierCountExact,
+            companyCount: 0,
+            contactCount: 0,
+          },
+        }, {
+          headers: { 'Cache-Control': 'no-store' },
+        });
+      }
       return NextResponse.json({
         suppliers: [],
         totalCount: supplierCountExact ?? 0,

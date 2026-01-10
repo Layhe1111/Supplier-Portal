@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { SupplierFormData, Product } from '@/types/supplier';
 import ProductModal from '@/components/ProductModal';
@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabaseClient';
 
 export default function DashboardPage() {
   const router = useRouter();
+  const didLoadRef = useRef(false);
   const [userData, setUserData] = useState<SupplierFormData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -42,6 +43,8 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const loadData = async () => {
+      if (didLoadRef.current) return;
+      didLoadRef.current = true;
       setIsLoading(true);
       setError('');
 

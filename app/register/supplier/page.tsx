@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   SupplierFormData,
@@ -28,8 +28,16 @@ export default function SupplierRegistrationPage() {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [isEditMode, setIsEditMode] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAutoSaving, setIsAutoSaving] = useState(false);
   const [error, setError] = useState('');
   const [supplierId, setSupplierId] = useState<string | null>(null);
+  const [showAutoSaveNotice, setShowAutoSaveNotice] = useState(false);
+  const autoSaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autoSaveNoticeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasUserInteractedRef = useRef(false);
+  const isSubmittingRef = useRef(false);
+  const isAutoSavingRef = useRef(false);
+  const didBootstrapRef = useRef(false);
 
   // Initialize form data based on supplier type
   const [formData, setFormData] = useState<NonBasicSupplierFormData | null>(null);
@@ -37,6 +45,8 @@ export default function SupplierRegistrationPage() {
   // Check if user is logged in and load existing data if in edit mode
   useEffect(() => {
     const bootstrap = async () => {
+      if (didBootstrapRef.current) return;
+      didBootstrapRef.current = true;
       const normalizeSupplierData = (raw: any) => {
         if (!raw || typeof raw !== 'object') {
           return { normalized: raw as NonBasicSupplierFormData, changed: false };
@@ -68,8 +78,9 @@ export default function SupplierRegistrationPage() {
         return { normalized: normalized as NonBasicSupplierFormData, changed };
       };
 
-      const { data } = await supabase.auth.getUser();
-      if (!data.user) {
+      const { data } = await supabase.auth.getSession();
+      const session = data.session;
+      if (!session?.user) {
         router.replace('/');
         return;
       }
@@ -77,18 +88,15 @@ export default function SupplierRegistrationPage() {
       let serverSupplier: SupplierFormData | null = null;
       let serverSupplierId: string | null = null;
 
-      if (data.user) {
-        const { data: sessionData } = await supabase.auth.getSession();
-        const token = sessionData.session?.access_token;
-        if (token) {
-          const res = await fetch('/api/suppliers/me', {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (res.ok) {
-            const body = await res.json().catch(() => ({}));
-            serverSupplier = body.supplier || null;
-            serverSupplierId = body.supplierId || null;
-          }
+      const token = session.access_token;
+      if (token) {
+        const res = await fetch('/api/suppliers/me', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const body = await res.json().catch(() => ({}));
+          serverSupplier = body.supplier || null;
+          serverSupplierId = body.supplierId || null;
         }
       }
 
@@ -285,6 +293,7 @@ export default function SupplierRegistrationPage() {
     field: keyof T,
     value: any
   ) => {
+    hasUserInteractedRef.current = true;
     setFormData((prev) => (prev ? { ...prev, [field]: value } : prev));
   };
 
@@ -377,11 +386,66 @@ export default function SupplierRegistrationPage() {
     }
   };
 
+  const triggerAutoSave = async () => {
+    if (!formData || !supplierType) return;
+    if (isSubmittingRef.current || isAutoSavingRef.current) return;
+    setError('');
+    setIsAutoSaving(true);
+    try {
+      await upsertSupplier('draft');
+      setShowAutoSaveNotice(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to auto save');
+    } finally {
+      setIsAutoSaving(false);
+    }
+  };
+
   const handleReset = () => {
     setSupplierType(null);
     setFormData(null);
     setSupplierId(null);
   };
+
+  useEffect(() => {
+    isSubmittingRef.current = isSubmitting;
+  }, [isSubmitting]);
+
+  useEffect(() => {
+    isAutoSavingRef.current = isAutoSaving;
+  }, [isAutoSaving]);
+
+  useEffect(() => {
+    if (!formData || !hasUserInteractedRef.current) return;
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current);
+    }
+    autoSaveTimeoutRef.current = setTimeout(() => {
+      triggerAutoSave();
+    }, 30000);
+
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
+      }
+    };
+  }, [formData]);
+
+  useEffect(() => {
+    if (!showAutoSaveNotice) return;
+    if (autoSaveNoticeTimeoutRef.current) {
+      clearTimeout(autoSaveNoticeTimeoutRef.current);
+    }
+    autoSaveNoticeTimeoutRef.current = setTimeout(() => {
+      setShowAutoSaveNotice(false);
+    }, 3000);
+
+    return () => {
+      if (autoSaveNoticeTimeoutRef.current) {
+        clearTimeout(autoSaveNoticeTimeoutRef.current);
+      }
+    };
+  }, [showAutoSaveNotice]);
 
   // Show loading while checking authentication
   if (isCheckingAuth) {
@@ -485,6 +549,18 @@ export default function SupplierRegistrationPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div
+        className={`fixed top-4 right-4 z-50 transform transition-all duration-300 ease-out ${
+          showAutoSaveNotice
+            ? 'translate-x-0 opacity-100'
+            : 'translate-x-full opacity-0 pointer-events-none'
+        }`}
+        aria-live="polite"
+      >
+        <div className="bg-gray-900 text-white text-sm font-light px-4 py-3 shadow-lg">
+          Auto-saved / 已自动保存
+        </div>
+      </div>
       <div className="max-w-5xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-light text-gray-900">

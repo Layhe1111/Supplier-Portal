@@ -39,8 +39,8 @@ export default function Header() {
 
   useEffect(() => {
     const checkSession = async () => {
-      const { data } = await supabase.auth.getUser();
-      setIsLoggedIn(!!data.user);
+      const { data } = await supabase.auth.getSession();
+      setIsLoggedIn(!!data.session?.user);
     };
     checkSession();
   }, [pathname]);

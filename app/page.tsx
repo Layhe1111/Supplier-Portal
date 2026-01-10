@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import { validateLocalPhone } from '@/lib/phoneValidation';
@@ -14,6 +14,7 @@ const COUNTRY_CODES = [
 
 export default function LoginPage() {
   const router = useRouter();
+  const didBootstrapRef = useRef(false);
   const [loginMethod, setLoginMethod] = useState<LoginMethod>('email');
   const [formData, setFormData] = useState({
     email: '',
@@ -25,8 +26,10 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   useEffect(() => {
     const bootstrap = async () => {
-      const { data } = await supabase.auth.getUser();
-      const user = data.user;
+      if (didBootstrapRef.current) return;
+      didBootstrapRef.current = true;
+      const { data } = await supabase.auth.getSession();
+      const user = data.session?.user;
       if (!user) return;
       const { data: suppliers } = await supabase
         .from('suppliers')

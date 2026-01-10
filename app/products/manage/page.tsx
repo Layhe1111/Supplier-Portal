@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { MaterialSupplierFormData, Product } from '@/types/supplier';
 import ProductModal from '@/components/ProductModal';
@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabaseClient';
 
 export default function ProductManagePage() {
   const router = useRouter();
+  const didLoadRef = useRef(false);
   const [userData, setUserData] = useState<MaterialSupplierFormData | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -18,6 +19,8 @@ export default function ProductManagePage() {
 
   useEffect(() => {
     const loadData = async () => {
+      if (didLoadRef.current) return;
+      didLoadRef.current = true;
       setIsLoading(true);
       setError('');
       const { data: sessionData } = await supabase.auth.getSession();

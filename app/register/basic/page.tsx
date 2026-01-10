@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import FormInput from '@/components/FormInput';
 import FormSelect from '@/components/FormSelect';
@@ -50,6 +50,7 @@ const COUNTRY_OPTIONS = [
 
 export default function BasicSupplierRegistrationPage() {
   const router = useRouter();
+  const didBootstrapRef = useRef(false);
   const [formData, setFormData] = useState<BasicSupplierFormData>({
     supplierType: 'basic',
     companyName: '',
@@ -74,6 +75,8 @@ export default function BasicSupplierRegistrationPage() {
   // Check if user is logged in (Supabase auth) and load any existing local draft
   useEffect(() => {
     const bootstrap = async () => {
+      if (didBootstrapRef.current) return;
+      didBootstrapRef.current = true;
       const normalizeBasicSupplierData = (raw: any) => {
         if (!raw || typeof raw !== 'object') {
           return { normalized: raw as BasicSupplierFormData, changed: false };
@@ -175,24 +178,22 @@ export default function BasicSupplierRegistrationPage() {
         return { normalized: normalized as BasicSupplierFormData, changed };
       };
 
-      const { data } = await supabase.auth.getUser();
-      if (!data.user) {
+      const { data } = await supabase.auth.getSession();
+      const session = data.session;
+      if (!session?.user) {
         router.replace('/');
         return;
       }
 
       let serverSupplier: BasicSupplierFormData | null = null;
-      if (data.user) {
-        const { data: sessionData } = await supabase.auth.getSession();
-        const token = sessionData.session?.access_token;
-        if (token) {
-          const res = await fetch('/api/suppliers/me?type=basic', {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (res.ok) {
-            const body = await res.json().catch(() => ({}));
-            serverSupplier = body.supplier || null;
-          }
+      const token = session.access_token;
+      if (token) {
+        const res = await fetch('/api/suppliers/me?type=basic', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const body = await res.json().catch(() => ({}));
+          serverSupplier = body.supplier || null;
         }
       }
 
@@ -480,7 +481,7 @@ export default function BasicSupplierRegistrationPage() {
           <div className="flex justify-end space-x-4">
             <button
               type="button"
-              onClick={() => router.push('/')}
+              onClick={() => router.push('/register/supplier')}
               className="px-6 py-2.5 border border-gray-300 text-sm font-light text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors"
             >
               Cancel / 取消
