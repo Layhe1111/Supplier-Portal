@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
+import { validateLocalPhone } from '@/lib/phoneValidation';
 
 type SignupMethod = 'email' | 'phone';
 type Step = 'input' | 'enter_code';
@@ -26,54 +27,48 @@ export default function SignupPage() {
     otp: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [resendSecondsLeft, setResendSecondsLeft] = useState(0);
   const [error, setError] = useState('');
-
-  const normalizePhone = (countryCode: string, phone: string) => {
-    const digits = phone.replace(/\D/g, '');
-    const normalized = `${countryCode}${digits}`.replace(/[^+\d]/g, '');
-    if (!/^\+\d{6,15}$/.test(normalized)) return null;
-    return normalized;
-  };
 
   const handleMethodChange = (method: SignupMethod) => {
     setSignupMethod(method);
     setStep('input');
     setError('');
+    setResendSecondsLeft(0);
     setFormData((prev) => ({ ...prev, otp: '' }));
   };
 
-  const handleSendOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
+  useEffect(() => {
+    if (resendSecondsLeft <= 0) return;
+    const timer = setInterval(() => {
+      setResendSecondsLeft((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [resendSecondsLeft]);
+
+  const sendOtp = async () => {
     setError('');
 
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match / 密碼不一致');
-      return;
+      return false;
     }
 
     if (formData.password.length < 6) {
       setError('Password must be at least 6 characters / 密碼至少需要6個字符');
-      return;
+      return false;
     }
 
     setIsSubmitting(true);
 
     try {
       if (signupMethod === 'phone') {
-        const phone = normalizePhone(formData.countryCode, formData.phone);
-        if (!phone) {
-          setError('Invalid phone number / 請輸入有效電話號碼');
-          setIsSubmitting(false);
-          return;
+        const validation = validateLocalPhone(formData.countryCode, formData.phone);
+        if (!validation.ok) {
+          setError(validation.error || 'Invalid phone number / 請輸入有效電話號碼');
+          return false;
         }
-        if (phone.startsWith('+86')) {
-          setError(
-            'Mainland China SMS is under review. We are currently onboarding this service. / 中國大陸短信正在審核中，我們正在開通服務。'
-          );
-          setIsSubmitting(false);
-          return;
-        }
-
+        const phone = validation.normalized;
         const res = await fetch('/api/auth/send-phone-otp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -83,8 +78,7 @@ export default function SignupPage() {
         if (!res.ok) {
           const body = await res.json().catch(() => ({}));
           setError(body.error || 'Failed to send verification code');
-          setIsSubmitting(false);
-          return;
+          return false;
         }
       } else {
         const res = await fetch('/api/auth/send-otp', {
@@ -96,17 +90,29 @@ export default function SignupPage() {
         if (!res.ok) {
           const body = await res.json().catch(() => ({}));
           setError(body.error || 'Failed to send verification code');
-          setIsSubmitting(false);
-          return;
+          return false;
         }
       }
 
       setStep('enter_code');
-      setIsSubmitting(false);
+      setResendSecondsLeft(60);
+      return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to send verification code');
+      return false;
+    } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleSendOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await sendOtp();
+  };
+
+  const handleResendOtp = async () => {
+    if (resendSecondsLeft > 0 || isSubmitting) return;
+    await sendOtp();
   };
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
@@ -116,12 +122,13 @@ export default function SignupPage() {
     setIsSubmitting(true);
     try {
       if (signupMethod === 'phone') {
-        const phone = normalizePhone(formData.countryCode, formData.phone);
-        if (!phone) {
-          setError('Invalid phone number / 請輸入有效電話號碼');
+        const validation = validateLocalPhone(formData.countryCode, formData.phone);
+        if (!validation.ok) {
+          setError(validation.error || 'Invalid phone number / 請輸入有效電話號碼');
           setIsSubmitting(false);
           return;
         }
+        const phone = validation.normalized;
 
         const res = await fetch('/api/auth/verify-phone-otp', {
           method: 'POST',
@@ -389,6 +396,16 @@ export default function SignupPage() {
                       ? '輸入短信中的6位數驗證碼。'
                       : '輸入郵件中的6位數驗證碼。'}
                   </p>
+                  <button
+                    type="button"
+                    onClick={handleResendOtp}
+                    disabled={isSubmitting || resendSecondsLeft > 0}
+                    className="mt-3 text-sm font-light text-gray-700 hover:text-gray-900 disabled:text-gray-400 disabled:cursor-not-allowed"
+                  >
+                    {resendSecondsLeft > 0
+                      ? `Resend in ${resendSecondsLeft}s / ${resendSecondsLeft}秒後可重發`
+                      : 'Resend Code / 重新發送驗證碼'}
+                  </button>
                 </div>
               )}
 

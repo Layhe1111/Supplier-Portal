@@ -9,6 +9,7 @@ import {
   MaterialSupplierFormData,
 } from '@/types/supplier';
 import { supabase } from '@/lib/supabaseClient';
+import { validateLocalPhone } from '@/lib/phoneValidation';
 import ContractorQuestionnaire from '@/components/questionnaires/ContractorQuestionnaire';
 import DesignerQuestionnaire from '@/components/questionnaires/DesignerQuestionnaire';
 import MaterialSupplierQuestionnaire from '@/components/questionnaires/MaterialSupplierQuestionnaire';
@@ -67,9 +68,8 @@ export default function SupplierRegistrationPage() {
         return { normalized: normalized as NonBasicSupplierFormData, changed };
       };
 
-      const localLoggedIn = localStorage.getItem('isLoggedIn');
       const { data } = await supabase.auth.getUser();
-      if (!data.user && !localLoggedIn) {
+      if (!data.user) {
         router.replace('/');
         return;
       }
@@ -97,37 +97,11 @@ export default function SupplierRegistrationPage() {
           router.replace('/register/basic');
           return;
         }
-        const { normalized, changed } = normalizeSupplierData(serverSupplier);
-        if (changed) {
-          localStorage.setItem('supplierData', JSON.stringify(normalized));
-        }
+        const { normalized } = normalizeSupplierData(serverSupplier);
         setSupplierType(normalized.supplierType);
         setFormData(normalized);
         setIsEditMode(true);
-        setSupplierId(serverSupplierId || 'local');
-      } else {
-        const local = localStorage.getItem('supplierData');
-        if (local) {
-          try {
-            const parsed = JSON.parse(local);
-            if (parsed.supplierType === 'basic') {
-              router.replace('/register/basic');
-              return;
-            }
-            if (parsed.supplierType) {
-              const { normalized, changed } = normalizeSupplierData(parsed);
-              if (changed) {
-                localStorage.setItem('supplierData', JSON.stringify(normalized));
-              }
-              setSupplierType(normalized.supplierType);
-              setFormData(normalized);
-              setIsEditMode(true);
-              setSupplierId('local');
-            }
-          } catch (err) {
-            console.error('Failed to parse local supplier data', err);
-          }
-        }
+        setSupplierId(serverSupplierId || null);
       }
 
       setIsCheckingAuth(false);
@@ -319,6 +293,16 @@ export default function SupplierRegistrationPage() {
 
     const payload: SupplierFormData = formData;
 
+    if (status === 'submitted' || payload.submitterPhone) {
+      const phoneCheck = validateLocalPhone(
+        payload.submitterPhoneCode || '+852',
+        payload.submitterPhone || ''
+      );
+      if (!phoneCheck.ok) {
+        throw new Error(phoneCheck.error || 'Invalid phone number');
+      }
+    }
+
     const { data: sessionData } = await supabase.auth.getSession();
     const token = sessionData.session?.access_token;
     if (!token) {
@@ -345,8 +329,6 @@ export default function SupplierRegistrationPage() {
 
     const body = await res.json().catch(() => ({}));
     const savedId = body.supplierId || supplierId || `local-${Date.now()}`;
-    localStorage.setItem('supplierData', JSON.stringify(payload));
-    localStorage.setItem('isLoggedIn', 'true');
     setSupplierId(savedId);
     return savedId;
   };

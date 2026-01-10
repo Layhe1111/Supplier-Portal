@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { validateLocalPhone } from '@/lib/phoneValidation';
 
 type SupplierStatus = 'draft' | 'submitted';
 type SupplierType = 'contractor' | 'designer' | 'material' | 'basic';
@@ -609,6 +610,15 @@ export async function POST(request: Request) {
       contact_fax: toText(payload.contactFax),
       submission_date: toText(payload.submissionDate),
     };
+    if (contactRow.contact_phone_code && contactRow.contact_phone) {
+      const phoneCheck = validateLocalPhone(
+        contactRow.contact_phone_code,
+        contactRow.contact_phone
+      );
+      if (!phoneCheck.ok) {
+        return NextResponse.json({ error: phoneCheck.error }, { status: 400 });
+      }
+    }
     ensureOk(
       await supabaseAdmin.from('supplier_contact').upsert(contactRow),
       'Upsert supplier_contact'

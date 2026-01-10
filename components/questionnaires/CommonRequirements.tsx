@@ -249,8 +249,8 @@ export default function CommonRequirements({
                 <p className="font-medium text-gray-900">Data handling / 資料處理</p>
                 <ul className="list-disc space-y-1 pl-5">
                   <li>
-                    Draft data is saved locally in your browser (localStorage) until submission; you
-                    can clear it by deleting local storage / 草稿數據會暫存在你的瀏覽器（localStorage），如需清除可刪除本地存儲
+                    Draft data is saved to your account until submission, so you can continue later
+                    after signing in / 草稿數據會保存到你的帳號下，登入後可繼續填寫
                   </li>
                   <li>
                     Submitted data may be stored in ProjectPilot-managed systems and backups to power
@@ -295,6 +295,26 @@ export default function CommonRequirements({
                 By checking the box, you confirm the above and authorize ProjectPilot to use and
                 share your submitted information as described. 勾選即表示你確認並授權 ProjectPilot 按上述方式使用及共享你提交的資料。
               </p>
+            </div>
+
+            <div className="sticky bottom-0 flex items-center justify-end gap-3 border-t border-gray-200 bg-white px-6 py-4">
+              <button
+                type="button"
+                onClick={() => setShowInfoSharingTerms(false)}
+                className="px-4 py-2 text-sm font-light text-gray-700 border border-gray-300 hover:bg-gray-50"
+              >
+                Close / 關閉
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  onChange('agreeInfoSharing', true);
+                  setShowInfoSharingTerms(false);
+                }}
+                className="px-4 py-2 text-sm font-light text-white bg-gray-900 hover:bg-gray-800"
+              >
+                Agree & Continue / 同意並繼續
+              </button>
             </div>
           </div>
         </div>

@@ -8,6 +8,7 @@ import FormSection from '@/components/FormSection';
 import FileUpload from '@/components/FileUpload';
 import { BasicSupplierFormData } from '@/types/supplier';
 import { supabase } from '@/lib/supabaseClient';
+import { validateLocalPhone } from '@/lib/phoneValidation';
 
 const PHONE_CODE_OPTIONS = [
   '+852',
@@ -174,9 +175,8 @@ export default function BasicSupplierRegistrationPage() {
         return { normalized: normalized as BasicSupplierFormData, changed };
       };
 
-      const localLoggedIn = localStorage.getItem('isLoggedIn');
       const { data } = await supabase.auth.getUser();
-      if (!data.user && !localLoggedIn) {
+      if (!data.user) {
         router.replace('/');
         return;
       }
@@ -197,27 +197,8 @@ export default function BasicSupplierRegistrationPage() {
       }
 
       if (serverSupplier) {
-        const { normalized, changed } = normalizeBasicSupplierData(serverSupplier);
-        if (changed) {
-          localStorage.setItem('supplierData', JSON.stringify(normalized));
-        }
+        const { normalized } = normalizeBasicSupplierData(serverSupplier);
         setFormData(normalized as BasicSupplierFormData);
-      } else {
-        const local = localStorage.getItem('supplierData');
-        if (local) {
-          try {
-            const parsed = JSON.parse(local);
-            if (parsed.supplierType === 'basic') {
-              const { normalized, changed } = normalizeBasicSupplierData(parsed);
-              if (changed) {
-                localStorage.setItem('supplierData', JSON.stringify(normalized));
-              }
-              setFormData(normalized as BasicSupplierFormData);
-            }
-          } catch (err) {
-            console.error('Failed to parse local supplier data', err);
-          }
-        }
       }
     };
     bootstrap();
@@ -253,6 +234,15 @@ export default function BasicSupplierRegistrationPage() {
       return;
     }
 
+    const phoneCheck = validateLocalPhone(
+      formData.submitterPhoneCode || '+852',
+      formData.submitterPhone || ''
+    );
+    if (!phoneCheck.ok) {
+      setError(phoneCheck.error || 'Invalid phone number');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -279,10 +269,6 @@ export default function BasicSupplierRegistrationPage() {
         const body = await res.json().catch(() => ({}));
         throw new Error(body.error || 'Failed to save supplier');
       }
-
-      // Save supplier data locally
-      localStorage.setItem('supplierData', JSON.stringify(formData));
-      localStorage.setItem('isLoggedIn', 'true');
 
       router.push('/dashboard');
     } catch (err) {

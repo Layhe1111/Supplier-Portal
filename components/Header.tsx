@@ -40,28 +40,22 @@ export default function Header() {
   useEffect(() => {
     const checkSession = async () => {
       const { data } = await supabase.auth.getUser();
-      const localLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-      setIsLoggedIn(!!data.user || localLoggedIn);
+      setIsLoggedIn(!!data.user);
     };
     checkSession();
   }, [pathname]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    localStorage.removeItem('isLoggedIn');
     setIsLoggedIn(false);
     router.push('/');
-  };
-
-  const handleEditProfile = () => {
-    router.push('/register/supplier');
   };
 
   const handleViewSuppliers = () => {
     router.push('/suppliers');
   };
 
-  const showViewSuppliers = !isLoggedIn && pathname === '/';
+  const showViewSuppliers = pathname !== '/suppliers';
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200">
@@ -191,12 +185,6 @@ export default function Header() {
                 )}
               </div>
 
-              <button
-                onClick={handleEditProfile}
-                className="px-4 py-2 text-sm font-light text-gray-700 hover:text-gray-900 border border-gray-300 hover:bg-gray-50 transition-colors"
-              >
-                Edit Profile / 編輯檔案
-              </button>
               <button
                 onClick={handleLogout}
                 className="px-4 py-2 text-sm font-light text-gray-700 hover:text-gray-900 border border-gray-300 hover:bg-gray-50 transition-colors"

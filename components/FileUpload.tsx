@@ -40,6 +40,9 @@ export default function FileUpload({
   const [filePath, setFilePath] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewName, setPreviewName] = useState<string>('');
+  const [previewIsObjectUrl, setPreviewIsObjectUrl] = useState(false);
 
   const formattedAccept =
     accept
@@ -56,6 +59,24 @@ export default function FileUpload({
       setFilePath(null);
     }
   }, [value]);
+
+  useEffect(() => {
+    return () => {
+      if (previewIsObjectUrl && previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewIsObjectUrl, previewUrl]);
+
+  const isLikelyImage = (path: string | null, file?: File | null) => {
+    if (file?.type?.startsWith('image/')) return true;
+    if (accept && accept.includes('image')) return true;
+    if (!path) return false;
+    const lower = path.toLowerCase();
+    return ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.heic', '.heif', '.bmp', '.svg'].some((ext) =>
+      lower.endsWith(ext)
+    );
+  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -85,6 +106,13 @@ export default function FileUpload({
     setError('');
     try {
       if (value instanceof File && !path) {
+        if (isLikelyImage(null, value)) {
+          const url = URL.createObjectURL(value);
+          setPreviewUrl(url);
+          setPreviewName(value.name);
+          setPreviewIsObjectUrl(true);
+          return;
+        }
         const url = URL.createObjectURL(value);
         window.open(url, '_blank', 'noopener,noreferrer');
         setTimeout(() => URL.revokeObjectURL(url), 10000);
@@ -97,10 +125,25 @@ export default function FileUpload({
       if (error || !data?.signedUrl) {
         throw new Error(error?.message || 'Failed to open file');
       }
+      if (isLikelyImage(path as string)) {
+        setPreviewUrl(data.signedUrl);
+        setPreviewName(getDisplayName(path));
+        setPreviewIsObjectUrl(false);
+        return;
+      }
       window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to open file');
     }
+  };
+
+  const handleClosePreview = () => {
+    if (previewIsObjectUrl && previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setPreviewUrl(null);
+    setPreviewName('');
+    setPreviewIsObjectUrl(false);
   };
 
   const canPreview = Boolean(fileName) && (Boolean(filePath) || value instanceof File);
@@ -153,6 +196,43 @@ export default function FileUpload({
       )}
       {error && (
         <p className="text-xs text-red-600 mt-1">{error}</p>
+      )}
+
+      {previewUrl && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          role="dialog"
+          aria-modal="true"
+        >
+          <button
+            type="button"
+            onClick={handleClosePreview}
+            className="absolute inset-0"
+            aria-label="Close preview backdrop"
+          />
+          <div className="relative z-10 max-w-4xl w-full bg-white border border-gray-200 shadow-lg">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+              <p className="text-sm font-light text-gray-800 truncate">
+                {previewName || 'Preview'}
+              </p>
+              <button
+                type="button"
+                onClick={handleClosePreview}
+                className="text-gray-500 hover:text-gray-800"
+                aria-label="Close preview"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-4 max-h-[80vh] overflow-auto">
+              <img
+                src={previewUrl}
+                alt={previewName || 'Preview'}
+                className="w-full h-auto object-contain"
+              />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -34,6 +34,8 @@ export default function MultiImageUpload({
   const [files, setFiles] = useState<{ name: string; path: string }[]>([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewName, setPreviewName] = useState<string>('');
 
   useEffect(() => {
     if (!value || value.length === 0) {
@@ -56,7 +58,8 @@ export default function MultiImageUpload({
       if (error || !data?.signedUrl) {
         throw new Error(error?.message || 'Failed to open file');
       }
-      window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
+      setPreviewUrl(data.signedUrl);
+      setPreviewName(getDisplayName(path));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to open file');
     }
@@ -96,6 +99,11 @@ export default function MultiImageUpload({
     const updatedFiles = files.filter((_, i) => i !== index);
     setFiles(updatedFiles);
     onChange(updatedFiles.map((item) => item.path));
+  };
+
+  const handleClosePreview = () => {
+    setPreviewUrl(null);
+    setPreviewName('');
   };
 
   return (
@@ -171,6 +179,43 @@ export default function MultiImageUpload({
 
       {error && (
         <p className="text-xs text-red-600 mt-2">{error}</p>
+      )}
+
+      {previewUrl && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          role="dialog"
+          aria-modal="true"
+        >
+          <button
+            type="button"
+            onClick={handleClosePreview}
+            className="absolute inset-0"
+            aria-label="Close preview backdrop"
+          />
+          <div className="relative z-10 max-w-4xl w-full bg-white border border-gray-200 shadow-lg">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+              <p className="text-sm font-light text-gray-800 truncate">
+                {previewName || 'Preview'}
+              </p>
+              <button
+                type="button"
+                onClick={handleClosePreview}
+                className="text-gray-500 hover:text-gray-800"
+                aria-label="Close preview"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-4 max-h-[80vh] overflow-auto">
+              <img
+                src={previewUrl}
+                alt={previewName || 'Preview'}
+                className="w-full h-auto object-contain"
+              />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

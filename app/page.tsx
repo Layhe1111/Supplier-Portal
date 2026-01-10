@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
+import { validateLocalPhone } from '@/lib/phoneValidation';
 
 type LoginMethod = 'email' | 'phone';
 
@@ -22,23 +23,10 @@ export default function LoginPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const normalizePhone = (countryCode: string, phone: string) => {
-    const digits = phone.replace(/\D/g, '');
-    const normalized = `${countryCode}${digits}`.replace(/[^+\d]/g, '');
-    if (!/^\+\d{6,15}$/.test(normalized)) return null;
-    return normalized;
-  };
-
   useEffect(() => {
     const bootstrap = async () => {
-      const localLoggedIn = localStorage.getItem('isLoggedIn');
-      const localSupplier = localStorage.getItem('supplierData');
       const { data } = await supabase.auth.getUser();
       const user = data.user;
-      if (!user && localLoggedIn) {
-        router.replace(localSupplier ? '/dashboard' : '/register/supplier');
-        return;
-      }
       if (!user) return;
       const { data: suppliers } = await supabase
         .from('suppliers')
@@ -80,10 +68,11 @@ export default function LoginPage() {
           throw new Error('Please enter phone number and password / 請輸入電話號碼與密碼');
         }
 
-        const phone = normalizePhone(formData.countryCode, formData.phone);
-        if (!phone) {
-          throw new Error('Invalid phone number / 請輸入有效電話號碼');
+        const validation = validateLocalPhone(formData.countryCode, formData.phone);
+        if (!validation.ok) {
+          throw new Error(validation.error || 'Invalid phone number / 請輸入有效電話號碼');
         }
+        const phone = validation.normalized;
 
         const { error: signInError } = await supabase.auth.signInWithPassword({
           phone,

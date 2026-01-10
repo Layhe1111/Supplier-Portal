@@ -13,9 +13,13 @@ export default function ProductManagePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [editingIndex, setEditingIndex] = useState<number | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const loadData = async () => {
+      setIsLoading(true);
+      setError('');
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData.session?.access_token;
       if (!token) {
@@ -47,20 +51,9 @@ export default function ProductManagePage() {
         setUserData(supplier);
         setProducts(supplier.products || []);
       } catch (err) {
-        const data = localStorage.getItem('supplierData');
-        if (!data) {
-          router.push('/register/supplier');
-          return;
-        }
-
-        const parsedData = JSON.parse(data);
-        if (parsedData.supplierType !== 'material') {
-          router.push('/dashboard');
-          return;
-        }
-
-        setUserData(parsedData);
-        setProducts(parsedData.products || []);
+        setError(err instanceof Error ? err.message : 'Failed to load supplier data');
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -134,10 +127,20 @@ export default function ProductManagePage() {
     router.push('/dashboard');
   };
 
-  if (!userData) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <p className="text-gray-600">Loading... / 加載中...</p>
+      </div>
+    );
+  }
+
+  if (!userData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <p className="text-gray-600">
+          {error || 'Failed to load supplier data'}
+        </p>
       </div>
     );
   }

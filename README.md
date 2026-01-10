@@ -6,7 +6,7 @@ Supplier registration and product management portal for ProjectPilot.
 
 - Supabase 已接入：Auth + Postgres + Storage
 - 電郵註冊採用 OTP（Resend 發送驗證碼）
-- 註冊/編輯資料提交至後端 API；草稿保存在 localStorage
+- 註冊/編輯資料提交至後端 API；草稿保存於後端
 - 手機號註冊/登入已接入 Twilio Verify（短信 OTP + 密碼登入）
 
 ## Features / 核心功能
@@ -36,7 +36,6 @@ Supplier registration and product management portal for ProjectPilot.
 - Supabase (Auth + Database + Storage)
 - Resend (Email OTP)
 - Twilio Verify (SMS OTP)
-- localStorage (draft cache)
 
 ## Setup / 配置
 
@@ -115,5 +114,5 @@ Supplier-Portal/
 ## Notes / 注意事項
 
 - 手機號註冊使用 Twilio Verify，需在 Supabase 開啟 Phone 登入
-- 草稿保存在 localStorage，清除瀏覽器儲存會丟失未提交資料
+- 草稿保存在後端帳號下，可跨裝置取用
 - 邀請碼欄位目前未做後端校驗

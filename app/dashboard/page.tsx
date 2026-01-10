@@ -2,40 +2,21 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { SupplierFormData, Product, SupplierDirectoryEntry } from '@/types/supplier';
+import { SupplierFormData, Product } from '@/types/supplier';
 import ProductModal from '@/components/ProductModal';
 import { supabase } from '@/lib/supabaseClient';
 
 export default function DashboardPage() {
   const router = useRouter();
   const [userData, setUserData] = useState<SupplierFormData | null>(null);
-  const [supplierId, setSupplierId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [editingIndex, setEditingIndex] = useState<number | undefined>(undefined);
-  const [showBasicSuppliers, setShowBasicSuppliers] = useState(false);
-  const [basicSupplierSearch, setBasicSupplierSearch] = useState('');
-  const [basicSuppliers, setBasicSuppliers] = useState<SupplierDirectoryEntry[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [error, setError] = useState('');
-
-  const persistProducts = (nextProducts: Product[]) => {
-    const local = localStorage.getItem('supplierData');
-    if (!local) return;
-    try {
-      const parsed = JSON.parse(local);
-      if (parsed?.supplierType !== 'material') return;
-      localStorage.setItem(
-        'supplierData',
-        JSON.stringify({ ...parsed, products: nextProducts })
-      );
-    } catch (err) {
-      console.error('Failed to update local product cache', err);
-    }
-  };
 
   const syncProducts = async (nextProducts: Product[]) => {
     const { data: sessionData } = await supabase.auth.getSession();
@@ -73,14 +54,9 @@ export default function DashboardPage() {
       }
 
       try {
-        const [meRes, basicRes] = await Promise.all([
-          fetch('/api/suppliers/me', {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          fetch('/api/suppliers/basic', {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
+        const meRes = await fetch('/api/suppliers/me', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
         if (!meRes.ok) {
           const body = await meRes.json().catch(() => ({}));
@@ -96,15 +72,8 @@ export default function DashboardPage() {
 
         const supplier = meBody.supplier as SupplierFormData;
         setUserData(supplier);
-        setSupplierId(meBody.supplierId || null);
         setProducts(supplier.supplierType === 'material' ? supplier.products || [] : []);
 
-        if (basicRes.ok) {
-          const basicBody = await basicRes.json().catch(() => ({ suppliers: [] }));
-          setBasicSuppliers(basicBody.suppliers || []);
-        } else {
-          setBasicSuppliers([]);
-        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load data');
       } finally {
@@ -140,7 +109,6 @@ export default function DashboardPage() {
     try {
       await syncProducts(nextProducts);
       setProducts(nextProducts);
-      persistProducts(nextProducts);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save products');
     }
@@ -155,7 +123,6 @@ export default function DashboardPage() {
       try {
         await syncProducts(nextProducts);
         setProducts(nextProducts);
-        persistProducts(nextProducts);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to save products');
       }
@@ -178,16 +145,6 @@ export default function DashboardPage() {
       selectedCategory === 'all' || product.category === selectedCategory;
 
     return matchesSearch && matchesCategory;
-  });
-
-  // Filter basic suppliers
-  const filteredBasicSuppliers = basicSuppliers.filter((supplier) => {
-    const searchLower = basicSupplierSearch.toLowerCase();
-    return (
-      supplier.companyName.toLowerCase().includes(searchLower) ||
-      (supplier.companyNameChinese?.toLowerCase().includes(searchLower) ?? false) ||
-      supplier.businessType.toLowerCase().includes(searchLower)
-    );
   });
 
   if (isLoading) {
@@ -245,16 +202,6 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Actions */}
-        <div className="flex justify-end mb-4">
-          <button
-            onClick={() => setShowBasicSuppliers(!showBasicSuppliers)}
-            className="px-6 py-2.5 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
-          >
-            {showBasicSuppliers ? 'Back / 返回' : 'View Other Suppliers / 查看其他供應商'}
-          </button>
-        </div>
-
         {/* Product Statistics - Only show for material suppliers */}
         {userData?.supplierType === 'material' && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -308,8 +255,8 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Product Management - Only show for material suppliers and when not viewing basic suppliers */}
-        {userData?.supplierType === 'material' && !showBasicSuppliers && (
+        {/* Product Management - Only show for material suppliers */}
+        {userData?.supplierType === 'material' && (
           <div className="bg-white border border-gray-200 p-8">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-light text-gray-900">
@@ -461,93 +408,8 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Basic Suppliers List - when viewing basic suppliers */}
-        {showBasicSuppliers && (
-          <div className="bg-white border border-gray-200 p-8">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-light text-gray-900">
-                Other Suppliers / 其他供應商
-              </h3>
-              <div className="flex-1 max-w-md ml-8">
-                <input
-                  type="text"
-                  placeholder="Search by name / 搜索公司名稱"
-                  value={basicSupplierSearch}
-                  onChange={(e) => setBasicSupplierSearch(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
-                />
-              </div>
-            </div>
-
-            {filteredBasicSuppliers.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
-                No suppliers found / 未找到供應商
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[600px] overflow-y-auto">
-                {filteredBasicSuppliers.map((supplier, index) => (
-                  <div
-                    key={index}
-                    className="border border-gray-200 p-6 hover:shadow-md transition-shadow"
-                  >
-                    {/* Company Names */}
-                    <h4 className="text-base font-medium text-gray-900 mb-1">
-                      {supplier.companyName}
-                    </h4>
-                    {supplier.companyNameChinese && (
-                      <p className="text-sm text-gray-700 mb-3">
-                        {supplier.companyNameChinese}
-                      </p>
-                    )}
-
-                    {/* Address */}
-                    <p className="text-sm text-gray-600 mb-3">
-                      {supplier.officeAddress}
-                    </p>
-
-                    {/* Contact Information */}
-                    <div className="space-y-1 text-sm text-gray-700">
-                      <p>
-                        <span className="font-medium">T:</span> ({supplier.submitterPhoneCode}) {supplier.submitterPhone}
-                      </p>
-                      {supplier.contactFax && (
-                        <p>
-                          <span className="font-medium">F:</span> ({supplier.submitterPhoneCode}) {supplier.contactFax}
-                        </p>
-                      )}
-                      <p>
-                        <span className="font-medium">E:</span> {supplier.submitterEmail}
-                      </p>
-                    </div>
-
-                    {/* Business Type */}
-                    <div className="mt-3 flex items-center text-sm">
-                      <span className="text-yellow-600 mr-2">▶</span>
-                      <span className="text-gray-700">
-                        <span className="font-medium">{supplier.businessType}</span>
-                      </span>
-                    </div>
-
-                    {/* Business Description (if available) */}
-                    {supplier.businessDescription && (
-                      <p className="mt-3 text-sm text-gray-600 italic">
-                        {supplier.businessDescription}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="mt-4 text-sm text-gray-600">
-              Showing {filteredBasicSuppliers.length} of {basicSuppliers.length} suppliers
-              / 顯示 {filteredBasicSuppliers.length} / {basicSuppliers.length} 個供應商
-            </div>
-          </div>
-        )}
-
-        {/* Info Section for Non-Material Suppliers - when not viewing basic suppliers */}
-        {userData?.supplierType !== 'material' && !showBasicSuppliers && (
+        {/* Info Section for Non-Material Suppliers */}
+        {userData?.supplierType !== 'material' && (
           <div className="bg-white border border-gray-200 p-8">
             <div className="text-center py-12">
               <svg className="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
