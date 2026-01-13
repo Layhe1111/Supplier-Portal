@@ -192,11 +192,11 @@ export default function CommonRequirements({
                   </li>
                   <li>
                     Product and service details (SKUs, pricing, MOQ, lead time, specs, photos,
-                    files, 3D models) / 產品與服務資料（SKU、價格、MOQ、交期、規格、圖片、文件、3D模型）
+                    files, 3D models) / 產品與服務資料（SKU、價格、MOQ、货期、規格、圖片、文件、3D模型）
                   </li>
                   <li>
                     Project experience, case highlights, and capability statements for design,
-                    build, or material supply / 設計、施工或材料供應相關的項目經驗、案例及能力說明
+                    build, or material/furniture supply / 設計、施工或材料家具供應相關的項目經驗、案例及能力說明
                   </li>
                   <li>
                     Supplementary links or uploads you provide for qualification / 你為資質審核提供的補充鏈接或文件

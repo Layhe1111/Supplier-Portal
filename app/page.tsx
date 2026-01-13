@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import { validateLocalPhone } from '@/lib/phoneValidation';
+import { validateEmail } from '@/lib/emailValidation';
 
 type LoginMethod = 'email' | 'phone';
 
@@ -86,8 +87,15 @@ export default function LoginPage() {
           throw signInError;
         }
       } else {
+        if (!formData.email || !formData.password) {
+          throw new Error('Please enter email and password / 請輸入電郵與密碼');
+        }
+        const emailCheck = validateEmail(formData.email, 'Email / 電郵');
+        if (!emailCheck.ok) {
+          throw new Error(emailCheck.error || 'Invalid email / 無效電郵');
+        }
         const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: formData.email,
+          email: emailCheck.normalized,
           password: formData.password,
         });
 

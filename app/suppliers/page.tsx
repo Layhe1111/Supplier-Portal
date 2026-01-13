@@ -7,6 +7,8 @@ import { supabase } from '@/lib/supabaseClient';
 export default function SuppliersDirectoryPage() {
   const [suppliers, setSuppliers] = useState<SupplierDirectoryEntry[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('submitted');
+  const [typeFilter, setTypeFilter] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(30);
@@ -19,13 +21,16 @@ export default function SuppliersDirectoryPage() {
     contactCount?: number;
   } | null>(null);
   const skipFirstFetchRef = useRef(false);
-  const prevQueryRef = useRef({ searchTerm, pageSize });
+  const prevQueryRef = useRef({ searchTerm, pageSize, sortBy, typeFilter });
 
   useEffect(() => {
     const prevQuery = prevQueryRef.current;
     const filtersChanged =
-      prevQuery.searchTerm !== searchTerm || prevQuery.pageSize !== pageSize;
-    prevQueryRef.current = { searchTerm, pageSize };
+      prevQuery.searchTerm !== searchTerm ||
+      prevQuery.pageSize !== pageSize ||
+      prevQuery.sortBy !== sortBy ||
+      prevQuery.typeFilter !== typeFilter;
+    prevQueryRef.current = { searchTerm, pageSize, sortBy, typeFilter };
 
     if (filtersChanged && currentPage !== 1) {
       setCurrentPage(1);
@@ -47,9 +52,13 @@ export default function SuppliersDirectoryPage() {
       const params = new URLSearchParams({
         page: String(currentPage),
         pageSize: String(pageSize),
+        sort: sortBy,
       });
       if (searchTerm.trim()) {
         params.set('q', searchTerm.trim());
+      }
+      if (typeFilter !== 'all') {
+        params.set('type', typeFilter);
       }
       if (debug) {
         params.set('debug', '1');
@@ -82,7 +91,7 @@ export default function SuppliersDirectoryPage() {
     };
 
     loadSuppliers();
-  }, [currentPage, pageSize, searchTerm]);
+  }, [currentPage, pageSize, searchTerm, sortBy, typeFilter]);
 
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
   const safePage = Math.min(currentPage, totalPages);
@@ -167,22 +176,61 @@ export default function SuppliersDirectoryPage() {
               companies {debugInfo.companyCount ?? '-'}, contacts {debugInfo.contactCount ?? '-'}
             </p>
           )}
-    
         </div>
 
         <div className="bg-white border border-gray-200 p-8">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-light text-gray-900">
-              Suppliers / 供應商列表
-            </h3>
-            <div className="flex-1 max-w-md ml-8">
-              <input
-                type="text"
-                placeholder="Search by name / 搜索公司名稱"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
-              />
+          <div className="mb-6">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <h3 className="text-lg font-light text-gray-900">
+                Suppliers / 供應商列表
+              </h3>
+            </div>
+            <div className="flex flex-wrap items-center justify-between gap-3 md:gap-4">
+              <div className="flex flex-wrap items-center gap-4">
+                <input
+                  type="text"
+                  placeholder="Search by name / 搜索公司名稱"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full md:w-64 px-4 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
+                />
+                <label className="flex items-center text-sm text-gray-600">
+                  Sort / 排序
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="ml-2 px-2 py-2 border border-gray-300 text-sm"
+                  >
+                    <option value="submitted">Submission time / 按提交時間</option>
+                    <option value="alpha">Alphabetical / 按字母順序</option>
+                  </select>
+                </label>
+                <label className="flex items-center text-sm text-gray-600">
+                  Type / 類型
+                  <select
+                    value={typeFilter}
+                    onChange={(e) => setTypeFilter(e.target.value)}
+                    className="ml-2 w-40 px-2 py-2 border border-gray-300 text-sm"
+                  >
+                    <option value="all">All / 全部</option>
+                    <option value="designer">Designer / 設計師</option>
+                    <option value="contractor">Contractor / 承包商</option>
+                    <option value="material">Material/Furniture Supplier / 材料家具供應商</option>
+                    <option value="basic">Other Suppliers / 其他供应商</option>
+                  </select>
+                </label>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchTerm('');
+                  setSortBy('submitted');
+                  setTypeFilter('all');
+                }}
+                className="px-4 py-2 text-sm font-light text-gray-700 hover:text-gray-900 border border-gray-300 hover:bg-gray-50 transition-colors"
+              >
+                Reset / 重置
+              </button>
             </div>
           </div>
 

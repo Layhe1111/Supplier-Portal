@@ -344,7 +344,7 @@ async function insertNewSupplier(entry, userId) {
       company_name_zh: entry.companyNameChinese || null,
       country: '',
       office_address: entry.officeAddress || null,
-      business_type: entry.businessType || 'Basic Supplier / 基礎供應商',
+      business_type: entry.businessType || 'Other Suppliers / 其他供应商',
       business_description: entry.businessDescription || null,
       company_supplement_link: entry.website || null,
       company_logo_path: null,

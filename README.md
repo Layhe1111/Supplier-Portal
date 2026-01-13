@@ -12,7 +12,7 @@ Supplier registration and product management portal for ProjectPilot.
 ## Features / 核心功能
 
 ### Supplier Registration / 供應商註冊
-- 多類型供應商：承包商、設計師、材料供應商、基礎供應商
+- 多類型供應商：承包商、設計師、材料供應商、其他供应商
 - 公司與聯絡人信息
 - 類型專屬問卷（項目案例、資質、保險、設計師名單等）
 - 文件與圖片上傳（Supabase Storage）

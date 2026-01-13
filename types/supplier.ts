@@ -80,6 +80,7 @@ export interface Designer {
   id: string;
   name: string;
   experience: string;
+  languages: string;
   cv: UploadValue | null;
   projects: DesignerProject[];
 }

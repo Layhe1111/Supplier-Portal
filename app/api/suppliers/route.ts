@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import { validateLocalPhone } from '@/lib/phoneValidation';
+import { validateOptionalUrl } from '@/lib/urlValidation';
 
 type SupplierStatus = 'draft' | 'submitted';
 type SupplierType = 'contractor' | 'designer' | 'material' | 'basic';
@@ -15,8 +15,8 @@ const SUPPLIER_TYPES = new Set<SupplierType>([
 const BUSINESS_TYPE_LABELS: Record<SupplierType, string> = {
   contractor: 'Contractor / 承包商',
   designer: 'Designer / 設計師',
-  material: 'Material Supplier / 材料供應商',
-  basic: 'Basic Supplier / 基礎供應商',
+  material: 'Material/Furniture Supplier / 材料家具供應商',
+  basic: 'Other Suppliers / 其他供应商',
 };
 
 const YES = new Set(['yes', 'true', '1']);
@@ -270,6 +270,7 @@ const saveDesigners = async (supplierId: string, designers: any[]) => {
     supplier_id: supplierId,
     name: toText(designer.name),
     experience: toText(designer.experience),
+    languages: toText(designer.languages),
     cv_path: toPath(designer.cv),
   }));
 
@@ -521,6 +522,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid supplier type' }, { status: 400 });
     }
 
+    const companyLinkCheck = validateOptionalUrl(
+      payload.companySupplementLink,
+      'Company website / 公司網站'
+    );
+    if (!companyLinkCheck.ok) {
+      return NextResponse.json({ error: companyLinkCheck.error }, { status: 400 });
+    }
+
+    if (Array.isArray(payload.products)) {
+      for (const product of payload.products) {
+        const specCheck = validateOptionalUrl(
+          product?.specificationLink,
+          'Product specification link / 產品規格連結'
+        );
+        if (!specCheck.ok) {
+          return NextResponse.json({ error: specCheck.error }, { status: 400 });
+        }
+      }
+    }
+
     const auth = await requireUser(request);
     if ('error' in auth) return auth.error;
     const userId = auth.user.id;
@@ -610,15 +631,6 @@ export async function POST(request: Request) {
       contact_fax: toText(payload.contactFax),
       submission_date: toText(payload.submissionDate),
     };
-    if (contactRow.contact_phone_code && contactRow.contact_phone) {
-      const phoneCheck = validateLocalPhone(
-        contactRow.contact_phone_code,
-        contactRow.contact_phone
-      );
-      if (!phoneCheck.ok) {
-        return NextResponse.json({ error: phoneCheck.error }, { status: 400 });
-      }
-    }
     ensureOk(
       await supabaseAdmin.from('supplier_contact').upsert(contactRow),
       'Upsert supplier_contact'

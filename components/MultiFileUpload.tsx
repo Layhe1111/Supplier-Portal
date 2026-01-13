@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { uploadFileToStorage } from '@/lib/storageUpload';
+import { extractOriginalFilename } from '@/lib/sanitizeFilename';
 
 interface MultiFileUploadProps {
   label: string;
@@ -15,11 +16,7 @@ interface MultiFileUploadProps {
   className?: string;
 }
 
-const getDisplayName = (path: string) => {
-  const base = path.split('/').pop() || path;
-  const match = base.match(/^\d{10,}-(.+)$/);
-  return match ? match[1] : base;
-};
+const getDisplayName = (path: string) => extractOriginalFilename(path);
 
 const STORAGE_BUCKET = process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET || 'supplier-files';
 

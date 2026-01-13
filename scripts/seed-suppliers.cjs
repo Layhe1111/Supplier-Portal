@@ -667,7 +667,7 @@ async function seedMaterial(userId) {
 }
 
 async function seedBasic(userId) {
-  const label = 'Basic Supplier / 基礎供應商';
+  const label = 'Other Suppliers / 其他供应商';
   const supplier = await insertSingle(
     'suppliers',
     {

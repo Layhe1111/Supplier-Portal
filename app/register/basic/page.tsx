@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import FormInput from '@/components/FormInput';
 import FormSelect from '@/components/FormSelect';
@@ -9,6 +9,9 @@ import FileUpload from '@/components/FileUpload';
 import { BasicSupplierFormData } from '@/types/supplier';
 import { supabase } from '@/lib/supabaseClient';
 import { validateLocalPhone } from '@/lib/phoneValidation';
+import { validateOptionalUrl } from '@/lib/urlValidation';
+import { validateEmail } from '@/lib/emailValidation';
+import { useUnsavedChanges } from '@/components/UnsavedChangesProvider';
 
 const PHONE_CODE_OPTIONS = [
   '+852',
@@ -51,6 +54,8 @@ const COUNTRY_OPTIONS = [
 export default function BasicSupplierRegistrationPage() {
   const router = useRouter();
   const didBootstrapRef = useRef(false);
+  const changeCounterRef = useRef(0);
+  const { setDirty, registerSaveHandler } = useUnsavedChanges();
   const [formData, setFormData] = useState<BasicSupplierFormData>({
     supplierType: 'basic',
     companyName: '',
@@ -200,17 +205,101 @@ export default function BasicSupplierRegistrationPage() {
       if (serverSupplier) {
         const { normalized } = normalizeBasicSupplierData(serverSupplier);
         setFormData(normalized as BasicSupplierFormData);
+        changeCounterRef.current = 0;
+        setDirty(false);
       }
     };
     bootstrap();
-  }, [router]);
+  }, [router, setDirty]);
 
   const handleInputChange = (field: keyof BasicSupplierFormData, value: string | File | null) => {
+    changeCounterRef.current += 1;
+    setDirty(true);
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
+
+  const saveDraftForNavigation = useCallback(async () => {
+    const saveVersion = changeCounterRef.current;
+    setError('');
+    setIsSubmitting(true);
+    try {
+      if (formData.submitterEmail?.trim()) {
+        const emailCheck = validateEmail(formData.submitterEmail, 'Email / 電郵');
+        if (!emailCheck.ok) {
+          setError(emailCheck.error || 'Invalid email');
+          return false;
+        }
+      }
+
+      if (formData.companySupplementLink?.trim()) {
+        const companyLinkCheck = validateOptionalUrl(
+          formData.companySupplementLink,
+          'Company website / 公司網站'
+        );
+        if (!companyLinkCheck.ok) {
+          setError(companyLinkCheck.error || 'Invalid website URL');
+          return false;
+        }
+      }
+
+      if (formData.submitterPhone?.trim()) {
+        const phoneCheck = validateLocalPhone(
+          formData.submitterPhoneCode || '+852',
+          formData.submitterPhone || ''
+        );
+        if (!phoneCheck.ok) {
+          setError(phoneCheck.error || 'Invalid phone number');
+          return false;
+        }
+      }
+
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) {
+        throw new Error('Please sign in to save to database / 請先登入再提交資料');
+      }
+
+      const res = await fetch('/api/suppliers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          supplierType: 'basic',
+          status: 'draft',
+          data: formData,
+        }),
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || 'Failed to save supplier');
+      }
+
+      if (changeCounterRef.current === saveVersion) {
+        setDirty(false);
+      }
+
+      return true;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save draft');
+      return false;
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [formData, setDirty]);
+
+  useEffect(() => {
+    registerSaveHandler(saveDraftForNavigation);
+    return () => {
+      registerSaveHandler(null);
+      setDirty(false);
+    };
+  }, [registerSaveHandler, saveDraftForNavigation, setDirty]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -232,6 +321,21 @@ export default function BasicSupplierRegistrationPage() {
 
     if (!formData.companyName?.trim() && !formData.companyNameChinese?.trim()) {
       setError('Please provide a company name in English or Chinese / 請至少填寫公司英文名或中文名');
+      return;
+    }
+
+    const emailCheck = validateEmail(formData.submitterEmail, 'Email / 電郵');
+    if (!emailCheck.ok) {
+      setError(emailCheck.error || 'Invalid email');
+      return;
+    }
+
+    const companyLinkCheck = validateOptionalUrl(
+      formData.companySupplementLink,
+      'Company website / 公司網站'
+    );
+    if (!companyLinkCheck.ok) {
+      setError(companyLinkCheck.error || 'Invalid website URL');
       return;
     }
 

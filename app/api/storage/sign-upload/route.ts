@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
+import { buildStorageFileName } from '@/lib/sanitizeFilename';
 
 export async function POST(request: Request) {
   try {
@@ -14,7 +15,8 @@ export async function POST(request: Request) {
     }
 
     const bucket = process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET || 'supplier-files';
-    const objectPath = `${authData.user.id}/${Date.now()}-${fileName}`;
+    const safeName = buildStorageFileName(fileName);
+    const objectPath = `${authData.user.id}/${Date.now()}-${safeName}`;
 
     const { data: signed, error } = await supabase.storage
       .from(bucket)

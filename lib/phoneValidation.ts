@@ -21,6 +21,7 @@ const PHONE_RULES: Record<string, PhoneRule> = {
 const COUNTRY_CODES = Object.keys(PHONE_RULES).sort((a, b) => b.length - a.length);
 
 const normalizeDigits = (value: string) => value.replace(/\D/g, '');
+const PHONE_INPUT_REGEX = /^[0-9\s()-]+$/;
 
 const formatRule = (rule: PhoneRule) =>
   rule.min === rule.max ? `${rule.min}` : `${rule.min}-${rule.max}`;
@@ -40,6 +41,19 @@ export const validateLocalPhone = (countryCode: string, phone: string) => {
   const rule = getPhoneRule(countryCode);
   if (!rule) {
     return { ok: false as const, error: `Unsupported country code: ${countryCode}` };
+  }
+  if (typeof phone !== 'string') {
+    return { ok: false as const, error: 'Invalid phone number' };
+  }
+  const trimmed = phone.trim();
+  if (!trimmed) {
+    return { ok: false as const, error: buildPhoneLengthError(countryCode) };
+  }
+  if (!PHONE_INPUT_REGEX.test(trimmed)) {
+    return {
+      ok: false as const,
+      error: 'Invalid phone number format / 電話號碼格式錯誤',
+    };
   }
   const digits = normalizeDigits(phone);
   if (digits.length < rule.min || digits.length > rule.max) {

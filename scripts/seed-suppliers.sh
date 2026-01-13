@@ -110,7 +110,7 @@ seed_common() {
 }
 
 seed_basic() {
-  local label="Basic Supplier"
+  local label="Other Suppliers"
   local supplier_id
   supplier_id=$(insert_one "suppliers" "$(jq -c -n \
     --arg user_id "$USER_ID" \

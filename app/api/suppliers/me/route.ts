@@ -509,7 +509,7 @@ export async function GET(request: Request) {
           .eq('supplier_id', supplierId),
         supabaseAdmin
           .from('designers')
-          .select('id, name, experience, cv_path, created_at')
+          .select('id, name, experience, languages, cv_path, created_at')
           .eq('supplier_id', supplierId)
           .order('created_at', { ascending: true }),
       ]);
@@ -596,6 +596,7 @@ export async function GET(request: Request) {
         id: designer.id,
         name: designer.name ?? '',
         experience: designer.experience ?? '',
+        languages: designer.languages ?? '',
         cv: designer.cv_path ?? null,
         projects: (designerProjectsByDesigner.get(designer.id) || []).map((project: any) => ({
           id: project.id,

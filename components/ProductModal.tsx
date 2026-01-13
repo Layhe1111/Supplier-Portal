@@ -192,7 +192,7 @@ export default function ProductModal({
               />
 
               <FormInput
-                label="Lead Time (days) / 交貨周期"
+                label="Lead Time (days) / 货期"
                 name="leadTime"
                 type="number"
                 required

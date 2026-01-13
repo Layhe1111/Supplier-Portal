@@ -39,7 +39,7 @@ export default function DesignerDBSection({
 }: DesignerDBSectionProps) {
   const projectTypeOptions = [
     { value: 'residential', label: 'Residential 住宅' },
-    { value: 'commercial', label: 'Commercial 商業' },
+    { value: 'commercial', label: 'Retail 零售' },
     { value: 'office', label: 'Office 辦公' },
     { value: 'hotel', label: 'Hotel 酒店' },
     { value: 'medical', label: 'Medical 醫療' },
@@ -192,6 +192,7 @@ export default function DesignerDBSection({
                   } else {
                     onChange('dbConstructionGrade', '');
                     onChange('dbLicenseNumber', '');
+                    onChange('dbCertificateUpload', null);
                   }
                 }}
                 required
@@ -203,23 +204,24 @@ export default function DesignerDBSection({
             </div>
 
             {data.dbConstructionGrade === 'RGBC' && (
-              <FormInput
-                label="Certificate Number / 資質證書編號"
-                name="dbLicenseNumber"
-                required
-                value={data.dbLicenseNumber}
-                onChange={(v) => onChange('dbLicenseNumber', v)}
-              />
+              <>
+                <FormInput
+                  label="Certificate Number / 資質證書編號"
+                  name="dbLicenseNumber"
+                  required
+                  value={data.dbLicenseNumber}
+                  onChange={(v) => onChange('dbLicenseNumber', v)}
+                />
+                <FileUpload
+                  label="Certificate Upload / 資質證書上傳"
+                  name="dbCertificateUpload"
+                  required
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  value={data.dbCertificateUpload}
+                  onChange={(file) => onChange('dbCertificateUpload', file)}
+                />
+              </>
             )}
-
-            <FileUpload
-              label="Certificate Upload / 資質證書上傳"
-              name="dbCertificateUpload"
-              required
-              accept=".pdf,.jpg,.jpeg,.png"
-              value={data.dbCertificateUpload}
-              onChange={(file) => onChange('dbCertificateUpload', file)}
-            />
           </div>
         </div>
 
@@ -279,13 +281,6 @@ export default function DesignerDBSection({
                     Add items and upload certificates
                   </span>
                 </label>
-                <button
-                  type="button"
-                  onClick={addDbOtherCertification}
-                  className="px-3 py-1 bg-gray-900 text-white text-xs font-light hover:bg-gray-800 transition-colors"
-                >
-                  + Add Certification / 添加
-                </button>
               </div>
 
               <div className="space-y-3">
@@ -330,6 +325,15 @@ export default function DesignerDBSection({
                   </div>
                 ))}
               </div>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={addDbOtherCertification}
+                  className="px-3 py-1 bg-gray-900 text-white text-xs font-light hover:bg-gray-800 transition-colors"
+                >
+                  + Add Certification / 添加
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -360,13 +364,6 @@ export default function DesignerDBSection({
               Project Highlights / 亮點項目
               <span className="text-red-500 ml-1">*</span>
             </h4>
-            <button
-              type="button"
-              onClick={addDbProjectHighlight}
-              className="px-4 py-2 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
-            >
-              + Add Project / 添加項目
-            </button>
           </div>
 
           {(!data.dbProjectHighlights || data.dbProjectHighlights.length === 0) ? (
@@ -412,6 +409,7 @@ export default function DesignerDBSection({
                       <FormInput
                         label="Year / 年份"
                         name={`db-project-year-${project.id}`}
+                        type="number"
                         required
                         value={project.year}
                         onChange={(v) =>
@@ -423,6 +421,7 @@ export default function DesignerDBSection({
                       <FormInput
                         label="Area (sqft) / 面積（平方呎）"
                         name={`db-project-area-${project.id}`}
+                        type="number"
                         required
                         value={project.area}
                         onChange={(v) =>
@@ -458,18 +457,51 @@ export default function DesignerDBSection({
                         ]}
                       />
 
-                      <FormSelect
-                        label="Property Types / 主要項目類型"
-                        name={`db-project-types-${project.id}`}
-                        type="checkbox"
-                        multiple
-                        required
-                        value={project.projectTypes || []}
-                        onChange={(v) =>
-                          updateDbProjectHighlight(project.id, 'projectTypes', v as string[])
-                        }
-                        options={projectTypeOptions}
-                      />
+                      {(() => {
+                        const customType = (project.projectTypes || []).find((type) =>
+                          type.startsWith('custom_')
+                        );
+                        const selectedType =
+                          (project.projectTypes || []).find((type) => !type.startsWith('custom_')) ||
+                          (customType ? 'other' : '');
+                        const customValue = customType ? customType.slice(7) : '';
+                        return (
+                          <div className="space-y-2">
+                            <FormSelect
+                              label="Property Types / 主要項目類型"
+                              name={`db-project-types-${project.id}`}
+                              type="radio"
+                              required
+                              value={selectedType}
+                              onChange={(v) => {
+                                const value = String(v);
+                                if (value === 'other') {
+                                  const next = customValue
+                                    ? ['other', `custom_${customValue}`]
+                                    : ['other'];
+                                  updateDbProjectHighlight(project.id, 'projectTypes', next);
+                                  return;
+                                }
+                                updateDbProjectHighlight(project.id, 'projectTypes', [value]);
+                              }}
+                              options={projectTypeOptions}
+                            />
+                            {selectedType === 'other' && (
+                              <input
+                                type="text"
+                                value={customValue}
+                                onChange={(e) => {
+                                  const value = e.target.value.trim();
+                                  const next = value ? ['other', `custom_${value}`] : ['other'];
+                                  updateDbProjectHighlight(project.id, 'projectTypes', next);
+                                }}
+                                placeholder="Enter other type / 請輸入其他類型"
+                                className="w-full px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+                              />
+                            )}
+                          </div>
+                        );
+                      })()}
                     </div>
 
                     <MultiImageUpload
@@ -486,6 +518,15 @@ export default function DesignerDBSection({
               ))}
             </div>
           )}
+          <div className="mt-4 flex justify-end">
+            <button
+              type="button"
+              onClick={addDbProjectHighlight}
+              className="px-4 py-2 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
+            >
+              + Add Project / 添加項目
+            </button>
+          </div>
         </div>
 
         <div>
@@ -530,7 +571,7 @@ export default function DesignerDBSection({
       <FormSection title="Section 5: Personnel / 人員">
         <div className="mb-6">
           <FileUpload
-            label="Company Organization Chart / 公司組織架構圖"
+            label="Contractor Organization Chart / 施工人员組織架構圖"
             name="dbOrganizationChart"
             required
             accept=".pdf,.jpg,.jpeg,.png"
@@ -603,13 +644,6 @@ export default function DesignerDBSection({
                         Projects / 項目經歷
                         <span className="text-red-500 ml-1">*</span>
                       </label>
-                      <button
-                        type="button"
-                        onClick={() => addDbProjectToManager(pmIndex)}
-                        className="px-3 py-1 bg-gray-900 text-white text-xs font-light hover:bg-gray-800 transition-colors"
-                      >
-                        + Add Project / 添加項目經歷
-                      </button>
                     </div>
 
                     <div className="space-y-3">
@@ -688,6 +722,7 @@ export default function DesignerDBSection({
                             <FormInput
                               label="Year / 年份"
                               name={`db-pm-${pmIndex}-project-${projectIndex}-year`}
+                              type="number"
                               required
                               value={project.year}
                               onChange={(v) => {
@@ -729,6 +764,7 @@ export default function DesignerDBSection({
                             <FormInput
                               label="Area (sqft) / 面積（平方呎）"
                               name={`db-pm-${pmIndex}-project-${projectIndex}-area`}
+                              type="number"
                               required
                               value={project.area}
                               onChange={(v) => {
@@ -749,6 +785,15 @@ export default function DesignerDBSection({
                           </div>
                         </div>
                       ))}
+                    </div>
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => addDbProjectToManager(pmIndex)}
+                        className="px-3 py-1 bg-gray-900 text-white text-xs font-light hover:bg-gray-800 transition-colors"
+                      >
+                        + Add Project / 添加項目經歷
+                      </button>
                     </div>
                   </div>
 

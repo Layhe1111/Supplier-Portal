@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { validateOptionalUrl } from '@/lib/urlValidation';
 
 const requireUser = async (request: Request) => {
   const authHeader = request.headers.get('authorization') || '';
@@ -155,6 +156,16 @@ export async function POST(request: Request) {
       : Array.isArray(body?.data?.products)
       ? body.data.products
       : [];
+
+    for (const product of products) {
+      const specCheck = validateOptionalUrl(
+        product?.specificationLink,
+        'Product specification link / 產品規格連結'
+      );
+      if (!specCheck.ok) {
+        return NextResponse.json({ error: specCheck.error }, { status: 400 });
+      }
+    }
 
     const supplierResult = await supabaseAdmin
       .from('suppliers')

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { SupplierFormData, Product } from '@/types/supplier';
 import ProductModal from '@/components/ProductModal';
 import { supabase } from '@/lib/supabaseClient';
+import { validateOptionalUrl } from '@/lib/urlValidation';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -103,6 +104,14 @@ export default function DashboardPage() {
     if (!userData || userData.supplierType !== 'material') return;
 
     setError('');
+    const specCheck = validateOptionalUrl(
+      product.specificationLink,
+      'Product specification link / 產品規格連結'
+    );
+    if (!specCheck.ok) {
+      setError(specCheck.error || 'Invalid product specification URL');
+      return;
+    }
     const mapped: Product = { ...product };
     const exists = products.find((p) => p.id === product.id);
     const nextProducts = exists
@@ -188,8 +197,8 @@ export default function DashboardPage() {
                 <p className="text-base text-gray-900">
                   {userData.supplierType === 'contractor' && 'Contractor / 承包商'}
                   {userData.supplierType === 'designer' && 'Designer / 設計師'}
-                  {userData.supplierType === 'material' && 'Material Supplier / 材料供應商'}
-                  {userData.supplierType === 'basic' && 'Basic Supplier / 基礎供應商'}
+                  {userData.supplierType === 'material' && 'Material/Furniture Supplier / 材料家具供應商'}
+                  {userData.supplierType === 'basic' && 'Other Suppliers / 其他供应商'}
                 </p>
               </div>
               <div>
@@ -328,13 +337,13 @@ export default function DashboardPage() {
                         SKU
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
-                        Product Name / 產品名稱
+                        Brand / 品牌
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
                         Category / 類別
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
-                        Brand / 品牌
+                        Product Name / 產品名稱
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
                         Price / 價格
@@ -343,7 +352,7 @@ export default function DashboardPage() {
                         MOQ
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
-                        Lead Time / 交期
+                        Lead Time / 货期
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
                         Actions / 操作
@@ -356,6 +365,12 @@ export default function DashboardPage() {
                         <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                           {product.sku}
                         </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                          {product.brand}
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                          {product.category}
+                        </td>
                         <td className="px-4 py-4 text-sm text-gray-900">
                           <div>
                             <p className="font-medium">{product.productName}</p>
@@ -363,12 +378,6 @@ export default function DashboardPage() {
                               <p className="text-xs text-gray-500">{product.spec}</p>
                             )}
                           </div>
-                        </td>
-                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                          {product.category}
-                        </td>
-                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                          {product.brand}
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                           {product.unitPrice ? `HKD ${parseInt(product.unitPrice).toLocaleString()}` : '-'}

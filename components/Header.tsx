@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import { useUnsavedChanges } from '@/components/UnsavedChangesProvider';
 
 export default function Header() {
   const router = useRouter();
@@ -11,6 +12,7 @@ export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [receiveNotifications, setReceiveNotifications] = useState(true);
+  const { isDirty, saveChanges } = useUnsavedChanges();
 
   // Sample notifications data
   const notifications = [
@@ -55,14 +57,37 @@ export default function Header() {
     router.push('/suppliers');
   };
 
+  const handleLogoClick = async () => {
+    if (isDirty) {
+      const confirmed = window.confirm(
+        '內容尚未保存，是否保存後離開？\nYou have unsaved changes. Save before leaving?'
+      );
+      if (!confirmed) return;
+      const saved = await saveChanges();
+      if (!saved) return;
+    }
+
+    router.push(isLoggedIn ? '/dashboard' : '/');
+  };
+
+  const handleBack = () => {
+    router.back();
+  };
+
   const showViewSuppliers = pathname !== '/suppliers';
+  const showBack = pathname === '/suppliers';
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo and Title */}
-          <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={handleLogoClick}
+            className="flex items-center gap-4 text-left hover:opacity-90 transition-opacity"
+            aria-label="ProjectPilot Home"
+          >
             <div className="relative w-16 h-16 flex-shrink-0">
               <Image
                 src="/logo.png"
@@ -80,16 +105,24 @@ export default function Header() {
                 Supplier Portal 供應商門戶
               </p>
             </div>
-          </div>
+          </button>
 
           {/* Actions */}
           <div className="flex items-center gap-4">
+            {showBack && (
+              <button
+                onClick={handleBack}
+                className="px-4 py-2 text-sm font-light text-gray-700 hover:text-gray-900 border border-gray-300 hover:bg-gray-50 transition-colors"
+              >
+                Back / 返回
+              </button>
+            )}
             {showViewSuppliers && (
               <button
                 onClick={handleViewSuppliers}
                 className="px-4 py-2 text-sm font-light text-gray-700 hover:text-gray-900 border border-gray-300 hover:bg-gray-50 transition-colors"
               >
-                View Suppliers / 查看供應商
+                Find Suppliers / 查找供应商
               </button>
             )}
 

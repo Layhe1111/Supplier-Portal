@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   SupplierFormData,
@@ -10,10 +10,13 @@ import {
 } from '@/types/supplier';
 import { supabase } from '@/lib/supabaseClient';
 import { validateLocalPhone } from '@/lib/phoneValidation';
+import { validateOptionalUrl } from '@/lib/urlValidation';
+import { validateEmail } from '@/lib/emailValidation';
 import ContractorQuestionnaire from '@/components/questionnaires/ContractorQuestionnaire';
 import DesignerQuestionnaire from '@/components/questionnaires/DesignerQuestionnaire';
 import MaterialSupplierQuestionnaire from '@/components/questionnaires/MaterialSupplierQuestionnaire';
 import CommonRequirements from '@/components/questionnaires/CommonRequirements';
+import { useUnsavedChanges } from '@/components/UnsavedChangesProvider';
 
 type NonBasicSupplierFormData =
   | ContractorFormData
@@ -38,6 +41,8 @@ export default function SupplierRegistrationPage() {
   const isSubmittingRef = useRef(false);
   const isAutoSavingRef = useRef(false);
   const didBootstrapRef = useRef(false);
+  const changeCounterRef = useRef(0);
+  const { setDirty, registerSaveHandler } = useUnsavedChanges();
 
   // Initialize form data based on supplier type
   const [formData, setFormData] = useState<NonBasicSupplierFormData | null>(null);
@@ -110,12 +115,14 @@ export default function SupplierRegistrationPage() {
         setFormData(normalized);
         setIsEditMode(true);
         setSupplierId(serverSupplierId || null);
+        changeCounterRef.current = 0;
+        setDirty(false);
       }
 
       setIsCheckingAuth(false);
     };
     bootstrap();
-  }, [router]);
+  }, [router, setDirty]);
 
   // Initialize form data when supplier type is selected
   useEffect(() => {
@@ -194,6 +201,8 @@ export default function SupplierRegistrationPage() {
           litigationFile: null,
         };
         setFormData(contractorData);
+        changeCounterRef.current = 0;
+        setDirty(false);
       } else if (supplierType === 'designer') {
         const designerData: DesignerFormData = {
           supplierType: 'designer',
@@ -260,6 +269,8 @@ export default function SupplierRegistrationPage() {
           dbLitigationFile: null,
         };
         setFormData(designerData);
+        changeCounterRef.current = 0;
+        setDirty(false);
       } else if (supplierType === 'material') {
         const materialData: MaterialSupplierFormData = {
           supplierType: 'material',
@@ -285,15 +296,19 @@ export default function SupplierRegistrationPage() {
           freeShippingToHK: '',
         };
         setFormData(materialData);
+        changeCounterRef.current = 0;
+        setDirty(false);
       }
     }
-  }, [supplierType, formData]);
+  }, [supplierType, formData, setDirty]);
 
   const updateField = <T extends NonBasicSupplierFormData>(
     field: keyof T,
     value: any
   ) => {
     hasUserInteractedRef.current = true;
+    changeCounterRef.current += 1;
+    setDirty(true);
     setFormData((prev) => (prev ? { ...prev, [field]: value } : prev));
   };
 
@@ -301,6 +316,7 @@ export default function SupplierRegistrationPage() {
     if (!formData || !supplierType) return null;
 
     const payload: SupplierFormData = formData;
+    const hkRegistrationDigits = (payload.hkBusinessRegistrationNumber || '').replace(/\D/g, '');
 
     if (status === 'submitted' || payload.submitterPhone) {
       const phoneCheck = validateLocalPhone(
@@ -309,6 +325,44 @@ export default function SupplierRegistrationPage() {
       );
       if (!phoneCheck.ok) {
         throw new Error(phoneCheck.error || 'Invalid phone number');
+      }
+    }
+
+    if (status === 'submitted' || payload.submitterEmail) {
+      const emailCheck = validateEmail(payload.submitterEmail, 'Email / 電郵');
+      if (!emailCheck.ok) {
+        throw new Error(emailCheck.error || 'Invalid email');
+      }
+    }
+
+    const companyLinkCheck = validateOptionalUrl(
+      payload.companySupplementLink,
+      'Company website / 公司網站'
+    );
+    if (!companyLinkCheck.ok) {
+      throw new Error(companyLinkCheck.error || 'Invalid website URL');
+    }
+
+    if (Array.isArray(payload.products)) {
+      for (const product of payload.products) {
+        const specCheck = validateOptionalUrl(
+          product?.specificationLink,
+          'Product specification link / 產品規格連結'
+        );
+        if (!specCheck.ok) {
+          throw new Error(specCheck.error || 'Invalid product specification URL');
+        }
+      }
+    }
+
+    if (
+      payload.country === 'Hong Kong' &&
+      (status === 'submitted' || hkRegistrationDigits)
+    ) {
+      if (hkRegistrationDigits.length !== 16) {
+        throw new Error(
+          'Business Registration Number must be 16 digits / 商業登記號需為16位數字'
+        );
       }
     }
 
@@ -375,25 +429,35 @@ export default function SupplierRegistrationPage() {
 
   const handleSaveDraft = async () => {
     if (!formData) return;
+    const saveVersion = changeCounterRef.current;
     setError('');
     setIsSubmitting(true);
     try {
       await upsertSupplier('draft');
+      if (changeCounterRef.current === saveVersion) {
+        setDirty(false);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save draft');
+      return false;
     } finally {
       setIsSubmitting(false);
     }
+    return true;
   };
 
   const triggerAutoSave = async () => {
     if (!formData || !supplierType) return;
     if (isSubmittingRef.current || isAutoSavingRef.current) return;
+    const saveVersion = changeCounterRef.current;
     setError('');
     setIsAutoSaving(true);
     try {
       await upsertSupplier('draft');
       setShowAutoSaveNotice(true);
+      if (changeCounterRef.current === saveVersion) {
+        setDirty(false);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to auto save');
     } finally {
@@ -405,7 +469,28 @@ export default function SupplierRegistrationPage() {
     setSupplierType(null);
     setFormData(null);
     setSupplierId(null);
+    changeCounterRef.current = 0;
+    setDirty(false);
   };
+
+  const saveDraftForNavigation = useCallback(async () => {
+    if (!formData) return true;
+    const saveVersion = changeCounterRef.current;
+    setError('');
+    setIsSubmitting(true);
+    try {
+      await upsertSupplier('draft');
+      if (changeCounterRef.current === saveVersion) {
+        setDirty(false);
+      }
+      return true;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save draft');
+      return false;
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [formData, setDirty, upsertSupplier]);
 
   useEffect(() => {
     isSubmittingRef.current = isSubmitting;
@@ -414,6 +499,14 @@ export default function SupplierRegistrationPage() {
   useEffect(() => {
     isAutoSavingRef.current = isAutoSaving;
   }, [isAutoSaving]);
+
+  useEffect(() => {
+    registerSaveHandler(saveDraftForNavigation);
+    return () => {
+      registerSaveHandler(null);
+      setDirty(false);
+    };
+  }, [registerSaveHandler, saveDraftForNavigation, setDirty]);
 
   useEffect(() => {
     if (!formData || !hasUserInteractedRef.current) return;
@@ -527,12 +620,12 @@ export default function SupplierRegistrationPage() {
                 className="w-full p-6 border-2 border-gray-300 hover:border-gray-900 hover:bg-gray-50 transition-all text-left group"
               >
                 <h3 className="text-lg font-medium text-gray-900 group-hover:text-gray-900">
-                  Basic Supplier / 基礎供應商
+                  Other Suppliers / 其他供应商
                 </h3>
                 <p className="mt-2 text-sm text-gray-600">
-                  Basic company and contact information
+                  Company and contact information for other suppliers
                   <br />
-                  基礎公司與聯絡信息
+                  其他供应商公司與聯絡信息
                 </p>
               </button>
             </div>
@@ -568,7 +661,7 @@ export default function SupplierRegistrationPage() {
               <>
                 {supplierType === 'contractor' && 'Edit Contractor Profile / 編輯承包商檔案'}
                 {supplierType === 'designer' && 'Edit Designer Profile / 編輯設計師檔案'}
-                {supplierType === 'material' && 'Edit Material Supplier Profile / 編輯材料供應商檔案'}
+                {supplierType === 'material' && 'Edit Material/Furniture Supplier Profile / 編輯材料家具供應商檔案'}
               </>
             ) : (
               <>

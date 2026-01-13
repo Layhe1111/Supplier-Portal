@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import { validateLocalPhone } from '@/lib/phoneValidation';
+import { validateEmail } from '@/lib/emailValidation';
 
 type SignupMethod = 'email' | 'phone';
 type Step = 'input' | 'enter_code';
@@ -81,10 +82,15 @@ export default function SignupPage() {
           return false;
         }
       } else {
+        const emailCheck = validateEmail(formData.email, 'Email / 電郵');
+        if (!emailCheck.ok) {
+          setError(emailCheck.error || 'Invalid email / 無效電郵');
+          return false;
+        }
         const res = await fetch('/api/auth/send-otp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: formData.email }),
+          body: JSON.stringify({ email: emailCheck.normalized }),
         });
 
         if (!res.ok) {
@@ -158,11 +164,17 @@ export default function SignupPage() {
           return;
         }
       } else {
+        const emailCheck = validateEmail(formData.email, 'Email / 電郵');
+        if (!emailCheck.ok) {
+          setError(emailCheck.error || 'Invalid email / 無效電郵');
+          setIsSubmitting(false);
+          return;
+        }
         const res = await fetch('/api/auth/verify-otp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            email: formData.email,
+            email: emailCheck.normalized,
             password: formData.password,
             code: formData.otp,
           }),
@@ -176,7 +188,7 @@ export default function SignupPage() {
         }
 
         const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: formData.email,
+          email: emailCheck.normalized,
           password: formData.password,
         });
 

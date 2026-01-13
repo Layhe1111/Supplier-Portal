@@ -8,6 +8,11 @@ import MultiImageUpload from '../MultiImageUpload';
 import MultiSelectWithSearch from '../MultiSelectWithSearch';
 import DesignerDBSection from './DesignerDBSection';
 import { DesignerFormData, Designer, DesignerProject, ProjectManager, Insurance } from '@/types/supplier';
+import {
+  formatRegisteredCapital,
+  parseRegisteredCapital,
+  REGISTERED_CAPITAL_CURRENCIES,
+} from '@/lib/registeredCapital';
 
 interface DesignerQuestionnaireProps {
   data: DesignerFormData;
@@ -117,7 +122,7 @@ export default function DesignerQuestionnaire({
 
   const projectTypeOptions = [
     { value: 'residential', label: 'Residential 住宅' },
-    { value: 'commercial', label: 'Commercial 商業' },
+    { value: 'commercial', label: 'Retail 零售' },
     { value: 'office', label: 'Office 辦公' },
     { value: 'hotel', label: 'Hotel 酒店' },
     { value: 'medical', label: 'Medical 醫療' },
@@ -125,6 +130,25 @@ export default function DesignerQuestionnaire({
     { value: 'industrial', label: 'Industrial 工業' },
     { value: 'other', label: 'Other 其他' },
   ];
+  const projectTypeLabelMap = Object.fromEntries(
+    projectTypeOptions.map((option) => [option.value, option.label])
+  );
+  const getProjectTypeValue = (types?: string[]) => {
+    const custom = (types || []).find((type) => type.startsWith('custom_'));
+    const selected = (types || []).find((type) => !type.startsWith('custom_'));
+    if (selected) return selected;
+    return custom ? 'other' : '';
+  };
+  const getProjectTypeCustomValue = (types?: string[]) => {
+    const custom = (types || []).find((type) => type.startsWith('custom_'));
+    return custom ? custom.slice(7) : '';
+  };
+  const buildProjectTypes = (value: string, customValue: string) => {
+    if (value === 'other') {
+      return customValue ? ['other', `custom_${customValue}`] : ['other'];
+    }
+    return value ? [value] : [];
+  };
 
   const softwareOptions = [
     { value: 'AutoCAD', label: 'AutoCAD' },
@@ -225,9 +249,41 @@ export default function DesignerQuestionnaire({
     onChange('designAwards', [...(data.designAwards || ['']), '']);
   };
 
-  const updateAward = (index: number, value: string) => {
+  const parseAwardEntry = (entry: string) => {
+    if (!entry) {
+      return { year: '', award: '', placement: '', project: '' };
+    }
+    try {
+      const parsed = JSON.parse(entry);
+      return {
+        year: typeof parsed?.year === 'string' ? parsed.year : '',
+        award: typeof parsed?.award === 'string' ? parsed.award : '',
+        placement: typeof parsed?.placement === 'string' ? parsed.placement : '',
+        project: typeof parsed?.project === 'string' ? parsed.project : '',
+      };
+    } catch {
+      return { year: '', award: entry, placement: '', project: '' };
+    }
+  };
+
+  const formatAwardEntry = (entry: {
+    year: string;
+    award: string;
+    placement: string;
+    project: string;
+  }) => {
+    const hasValue = Object.values(entry).some((value) => value.trim() !== '');
+    return hasValue ? JSON.stringify(entry) : '';
+  };
+
+  const updateAward = (
+    index: number,
+    field: 'year' | 'award' | 'placement' | 'project',
+    value: string
+  ) => {
     const updated = [...(data.designAwards || [''])];
-    updated[index] = value;
+    const current = parseAwardEntry(updated[index] || '');
+    updated[index] = formatAwardEntry({ ...current, [field]: value });
     onChange('designAwards', updated);
   };
 
@@ -243,6 +299,7 @@ export default function DesignerQuestionnaire({
       id: Date.now().toString(),
       name: '',
       experience: '',
+      languages: '',
       cv: null,
       projects: [],
     };
@@ -499,6 +556,10 @@ export default function DesignerQuestionnaire({
 
   const isHongKong = data.country === 'Hong Kong';
   const isChina = data.country === 'China';
+  const capital = parseRegisteredCapital(data.registeredCapital);
+  const hkRegistrationDigits = (data.hkBusinessRegistrationNumber || '').replace(/\D/g, '');
+  const showHkRegistrationError =
+    isHongKong && hkRegistrationDigits.length > 0 && hkRegistrationDigits.length !== 16;
 
   return (
     <>
@@ -525,19 +586,30 @@ export default function DesignerQuestionnaire({
             label="Year of Incorporation / 成立年份"
             name="yearEstablished"
             type="number"
-            required
             value={data.yearEstablished}
             onChange={(v) => onChange('yearEstablished', v)}
           />
 
-          <FormInput
-            label="Registered Capital / 註冊資本"
-            name="registeredCapital"
-            required={!isHongKong}
-            placeholder="e.g., HKD 1,000,000"
-            value={data.registeredCapital}
-            onChange={(v) => onChange('registeredCapital', v)}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_140px] gap-3">
+            <FormInput
+              label="Registered Capital Amount / 註冊資本數額"
+              name="registeredCapitalAmount"
+              type="number"
+              value={capital.amount}
+              onChange={(v) =>
+                onChange('registeredCapital', formatRegisteredCapital(v, capital.currency))
+              }
+            />
+            <FormSelect
+              label="Currency / 貨幣"
+              name="registeredCapitalCurrency"
+              value={capital.currency}
+              onChange={(v) =>
+                onChange('registeredCapital', formatRegisteredCapital(capital.amount, String(v)))
+              }
+              options={REGISTERED_CAPITAL_CURRENCIES}
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -574,14 +646,21 @@ export default function DesignerQuestionnaire({
         </div>
 
         {isHongKong && (
-          <FormInput
-            label="Business Registration Number / 商業登記號"
-            name="hkBusinessRegistrationNumber"
-            required
-            value={data.hkBusinessRegistrationNumber}
-            onChange={(v) => onChange('hkBusinessRegistrationNumber', v)}
-            placeholder="e.g., 12345678-000"
-          />
+          <div>
+            <FormInput
+              label="Business Registration Number / 商業登記號"
+              name="hkBusinessRegistrationNumber"
+              required
+              value={data.hkBusinessRegistrationNumber}
+              onChange={(v) => onChange('hkBusinessRegistrationNumber', v)}
+              placeholder="e.g., 12345678-000"
+            />
+            {showHkRegistrationError && (
+              <p className="mt-1 text-xs text-red-600">
+                Business Registration Number must be 16 digits / 商業登記號需為16位數字
+              </p>
+            )}
+          </div>
         )}
 
         {isChina && (
@@ -642,6 +721,67 @@ export default function DesignerQuestionnaire({
             <label className="block text-sm font-light text-gray-700">
               Design Awards / 設計獎項
             </label>
+          </div>
+
+          <div className="space-y-2">
+            <div className="hidden md:grid grid-cols-[120px_minmax(0,2fr)_140px_minmax(0,2fr)] gap-2 text-xs font-medium text-gray-600 uppercase tracking-wider">
+              <div>Year / 年份</div>
+              <div>Award / 獎項</div>
+              <div>Placement / 名次</div>
+              <div>Project / 項目</div>
+            </div>
+            {(data.designAwards || ['']).map((award, index) => {
+              const parsed = parseAwardEntry(award);
+              return (
+                <div
+                  key={index}
+                  className="grid grid-cols-1 md:grid-cols-[120px_minmax(0,2fr)_140px_minmax(0,2fr)] gap-2 items-center"
+                >
+                  <input
+                    type="text"
+                    value={parsed.year}
+                    onChange={(e) => updateAward(index, 'year', e.target.value)}
+                    placeholder="e.g., 2024"
+                    className="px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+                  />
+                  <input
+                    type="text"
+                    value={parsed.award}
+                    onChange={(e) => updateAward(index, 'award', e.target.value)}
+                    placeholder="e.g., Best Design Award"
+                    className="px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+                  />
+                  <input
+                    type="text"
+                    value={parsed.placement}
+                    onChange={(e) => updateAward(index, 'placement', e.target.value)}
+                    placeholder="e.g., Gold"
+                    className="px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+                  />
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={parsed.project}
+                      onChange={(e) => updateAward(index, 'project', e.target.value)}
+                      placeholder="e.g., Project Name"
+                      className="flex-1 px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+                    />
+                    {(data.designAwards || ['']).length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeAward(index)}
+                        className="text-red-500 hover:text-red-700 text-sm font-medium"
+                        aria-label="Remove award"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="mt-3 flex justify-end">
             <button
               type="button"
               onClick={addAward}
@@ -649,29 +789,6 @@ export default function DesignerQuestionnaire({
             >
               + Add Award / 添加獎項
             </button>
-          </div>
-
-          <div className="space-y-2">
-            {(data.designAwards || ['']).map((award, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <input
-                  type="text"
-                  value={award}
-                  onChange={(e) => updateAward(index, e.target.value)}
-                  placeholder="e.g., Best Design Award 2024"
-                  className="flex-1 px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
-                />
-                {(data.designAwards || ['']).length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removeAward(index)}
-                    className="text-red-500 hover:text-red-700 text-sm font-medium"
-                  >
-                    ✕
-                  </button>
-                )}
-              </div>
-            ))}
           </div>
         </div>
 
@@ -697,14 +814,7 @@ export default function DesignerQuestionnaire({
 
         <div className="mt-6">
           <div className="flex items-center justify-between mb-3">
-            <h4 className="text-sm font-medium text-gray-900">Design Highlights / 設計亮點</h4>
-            <button
-              type="button"
-              onClick={addDesignHighlight}
-              className="px-3 py-1.5 bg-gray-900 text-white text-xs font-light hover:bg-gray-800 transition-colors"
-            >
-              + Add Highlight / 添加亮點
-            </button>
+            <h4 className="text-sm font-medium text-gray-900">Design Highlights / 经典案例</h4>
           </div>
 
           {(!data.designHighlights || data.designHighlights.length === 0) ? (
@@ -712,7 +822,7 @@ export default function DesignerQuestionnaire({
               <p className="text-gray-500 text-xs">
                 No highlights added yet. Click "Add Highlight" to add a project.
                 <br />
-                尚未添加亮點。點擊“添加亮點”添加項目。
+                尚未添加经典案例。點擊“添加经典案例”添加項目。
               </p>
             </div>
           ) : (
@@ -721,7 +831,7 @@ export default function DesignerQuestionnaire({
                 <div key={project.id} className="border border-gray-200 p-4 bg-gray-50 rounded">
                   <div className="flex items-center justify-between mb-3">
                     <h6 className="text-xs font-medium text-gray-900">
-                      Highlight {index + 1} / 亮點 {index + 1}
+                      Highlight {index + 1} / 经典案例 {index + 1}
                     </h6>
                     <button
                       type="button"
@@ -756,6 +866,7 @@ export default function DesignerQuestionnaire({
                       <FormInput
                         label="Area (sqft) / 面積（平方呎）"
                         name={`highlight-area-${project.id}`}
+                        type="number"
                         required
                         value={project.area}
                         onChange={(v) => updateDesignHighlight(project.id, 'area', v)}
@@ -785,18 +896,44 @@ export default function DesignerQuestionnaire({
                         ]}
                       />
 
-                      <FormSelect
-                        label="Property Types / 主要項目類型"
-                        name={`highlight-project-types-${project.id}`}
-                        type="checkbox"
-                        multiple
-                        required
-                        value={project.projectTypes || []}
-                        onChange={(v) =>
-                          updateDesignHighlight(project.id, 'projectTypes', v as string[])
-                        }
-                        options={projectTypeOptions}
-                      />
+                      {(() => {
+                        const selectedType = getProjectTypeValue(project.projectTypes);
+                        const customValue = getProjectTypeCustomValue(project.projectTypes);
+                        return (
+                          <div className="space-y-2">
+                            <FormSelect
+                              label="Property Types / 主要項目類型"
+                              name={`highlight-project-types-${project.id}`}
+                              type="radio"
+                              required
+                              value={selectedType}
+                              onChange={(v) =>
+                                updateDesignHighlight(
+                                  project.id,
+                                  'projectTypes',
+                                  buildProjectTypes(String(v), customValue)
+                                )
+                              }
+                              options={projectTypeOptions}
+                            />
+                            {selectedType === 'other' && (
+                              <input
+                                type="text"
+                                value={customValue}
+                                onChange={(e) =>
+                                  updateDesignHighlight(
+                                    project.id,
+                                    'projectTypes',
+                                    buildProjectTypes('other', e.target.value.trim())
+                                  )
+                                }
+                                placeholder="Enter other type / 請輸入其他類型"
+                                className="w-full px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+                              />
+                            )}
+                          </div>
+                        );
+                      })()}
                     </div>
 
                     <MultiImageUpload
@@ -811,6 +948,15 @@ export default function DesignerQuestionnaire({
               ))}
             </div>
           )}
+          <div className="mt-4 flex justify-end">
+            <button
+              type="button"
+              onClick={addDesignHighlight}
+              className="px-3 py-1.5 bg-gray-900 text-white text-xs font-light hover:bg-gray-800 transition-colors"
+            >
+              + Add Highlight / 添加经典案例
+            </button>
+          </div>
         </div>
 
         <div className="mt-6">
@@ -892,58 +1038,55 @@ export default function DesignerQuestionnaire({
                   emptyMessage="No styles found / 找不到風格"
                 />
 
-                {/* Custom style input when "other" is selected */}
-                {data.projectTypes.includes('other') && (
-                  <div className="pt-2 border-t border-gray-200">
-                    <label className="block text-xs font-light text-gray-600 mb-2">
-                      Custom Style / 自定義風格
-                    </label>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        id="customStyleInput"
-                        placeholder="Enter custom style / 輸入自定義風格"
-                        className="flex-1 px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            const input = e.currentTarget;
-                            const value = input.value.trim();
-                            if (value) {
-                              const customStyle = `custom_${value}`;
-                              if (!(data.designStyles || []).includes(customStyle)) {
-                                onChange('designStyles', [...(data.designStyles || []), customStyle]);
-                                input.value = '';
-                              }
+                <div className="pt-2 border-t border-gray-200">
+                  <label className="block text-xs font-light text-gray-600 mb-2">
+                    Custom Style / 自定義風格
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      id="customStyleInput"
+                      placeholder="Enter custom style / 輸入自定義風格"
+                      className="flex-1 px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          const input = e.currentTarget;
+                          const value = input.value.trim();
+                          if (value) {
+                            const customStyle = `custom_${value}`;
+                            if (!(data.designStyles || []).includes(customStyle)) {
+                              onChange('designStyles', [...(data.designStyles || []), customStyle]);
+                              input.value = '';
                             }
                           }
-                        }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const input = document.getElementById('customStyleInput') as HTMLInputElement;
-                          if (input) {
-                            const value = input.value.trim();
-                            if (value) {
-                              const customStyle = `custom_${value}`;
-                              if (!(data.designStyles || []).includes(customStyle)) {
-                                onChange('designStyles', [...(data.designStyles || []), customStyle]);
-                                input.value = '';
-                              }
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const input = document.getElementById('customStyleInput') as HTMLInputElement;
+                        if (input) {
+                          const value = input.value.trim();
+                          if (value) {
+                            const customStyle = `custom_${value}`;
+                            if (!(data.designStyles || []).includes(customStyle)) {
+                              onChange('designStyles', [...(data.designStyles || []), customStyle]);
+                              input.value = '';
                             }
                           }
-                        }}
-                        className="px-4 py-2 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors whitespace-nowrap"
-                      >
-                        Add / 添加
-                      </button>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Press Enter or click Add to add custom style / 按 Enter 或點擊添加來添加自定義風格
-                    </p>
+                        }
+                      }}
+                      className="px-4 py-2 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors whitespace-nowrap"
+                    >
+                      Add / 添加
+                    </button>
                   </div>
-                )}
+                  <p className="text-xs text-gray-500 mt-1">
+                    Press Enter or click Add to add custom style / 按 Enter 或點擊添加來添加自定義風格
+                  </p>
+                </div>
               </div>
             )}
           </div>
@@ -989,16 +1132,6 @@ export default function DesignerQuestionnaire({
                   <label className="block text-xs font-light text-gray-600">
                     Other Software / 其他軟件
                   </label>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const customSoftware = (data.mainSoftware || []).filter(s => !softwareOptions.some(opt => opt.value === s));
-                      onChange('mainSoftware', [...(data.mainSoftware || []), '']);
-                    }}
-                    className="px-2 py-1 bg-gray-600 text-white text-xs font-light hover:bg-gray-700 transition-colors"
-                  >
-                    + Add Other / 添加其他
-                  </button>
                 </div>
 
                 <div className="space-y-2">
@@ -1031,6 +1164,17 @@ export default function DesignerQuestionnaire({
                       </div>
                     ))}
                 </div>
+                <div className="mt-2 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onChange('mainSoftware', [...(data.mainSoftware || []), '']);
+                    }}
+                    className="px-2 py-1 bg-gray-600 text-white text-xs font-light hover:bg-gray-700 transition-colors"
+                  >
+                    + Add Other / 添加其他
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -1057,13 +1201,6 @@ export default function DesignerQuestionnaire({
                 Design Personnel / 設計人員
                 <span className="text-red-500 ml-1">*</span>
               </h4>
-              <button
-                type="button"
-                onClick={addDesigner}
-                className="px-4 py-2 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
-              >
-                + Add Designer / 添加設計師
-              </button>
             </div>
 
             {(!data.designers || data.designers.length === 0) ? (
@@ -1105,14 +1242,24 @@ export default function DesignerQuestionnaire({
                         onChange={(v) => updateDesigner(designer.id, 'name', v)}
                       />
 
-                      <FormInput
-                        label="Years of Experience / 年資"
-                        name={`designer-experience-${designer.id}`}
-                        required
-                        value={designer.experience}
-                        onChange={(v) => updateDesigner(designer.id, 'experience', v)}
-                        placeholder="e.g., 10 years in residential design"
-                      />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormInput
+                          label="Years of Experience / 年資"
+                          name={`designer-experience-${designer.id}`}
+                          type="number"
+                          required
+                          value={designer.experience}
+                          onChange={(v) => updateDesigner(designer.id, 'experience', v)}
+                          placeholder="e.g., 10"
+                        />
+                        <FormInput
+                          label="Languages / 語言能力"
+                          name={`designer-languages-${designer.id}`}
+                          value={designer.languages || ''}
+                          onChange={(v) => updateDesigner(designer.id, 'languages', v)}
+                          placeholder="e.g., English, Chinese"
+                        />
+                      </div>
 
                       <FileUpload
                         label="CV / 簡歷"
@@ -1131,13 +1278,6 @@ export default function DesignerQuestionnaire({
                           Projects / 項目經歷
                           <span className="text-red-500 ml-1">*</span>
                         </h6>
-                        <button
-                          type="button"
-                          onClick={() => addProject(designer.id)}
-                          className="px-3 py-1.5 bg-gray-700 text-white text-xs font-light hover:bg-gray-600 transition-colors"
-                        >
-                          + Add Project / 添加項目經歷
-                        </button>
                       </div>
 
                       {designer.projects.length === 0 ? (
@@ -1196,6 +1336,7 @@ export default function DesignerQuestionnaire({
                                   <FormInput
                                     label="Area (sqft) / 面積（平方呎）"
                                     name={`project-area-${project.id}`}
+                                    type="number"
                                     required
                                     value={project.area}
                                     onChange={(v) =>
@@ -1231,18 +1372,46 @@ export default function DesignerQuestionnaire({
                                     ]}
                                   />
 
-                                  <FormSelect
-                                    label="Property Types / 主要項目類型"
-                                    name={`project-types-${project.id}`}
-                                    type="checkbox"
-                                    multiple
-                                    required
-                                    value={project.projectTypes || []}
-                                    onChange={(v) =>
-                                      updateProject(designer.id, project.id, 'projectTypes', v as string[])
-                                    }
-                                    options={projectTypeOptions}
-                                  />
+                                  {(() => {
+                                    const selectedType = getProjectTypeValue(project.projectTypes);
+                                    const customValue = getProjectTypeCustomValue(project.projectTypes);
+                                    return (
+                                      <div className="space-y-2">
+                                        <FormSelect
+                                          label="Property Types / 主要項目類型"
+                                          name={`project-types-${project.id}`}
+                                          type="radio"
+                                          required
+                                          value={selectedType}
+                                          onChange={(v) =>
+                                            updateProject(
+                                              designer.id,
+                                              project.id,
+                                              'projectTypes',
+                                              buildProjectTypes(String(v), customValue)
+                                            )
+                                          }
+                                          options={projectTypeOptions}
+                                        />
+                                        {selectedType === 'other' && (
+                                          <input
+                                            type="text"
+                                            value={customValue}
+                                            onChange={(e) =>
+                                              updateProject(
+                                                designer.id,
+                                                project.id,
+                                                'projectTypes',
+                                                buildProjectTypes('other', e.target.value.trim())
+                                              )
+                                            }
+                                            placeholder="Enter other type / 請輸入其他類型"
+                                            className="w-full px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+                                          />
+                                        )}
+                                      </div>
+                                    );
+                                  })()}
                                 </div>
 
                                 <MultiImageUpload
@@ -1259,11 +1428,29 @@ export default function DesignerQuestionnaire({
                           ))}
                         </div>
                       )}
+                      <div className="mt-3 flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => addProject(designer.id)}
+                          className="px-3 py-1.5 bg-gray-700 text-white text-xs font-light hover:bg-gray-600 transition-colors"
+                        >
+                          + Add Project / 添加項目經歷
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
             )}
+            <div className="mt-4 flex justify-end">
+              <button
+                type="button"
+                onClick={addDesigner}
+                className="px-4 py-2 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
+              >
+                + Add Designer / 添加設計師
+              </button>
+            </div>
           </div>
         </div>
       </FormSection>
@@ -1335,7 +1522,12 @@ export default function DesignerQuestionnaire({
                     </div>
                   )}
                   {autofillSource.projectTypes && autofillSource.projectTypes.length > 0 && (
-                    <div className="whitespace-nowrap">Property Types / 項目類型: {autofillSource.projectTypes.join(', ')}</div>
+                    <div className="whitespace-nowrap">
+                      Property Types / 項目類型:{' '}
+                      {autofillSource.projectTypes
+                        .map((type) => projectTypeLabelMap[type] || type)
+                        .join(', ')}
+                    </div>
                   )}
                 </div>
               </div>

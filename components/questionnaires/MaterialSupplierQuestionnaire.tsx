@@ -6,6 +6,11 @@ import FileUpload from '../FileUpload';
 import MultiFileUpload from '../MultiFileUpload';
 import MultiImageUpload from '../MultiImageUpload';
 import { MaterialSupplierFormData, Product, DesignerProject } from '@/types/supplier';
+import {
+  formatRegisteredCapital,
+  parseRegisteredCapital,
+  REGISTERED_CAPITAL_CURRENCIES,
+} from '@/lib/registeredCapital';
 
 interface MaterialSupplierQuestionnaireProps {
   data: MaterialSupplierFormData;
@@ -49,7 +54,7 @@ export default function MaterialSupplierQuestionnaire({
 
   const projectTypeOptions = [
     { value: 'residential', label: 'Residential 住宅' },
-    { value: 'commercial', label: 'Commercial 商業' },
+    { value: 'commercial', label: 'Retail 零售' },
     { value: 'office', label: 'Office 辦公' },
     { value: 'hotel', label: 'Hotel 酒店' },
     { value: 'medical', label: 'Medical 醫療' },
@@ -140,6 +145,10 @@ export default function MaterialSupplierQuestionnaire({
 
   const isHongKong = data.country === 'Hong Kong';
   const isChina = data.country === 'China';
+  const capital = parseRegisteredCapital(data.registeredCapital);
+  const hkRegistrationDigits = (data.hkBusinessRegistrationNumber || '').replace(/\D/g, '');
+  const showHkRegistrationError =
+    isHongKong && hkRegistrationDigits.length > 0 && hkRegistrationDigits.length !== 16;
 
   // Project Highlights management functions
   const addProjectHighlight = () => {
@@ -200,19 +209,32 @@ export default function MaterialSupplierQuestionnaire({
             label="Year of Incorporation / 成立年份"
             name="yearEstablished"
             type="number"
-            required
             value={data.yearEstablished}
             onChange={(v) => onChange('yearEstablished', v)}
           />
 
-          <FormInput
-            label="Registered Capital / 註冊資本"
-            name="registeredCapital"
-            required={!isHongKong}
-            placeholder="e.g., HKD 1,000,000"
-            value={data.registeredCapital}
-            onChange={(v) => onChange('registeredCapital', v)}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_140px] gap-3">
+            <FormInput
+              label="Registered Capital Amount / 註冊資本數額"
+              name="registeredCapitalAmount"
+              type="number"
+              required={!isHongKong}
+              value={capital.amount}
+              onChange={(v) =>
+                onChange('registeredCapital', formatRegisteredCapital(v, capital.currency))
+              }
+            />
+            <FormSelect
+              label="Currency / 貨幣"
+              name="registeredCapitalCurrency"
+              required={!isHongKong}
+              value={capital.currency}
+              onChange={(v) =>
+                onChange('registeredCapital', formatRegisteredCapital(capital.amount, String(v)))
+              }
+              options={REGISTERED_CAPITAL_CURRENCIES}
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -226,7 +248,7 @@ export default function MaterialSupplierQuestionnaire({
           />
 
           <FormInput
-            label="Office Address / 辦公地址"
+            label="Office/Showroom Address / 辦公/展廳地址"
             name="officeAddress"
             required
             value={data.officeAddress}
@@ -249,14 +271,21 @@ export default function MaterialSupplierQuestionnaire({
         </div>
 
         {isHongKong && (
-          <FormInput
-            label="Business Registration Number / 商業登記號"
-            name="hkBusinessRegistrationNumber"
-            required
-            value={data.hkBusinessRegistrationNumber}
-            onChange={(v) => onChange('hkBusinessRegistrationNumber', v)}
-            placeholder="e.g., 12345678-000"
-          />
+          <div>
+            <FormInput
+              label="Business Registration Number / 商業登記號"
+              name="hkBusinessRegistrationNumber"
+              required
+              value={data.hkBusinessRegistrationNumber}
+              onChange={(v) => onChange('hkBusinessRegistrationNumber', v)}
+              placeholder="e.g., 12345678-000"
+            />
+            {showHkRegistrationError && (
+              <p className="mt-1 text-xs text-red-600">
+                Business Registration Number must be 16 digits / 商業登記號需為16位數字
+              </p>
+            )}
+          </div>
         )}
 
         {isChina && (
@@ -331,13 +360,6 @@ export default function MaterialSupplierQuestionnaire({
                 (At least one required / 至少填一個)
               </span>
             </label>
-            <button
-              type="button"
-              onClick={addBrand}
-              className="px-3 py-1 bg-gray-900 text-white text-xs font-light hover:bg-gray-800 transition-colors"
-            >
-              + Add Brand / 添加品牌
-            </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4 justify-items-start">
@@ -363,6 +385,15 @@ export default function MaterialSupplierQuestionnaire({
               </div>
             ))}
           </div>
+          <div className="mt-3 flex justify-end">
+            <button
+              type="button"
+              onClick={addBrand}
+              className="px-3 py-1 bg-gray-900 text-white text-xs font-light hover:bg-gray-800 transition-colors"
+            >
+              + Add Brand / 添加品牌
+            </button>
+          </div>
         </div>
 
         <div>
@@ -370,13 +401,6 @@ export default function MaterialSupplierQuestionnaire({
             <h4 className="text-sm font-medium text-gray-900">
               Warehouse Information / 倉庫信息
             </h4>
-            <button
-              type="button"
-              onClick={addWarehouse}
-              className="px-4 py-2 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
-            >
-              + Add Warehouse / 添加倉庫
-            </button>
           </div>
 
           {(!data.warehouses || data.warehouses.length === 0) ? (
@@ -420,25 +444,29 @@ export default function MaterialSupplierQuestionnaire({
                       />
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-light text-gray-700 mb-1">
-                        Storage Capacity (sqft) / 庫存容量（平方呎）
-                        <span className="text-red-500 ml-1">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        value={warehouse.capacity}
-                        onChange={(e) => updateWarehouse(index, 'capacity', e.target.value)}
-                        placeholder="e.g., 10000"
-                        required
-                        className="w-full px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
-                      />
-                    </div>
+                    <FormInput
+                      label="Storage Capacity (sqft) / 庫存容量（平方呎）"
+                      name={`warehouse-capacity-${index}`}
+                      type="number"
+                      required
+                      value={warehouse.capacity}
+                      onChange={(v) => updateWarehouse(index, 'capacity', v)}
+                      placeholder="e.g., 10000"
+                    />
                   </div>
                 </div>
               ))}
             </div>
           )}
+          <div className="mt-4 flex justify-end">
+            <button
+              type="button"
+              onClick={addWarehouse}
+              className="px-4 py-2 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
+            >
+              + Add Warehouse / 添加倉庫
+            </button>
+          </div>
         </div>
 
         <div className="mt-6">
@@ -489,14 +517,6 @@ export default function MaterialSupplierQuestionnaire({
             <p>【Product Brand / 產品品牌】：_____________</p>
             <p>【Product Series / 產品系列】：_____________</p>
           </div>
-
-          <button
-            type="button"
-            onClick={addProduct}
-            className="px-6 py-2.5 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
-          >
-            + Add Product / 添加產品
-          </button>
         </div>
 
         {data.products.length === 0 ? (
@@ -645,7 +665,7 @@ export default function MaterialSupplierQuestionnaire({
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                       <FormInput
-                        label="Lead Time (days) / 交貨周期"
+                        label="Lead Time (days) / 货期"
                         name={`leadTime-${product.id}`}
                         type="number"
                         required
@@ -727,6 +747,15 @@ export default function MaterialSupplierQuestionnaire({
             ))}
           </div>
         )}
+        <div className="mt-4 flex justify-end">
+          <button
+            type="button"
+            onClick={addProduct}
+            className="px-6 py-2.5 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
+          >
+            + Add Product / 添加產品
+          </button>
+        </div>
       </FormSection>
 
       {/* Section 3: Project Highlights */}
@@ -737,13 +766,6 @@ export default function MaterialSupplierQuestionnaire({
               Project Highlights / 亮點項目
               <span className="text-red-500 ml-1">*</span>
             </h4>
-            <button
-              type="button"
-              onClick={addProjectHighlight}
-              className="px-4 py-2 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
-            >
-              + Add Project / 添加項目
-            </button>
           </div>
 
           {(!data.projectHighlights || data.projectHighlights.length === 0) ? (
@@ -789,6 +811,7 @@ export default function MaterialSupplierQuestionnaire({
                       <FormInput
                         label="Year / 年份"
                         name={`project-year-${project.id}`}
+                        type="number"
                         required
                         value={project.year}
                         onChange={(v) =>
@@ -800,6 +823,7 @@ export default function MaterialSupplierQuestionnaire({
                       <FormInput
                         label="Area (sqft) / 面積（平方呎）"
                         name={`project-area-${project.id}`}
+                        type="number"
                         required
                         value={project.area}
                         onChange={(v) =>
@@ -835,18 +859,51 @@ export default function MaterialSupplierQuestionnaire({
                         ]}
                       />
 
-                      <FormSelect
-                        label="Property Types / 主要項目類型"
-                        name={`project-types-${project.id}`}
-                        type="checkbox"
-                        multiple
-                        required
-                        value={project.projectTypes || []}
-                        onChange={(v) =>
-                          updateProjectHighlight(project.id, 'projectTypes', v as string[])
-                        }
-                        options={projectTypeOptions}
-                      />
+                      {(() => {
+                        const customType = (project.projectTypes || []).find((type) =>
+                          type.startsWith('custom_')
+                        );
+                        const selectedType =
+                          (project.projectTypes || []).find((type) => !type.startsWith('custom_')) ||
+                          (customType ? 'other' : '');
+                        const customValue = customType ? customType.slice(7) : '';
+                        return (
+                          <div className="space-y-2">
+                            <FormSelect
+                              label="Property Types / 主要項目類型"
+                              name={`project-types-${project.id}`}
+                              type="radio"
+                              required
+                              value={selectedType}
+                              onChange={(v) => {
+                                const value = String(v);
+                                if (value === 'other') {
+                                  const next = customValue
+                                    ? ['other', `custom_${customValue}`]
+                                    : ['other'];
+                                  updateProjectHighlight(project.id, 'projectTypes', next);
+                                  return;
+                                }
+                                updateProjectHighlight(project.id, 'projectTypes', [value]);
+                              }}
+                              options={projectTypeOptions}
+                            />
+                            {selectedType === 'other' && (
+                              <input
+                                type="text"
+                                value={customValue}
+                                onChange={(e) => {
+                                  const value = e.target.value.trim();
+                                  const next = value ? ['other', `custom_${value}`] : ['other'];
+                                  updateProjectHighlight(project.id, 'projectTypes', next);
+                                }}
+                                placeholder="Enter other type / 請輸入其他類型"
+                                className="w-full px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+                              />
+                            )}
+                          </div>
+                        );
+                      })()}
                     </div>
 
                     <MultiImageUpload
@@ -864,6 +921,15 @@ export default function MaterialSupplierQuestionnaire({
               ))}
             </div>
           )}
+          <div className="mt-4 flex justify-end">
+            <button
+              type="button"
+              onClick={addProjectHighlight}
+              className="px-4 py-2 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
+            >
+              + Add Project / 添加項目
+            </button>
+          </div>
         </div>
       </FormSection>
 

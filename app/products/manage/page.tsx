@@ -1,14 +1,17 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { MaterialSupplierFormData, Product } from '@/types/supplier';
 import ProductModal from '@/components/ProductModal';
 import { supabase } from '@/lib/supabaseClient';
+import { useUnsavedChanges } from '@/components/UnsavedChangesProvider';
 
 export default function ProductManagePage() {
   const router = useRouter();
   const didLoadRef = useRef(false);
+  const changeCounterRef = useRef(0);
+  const { setDirty, registerSaveHandler } = useUnsavedChanges();
   const [userData, setUserData] = useState<MaterialSupplierFormData | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,6 +56,8 @@ export default function ProductManagePage() {
 
         setUserData(supplier);
         setProducts(supplier.products || []);
+        changeCounterRef.current = 0;
+        setDirty(false);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load supplier data');
       } finally {
@@ -61,7 +66,7 @@ export default function ProductManagePage() {
     };
 
     loadData();
-  }, [router]);
+  }, [router, setDirty]);
 
   const handleAddProduct = () => {
     setEditingProduct(null);
@@ -76,6 +81,8 @@ export default function ProductManagePage() {
   };
 
   const handleSaveProduct = (product: Product) => {
+    changeCounterRef.current += 1;
+    setDirty(true);
     if (editingProduct) {
       // Edit existing product
       const updatedProducts = products.map((p) =>
@@ -90,20 +97,25 @@ export default function ProductManagePage() {
 
   const handleDeleteProduct = (id: string) => {
     if (confirm('Are you sure you want to delete this product? / 確定要刪除此產品嗎？')) {
+      changeCounterRef.current += 1;
+      setDirty(true);
       setProducts(products.filter((p) => p.id !== id));
     }
   };
 
-  const handleSaveAll = async () => {
-    if (!userData) return;
+  const saveProducts = useCallback(async (navigateOnSuccess: boolean) => {
+    if (!userData) return false;
 
     const { data: sessionData } = await supabase.auth.getSession();
     const token = sessionData.session?.access_token;
     if (!token) {
-      router.push('/');
-      return;
+      if (navigateOnSuccess) {
+        router.push('/');
+      }
+      return false;
     }
 
+    const saveVersion = changeCounterRef.current;
     try {
       const res = await fetch('/api/products', {
         method: 'POST',
@@ -117,18 +129,42 @@ export default function ProductManagePage() {
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         alert(body.error || 'Failed to save products');
-        return;
+        return false;
       }
 
-      router.push('/dashboard');
+      if (changeCounterRef.current === saveVersion) {
+        setDirty(false);
+      }
+
+      if (navigateOnSuccess) {
+        router.push('/dashboard');
+      }
+      return true;
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to save products');
+      return false;
     }
+  }, [products, router, setDirty, userData]);
+
+  const handleSaveAll = async () => {
+    await saveProducts(true);
   };
+
+  const saveProductsForNavigation = useCallback(async () => {
+    return await saveProducts(false);
+  }, [saveProducts]);
 
   const handleCancel = () => {
     router.push('/dashboard');
   };
+
+  useEffect(() => {
+    registerSaveHandler(saveProductsForNavigation);
+    return () => {
+      registerSaveHandler(null);
+      setDirty(false);
+    };
+  }, [registerSaveHandler, saveProductsForNavigation, setDirty]);
 
   if (isLoading) {
     return (
@@ -161,16 +197,6 @@ export default function ProductManagePage() {
         </div>
 
         <div className="bg-white shadow-sm border border-gray-200 p-8">
-          <div className="mb-6">
-            <button
-              type="button"
-              onClick={handleAddProduct}
-              className="px-6 py-2.5 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
-            >
-              + Add Product / 添加產品
-            </button>
-          </div>
-
           {products.length === 0 ? (
             <div className="text-center py-12 border-2 border-dashed border-gray-300">
               <svg
@@ -201,13 +227,13 @@ export default function ProductManagePage() {
                       SKU
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
-                      Product Name / 產品名稱
+                      Brand / 品牌
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
                       Category / 類別
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
-                      Brand / 品牌
+                      Product Name / 產品名稱
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
                       Price / 價格
@@ -216,7 +242,7 @@ export default function ProductManagePage() {
                       MOQ
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
-                      Lead Time / 交期
+                      Lead Time / 货期
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-light text-gray-700 uppercase tracking-wider">
                       Actions / 操作
@@ -229,6 +255,12 @@ export default function ProductManagePage() {
                       <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                         {product.sku}
                       </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                        {product.brand}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                        {product.category}
+                      </td>
                       <td className="px-4 py-4 text-sm text-gray-900">
                         <div>
                           <p className="font-medium">{product.productName}</p>
@@ -236,12 +268,6 @@ export default function ProductManagePage() {
                             <p className="text-xs text-gray-500">{product.spec}</p>
                           )}
                         </div>
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {product.category}
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {product.brand}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                         HKD {parseInt(product.unitPrice).toLocaleString()}
@@ -274,6 +300,16 @@ export default function ProductManagePage() {
               </table>
             </div>
           )}
+
+          <div className="mt-6 flex justify-end">
+            <button
+              type="button"
+              onClick={handleAddProduct}
+              className="px-6 py-2.5 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
+            >
+              + Add Product / 添加產品
+            </button>
+          </div>
 
           <div className="flex items-center justify-between pt-6 border-t border-gray-200 mt-6">
             <button

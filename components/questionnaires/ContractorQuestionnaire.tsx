@@ -7,6 +7,11 @@ import FileUpload from '../FileUpload';
 import MultiFileUpload from '../MultiFileUpload';
 import MultiImageUpload from '../MultiImageUpload';
 import { ContractorFormData, ProjectManager, DesignerProject, ProjectManagerProject } from '@/types/supplier';
+import {
+  formatRegisteredCapital,
+  parseRegisteredCapital,
+  REGISTERED_CAPITAL_CURRENCIES,
+} from '@/lib/registeredCapital';
 
 interface ContractorQuestionnaireProps {
   data: ContractorFormData;
@@ -44,7 +49,7 @@ export default function ContractorQuestionnaire({
   ];
   const projectTypeOptions = [
     { value: 'residential', label: 'Residential 住宅' },
-    { value: 'commercial', label: 'Commercial 商業' },
+    { value: 'commercial', label: 'Retail 零售' },
     { value: 'office', label: 'Office 辦公' },
     { value: 'hotel', label: 'Hotel 酒店' },
     { value: 'medical', label: 'Medical 醫療' },
@@ -160,6 +165,10 @@ export default function ContractorQuestionnaire({
 
   const isHongKong = data.country === 'Hong Kong';
   const isChina = data.country === 'China';
+  const capital = parseRegisteredCapital(data.registeredCapital);
+  const hkRegistrationDigits = (data.hkBusinessRegistrationNumber || '').replace(/\D/g, '');
+  const showHkRegistrationError =
+    isHongKong && hkRegistrationDigits.length > 0 && hkRegistrationDigits.length !== 16;
 
   return (
     <>
@@ -191,14 +200,28 @@ export default function ContractorQuestionnaire({
             onChange={(v) => onChange('yearEstablished', v)}
           />
 
-          <FormInput
-            label="Registered Capital / 註冊資本"
-            name="registeredCapital"
-            required={!isHongKong}
-            placeholder="e.g., HKD 1,000,000"
-            value={data.registeredCapital}
-            onChange={(v) => onChange('registeredCapital', v)}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_140px] gap-3">
+            <FormInput
+              label="Registered Capital Amount / 註冊資本數額"
+              name="registeredCapitalAmount"
+              type="number"
+              required={!isHongKong}
+              value={capital.amount}
+              onChange={(v) =>
+                onChange('registeredCapital', formatRegisteredCapital(v, capital.currency))
+              }
+            />
+            <FormSelect
+              label="Currency / 貨幣"
+              name="registeredCapitalCurrency"
+              required={!isHongKong}
+              value={capital.currency}
+              onChange={(v) =>
+                onChange('registeredCapital', formatRegisteredCapital(capital.amount, String(v)))
+              }
+              options={REGISTERED_CAPITAL_CURRENCIES}
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -222,14 +245,21 @@ export default function ContractorQuestionnaire({
         </div>
 
         {isHongKong && (
-          <FormInput
-            label="Business Registration Number / 商業登記號"
-            name="hkBusinessRegistrationNumber"
-            required
-            value={data.hkBusinessRegistrationNumber}
-            onChange={(v) => onChange('hkBusinessRegistrationNumber', v)}
-            placeholder="e.g., 12345678-000"
-          />
+          <div>
+            <FormInput
+              label="Business Registration Number / 商業登記號"
+              name="hkBusinessRegistrationNumber"
+              required
+              value={data.hkBusinessRegistrationNumber}
+              onChange={(v) => onChange('hkBusinessRegistrationNumber', v)}
+              placeholder="e.g., 12345678-000"
+            />
+            {showHkRegistrationError && (
+              <p className="mt-1 text-xs text-red-600">
+                Business Registration Number must be 16 digits / 商業登記號需為16位數字
+              </p>
+            )}
+          </div>
         )}
 
         {isChina && (
@@ -444,13 +474,6 @@ export default function ContractorQuestionnaire({
                     Add items and upload certificates
                   </span>
                 </label>
-                <button
-                  type="button"
-                  onClick={addOtherCertification}
-                  className="px-3 py-1 bg-gray-900 text-white text-xs font-light hover:bg-gray-800 transition-colors"
-                >
-                  + Add Certification / 添加
-                </button>
               </div>
 
               <div className="space-y-3">
@@ -495,6 +518,15 @@ export default function ContractorQuestionnaire({
                   </div>
                 ))}
               </div>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={addOtherCertification}
+                  className="px-3 py-1 bg-gray-900 text-white text-xs font-light hover:bg-gray-800 transition-colors"
+                >
+                  + Add Certification / 添加
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -525,13 +557,6 @@ export default function ContractorQuestionnaire({
               Project Highlights / 亮點項目
               <span className="text-red-500 ml-1">*</span>
             </h4>
-            <button
-              type="button"
-              onClick={addProjectHighlight}
-              className="px-4 py-2 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
-            >
-              + Add Project / 添加項目
-            </button>
           </div>
 
           {(!data.projectHighlights || data.projectHighlights.length === 0) ? (
@@ -574,27 +599,29 @@ export default function ContractorQuestionnaire({
                     />
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <FormInput
-                        label="Year / 年份"
-                        name={`project-year-${project.id}`}
-                        required
-                        value={project.year}
-                        onChange={(v) =>
-                          updateProjectHighlight(project.id, 'year', v)
-                        }
-                        placeholder="e.g., 2024"
-                      />
+                    <FormInput
+                      label="Year / 年份"
+                      name={`project-year-${project.id}`}
+                      type="number"
+                      required
+                      value={project.year}
+                      onChange={(v) =>
+                        updateProjectHighlight(project.id, 'year', v)
+                      }
+                      placeholder="e.g., 2024"
+                    />
 
-                      <FormInput
-                        label="Area (sqft) / 面積（平方呎）"
-                        name={`project-area-${project.id}`}
-                        required
-                        value={project.area}
-                        onChange={(v) =>
-                          updateProjectHighlight(project.id, 'area', v)
-                        }
-                        placeholder="e.g., 1500 sq ft"
-                      />
+                    <FormInput
+                      label="Area (sqft) / 面積（平方呎）"
+                      name={`project-area-${project.id}`}
+                      type="number"
+                      required
+                      value={project.area}
+                      onChange={(v) =>
+                        updateProjectHighlight(project.id, 'area', v)
+                      }
+                      placeholder="e.g., 1500 sq ft"
+                    />
 
                       <FormInput
                         label="Building Name / 大廈名稱"
@@ -623,18 +650,51 @@ export default function ContractorQuestionnaire({
                         ]}
                       />
 
-                      <FormSelect
-                        label="Property Types / 主要項目類型"
-                        name={`project-types-${project.id}`}
-                        type="checkbox"
-                        multiple
-                        required
-                        value={project.projectTypes || []}
-                        onChange={(v) =>
-                          updateProjectHighlight(project.id, 'projectTypes', v as string[])
-                        }
-                        options={projectTypeOptions}
-                      />
+                      {(() => {
+                        const customType = (project.projectTypes || []).find((type) =>
+                          type.startsWith('custom_')
+                        );
+                        const selectedType =
+                          (project.projectTypes || []).find((type) => !type.startsWith('custom_')) ||
+                          (customType ? 'other' : '');
+                        const customValue = customType ? customType.slice(7) : '';
+                        return (
+                          <div className="space-y-2">
+                            <FormSelect
+                              label="Property Types / 主要項目類型"
+                              name={`project-types-${project.id}`}
+                              type="radio"
+                              required
+                              value={selectedType}
+                              onChange={(v) => {
+                                const value = String(v);
+                                if (value === 'other') {
+                                  const next = customValue
+                                    ? ['other', `custom_${customValue}`]
+                                    : ['other'];
+                                  updateProjectHighlight(project.id, 'projectTypes', next);
+                                  return;
+                                }
+                                updateProjectHighlight(project.id, 'projectTypes', [value]);
+                              }}
+                              options={projectTypeOptions}
+                            />
+                            {selectedType === 'other' && (
+                              <input
+                                type="text"
+                                value={customValue}
+                                onChange={(e) => {
+                                  const value = e.target.value.trim();
+                                  const next = value ? ['other', `custom_${value}`] : ['other'];
+                                  updateProjectHighlight(project.id, 'projectTypes', next);
+                                }}
+                                placeholder="Enter other type / 請輸入其他類型"
+                                className="w-full px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+                              />
+                            )}
+                          </div>
+                        );
+                      })()}
                     </div>
 
                     <MultiImageUpload
@@ -651,6 +711,15 @@ export default function ContractorQuestionnaire({
               ))}
             </div>
           )}
+          <div className="mt-4 flex justify-end">
+            <button
+              type="button"
+              onClick={addProjectHighlight}
+              className="px-4 py-2 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
+            >
+              + Add Project / 添加項目
+            </button>
+          </div>
         </div>
 
         <div>
@@ -777,28 +846,6 @@ export default function ContractorQuestionnaire({
                         Projects / 項目經歷
                         <span className="text-red-500 ml-1">*</span>
                       </label>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const updated = [...(data.projectManagers || [])];
-                          const newProject: ProjectManagerProject = {
-                            id: `${Date.now()}-${Math.random()}`,
-                            projectName: '',
-                            clientName: '',
-                            year: '',
-                            buildingName: '',
-                            area: '',
-                          };
-                          updated[pmIndex] = {
-                            ...updated[pmIndex],
-                            projects: [...(updated[pmIndex].projects || []), newProject],
-                          };
-                          onChange('projectManagers', updated);
-                        }}
-                        className="px-3 py-1 bg-gray-900 text-white text-xs font-light hover:bg-gray-800 transition-colors"
-                      >
-                        + Add Project / 添加項目經歷
-                      </button>
                     </div>
 
                     <div className="space-y-3">
@@ -877,6 +924,7 @@ export default function ContractorQuestionnaire({
                             <FormInput
                               label="Year / 年份"
                               name={`pm-${pmIndex}-project-${projectIndex}-year`}
+                              type="number"
                               required
                               value={project.year}
                               onChange={(v) => {
@@ -918,6 +966,7 @@ export default function ContractorQuestionnaire({
                             <FormInput
                               label="Area (sqft) / 面積（平方呎）"
                               name={`pm-${pmIndex}-project-${projectIndex}-area`}
+                              type="number"
                               required
                               value={project.area}
                               onChange={(v) => {
@@ -938,6 +987,30 @@ export default function ContractorQuestionnaire({
                           </div>
                         </div>
                       ))}
+                    </div>
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = [...(data.projectManagers || [])];
+                          const newProject: ProjectManagerProject = {
+                            id: `${Date.now()}-${Math.random()}`,
+                            projectName: '',
+                            clientName: '',
+                            year: '',
+                            buildingName: '',
+                            area: '',
+                          };
+                          updated[pmIndex] = {
+                            ...updated[pmIndex],
+                            projects: [...(updated[pmIndex].projects || []), newProject],
+                          };
+                          onChange('projectManagers', updated);
+                        }}
+                        className="px-3 py-1 bg-gray-900 text-white text-xs font-light hover:bg-gray-800 transition-colors"
+                      >
+                        + Add Project / 添加項目經歷
+                      </button>
                     </div>
                   </div>
 

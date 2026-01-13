@@ -259,6 +259,7 @@ create table if not exists public.designers (
   supplier_id uuid not null references public.suppliers(id) on delete cascade,
   name text,
   experience text,
+  languages text,
   cv_path text,
   created_at timestamptz default now(),
   updated_at timestamptz default now()

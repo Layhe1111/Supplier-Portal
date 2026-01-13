@@ -1,14 +1,11 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { checkTwilioVerification } from '@/lib/twilioVerify';
-import { validateE164Phone } from '@/lib/phoneValidation';
 
 export async function POST(request: Request) {
   try {
     const { phone, code, password, accountType } = await request.json();
-    const validation = validateE164Phone(phone);
-
-    if (!validation.ok || !code || !password) {
+    if (typeof phone !== 'string' || !phone.trim() || !code || !password) {
       return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
     }
 
@@ -23,13 +20,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const verification = await checkTwilioVerification(validation.normalized, code);
+    const normalizedPhone = phone.trim();
+    const verification = await checkTwilioVerification(normalizedPhone, code);
     if (verification?.status !== 'approved') {
       return NextResponse.json({ error: 'Invalid or expired code' }, { status: 400 });
     }
 
     const { data, error } = await supabaseAdmin.auth.admin.createUser({
-      phone: validation.normalized,
+      phone: normalizedPhone,
       password,
       phone_confirm: true,
       user_metadata: {

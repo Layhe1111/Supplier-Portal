@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { uploadFileToStorage } from '@/lib/storageUpload';
+import { extractOriginalFilename } from '@/lib/sanitizeFilename';
 
 interface FileUploadProps {
   label: string;
@@ -18,9 +19,7 @@ const getDisplayName = (value?: File | string | null) => {
   if (!value) return '';
   if (value instanceof File) return value.name;
   if (typeof value === 'string') {
-    const base = value.split('/').pop() || value;
-    const match = base.match(/^\d{10,}-(.+)$/);
-    return match ? match[1] : base;
+    return extractOriginalFilename(value);
   }
   return '';
 };
