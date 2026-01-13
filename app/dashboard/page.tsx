@@ -75,6 +75,14 @@ export default function DashboardPage() {
         }
 
         const supplier = meBody.supplier as SupplierFormData;
+        const supplierStatus = meBody.status as 'draft' | 'submitted' | null;
+        if (supplierStatus === 'draft') {
+          setIsLoading(false);
+          router.replace(
+            supplier.supplierType === 'basic' ? '/register/basic' : '/register/supplier'
+          );
+          return;
+        }
         setUserData(supplier);
         setProducts(supplier.supplierType === 'material' ? supplier.products || [] : []);
 

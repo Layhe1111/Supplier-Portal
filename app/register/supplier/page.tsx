@@ -32,6 +32,7 @@ export default function SupplierRegistrationPage() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAutoSaving, setIsAutoSaving] = useState(false);
+  const [isClearingType, setIsClearingType] = useState(false);
   const [error, setError] = useState('');
   const [supplierId, setSupplierId] = useState<string | null>(null);
   const [showAutoSaveNotice, setShowAutoSaveNotice] = useState(false);
@@ -465,12 +466,49 @@ export default function SupplierRegistrationPage() {
     }
   };
 
-  const handleReset = () => {
+  const clearSupplierTypeData = async (
+    type: 'contractor' | 'designer' | 'material'
+  ) => {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData.session?.access_token;
+    if (!token) return;
+
+    const res = await fetch(`/api/suppliers?type=${encodeURIComponent(type)}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.error || 'Failed to clear data');
+    }
+  };
+
+  const handleReset = async () => {
+    const confirmed = window.confirm(
+      'Changing supplier type will clear all data for this type. Continue? / 更改類型會清除本類型已填資料，是否繼續？'
+    );
+    if (!confirmed) return;
+    setError('');
+    setIsClearingType(true);
+    const typeToClear = supplierType;
     setSupplierType(null);
     setFormData(null);
     setSupplierId(null);
     changeCounterRef.current = 0;
+    hasUserInteractedRef.current = false;
     setDirty(false);
+    if (typeToClear) {
+      try {
+        await clearSupplierTypeData(typeToClear);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to clear data');
+      } finally {
+        setIsClearingType(false);
+      }
+    } else {
+      setIsClearingType(false);
+    }
   };
 
   const saveDraftForNavigation = useCallback(async () => {
@@ -562,6 +600,18 @@ export default function SupplierRegistrationPage() {
               供應商註冊 / Please select your supplier type
             </p>
           </div>
+
+          {isClearingType && (
+            <p className="mb-4 text-sm text-gray-600">
+              Clearing data... / 正在清除資料...
+            </p>
+          )}
+
+          {error && (
+            <p className="mb-4 text-sm text-red-600">
+              {error}
+            </p>
+          )}
 
           <div className="bg-white shadow-sm border border-gray-200 p-8">
             <h2 className="text-xl font-light text-gray-900 mb-2">

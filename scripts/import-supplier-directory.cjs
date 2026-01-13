@@ -59,16 +59,38 @@ function normalizeName(name) {
   return toText(name).toLowerCase().replace(/\s+/g, ' ').trim();
 }
 
-function normalizeKey(name, businessType) {
-  const normalizedName = normalizeName(name);
-  const normalizedType = toText(businessType).toLowerCase().replace(/\s+/g, ' ').trim();
-  return `${normalizedName}||${normalizedType}`;
+function normalizeKey(name) {
+  return normalizeName(name);
 }
 
 function normalizePhoneCode(value) {
   const text = toText(value);
-  if (!text) return '+852';
-  return text.startsWith('+') ? text : `+${text}`;
+  if (!text) return '';
+  const digits = text.replace(/[^\d+]/g, '');
+  if (!digits) return '';
+  return digits.startsWith('+') ? digits : `+${digits.replace(/[^\d]/g, '')}`;
+}
+
+function joinUnique(values) {
+  const unique = [];
+  const seen = new Set();
+  values.forEach((value) => {
+    const trimmed = toText(value);
+    if (!trimmed) return;
+    const key = trimmed.toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
+    unique.push(trimmed);
+  });
+  return unique.join(' | ');
+}
+
+function buildPhoneValue(code, phone) {
+  const phoneText = toText(phone);
+  if (!phoneText) return '';
+  const normalizedCode = normalizePhoneCode(code);
+  if (!normalizedCode) return phoneText;
+  return `${normalizedCode} ${phoneText}`;
 }
 
 function todayDate() {
@@ -107,16 +129,6 @@ async function queryWithRetry(makeRequest, context, retries = 6) {
   throw new Error(`${context}: failed after retries`);
 }
 
-function mergeEntry(target, source) {
-  const merged = { ...target };
-  Object.keys(source).forEach((key) => {
-    if (!merged[key] && source[key]) {
-      merged[key] = source[key];
-    }
-  });
-  return merged;
-}
-
 async function loadDirectoryEntries() {
   if (!fs.existsSync(DATA_PATH)) {
     throw new Error(`Missing input file: ${DATA_PATH}`);
@@ -129,7 +141,7 @@ async function loadDirectoryEntries() {
   const sheet = workbook.Sheets[sheetName];
   const rows = xlsx.utils.sheet_to_json(sheet, { defval: '', raw: false });
 
-  const deduped = new Map();
+  const grouped = new Map();
   let skipped = 0;
   let duplicates = 0;
 
@@ -139,14 +151,13 @@ async function loadDirectoryEntries() {
       skipped += 1;
       return;
     }
-    const normalized = normalizeKey(companyName, row[COLS.businessType]);
+    const normalized = normalizeKey(companyName);
     const entry = {
       rowIndex: index + 2,
       companyName,
       companyNameChinese: toText(row[COLS.companyNameChinese]),
       officeAddress: toText(row[COLS.officeAddress]),
-      phoneCode: normalizePhoneCode(row[COLS.phoneCode]),
-      phone: toText(row[COLS.phone]),
+      phone: buildPhoneValue(row[COLS.phoneCode], row[COLS.phone]),
       fax: toText(row[COLS.fax]),
       email: toText(row[COLS.email]),
       website: toText(row[COLS.website]),
@@ -154,18 +165,46 @@ async function loadDirectoryEntries() {
       businessDescription: toText(row[COLS.businessDescription]),
     };
 
-    if (deduped.has(normalized)) {
+    if (grouped.has(normalized)) {
       duplicates += 1;
-      const existing = deduped.get(normalized);
-      deduped.set(normalized, mergeEntry(existing, entry));
+      const existing = grouped.get(normalized);
+      existing.companyNameChinese.push(entry.companyNameChinese);
+      existing.officeAddress.push(entry.officeAddress);
+      existing.phone.push(entry.phone);
+      existing.fax.push(entry.fax);
+      existing.email.push(entry.email);
+      existing.website.push(entry.website);
+      existing.businessType.push(entry.businessType);
+      existing.businessDescription.push(entry.businessDescription);
       return;
     }
 
-    deduped.set(normalized, entry);
+    grouped.set(normalized, {
+      companyName: entry.companyName,
+      companyNameChinese: [entry.companyNameChinese],
+      officeAddress: [entry.officeAddress],
+      phone: [entry.phone],
+      fax: [entry.fax],
+      email: [entry.email],
+      website: [entry.website],
+      businessType: [entry.businessType],
+      businessDescription: [entry.businessDescription],
+    });
   });
 
   return {
-    entries: Array.from(deduped.values()),
+    entries: Array.from(grouped.values()).map((entry) => ({
+      companyName: entry.companyName,
+      companyNameChinese: joinUnique(entry.companyNameChinese),
+      officeAddress: joinUnique(entry.officeAddress),
+      phoneCode: '',
+      phone: joinUnique(entry.phone),
+      fax: joinUnique(entry.fax),
+      email: joinUnique(entry.email),
+      website: joinUnique(entry.website),
+      businessType: joinUnique(entry.businessType),
+      businessDescription: joinUnique(entry.businessDescription),
+    })),
     skipped,
     duplicates,
     total: rows.length,
@@ -235,8 +274,7 @@ async function dedupeDatabaseByName(suppliers, companyMap) {
   suppliers.forEach((supplier) => {
     const company = companyMap.get(supplier.id);
     const companyName = company?.company_name_en || '';
-    const businessType = company?.business_type || '';
-    const normalized = normalizeKey(companyName, businessType);
+    const normalized = normalizeKey(companyName);
     if (!normalized) return;
     const list = grouped.get(normalized) || [];
     list.push({ supplier, company });
@@ -256,7 +294,7 @@ async function dedupeDatabaseByName(suppliers, companyMap) {
       toDelete.push(item.supplier.id);
     });
     grouped.set(
-      normalizeKey(keep.company?.company_name_en || '', keep.company?.business_type || ''),
+      normalizeKey(keep.company?.company_name_en || ''),
       [keep]
     );
   });
@@ -293,7 +331,7 @@ async function upsertExistingSupplier(supplierId, entry, companyMap, contactMap)
     supplier_id: supplierId,
     contact_name: pickValue('', existingContact.contact_name),
     contact_position: pickValue('', existingContact.contact_position),
-    contact_phone_code: pickValue(entry.phoneCode, existingContact.contact_phone_code),
+    contact_phone_code: entry.phoneCode || null,
     contact_phone: pickValue(entry.phone, existingContact.contact_phone),
     contact_email: pickValue(entry.email, existingContact.contact_email),
     contact_fax: pickValue(entry.fax, existingContact.contact_fax),
@@ -357,7 +395,7 @@ async function insertNewSupplier(entry, userId) {
       supplier_id: supplierId,
       contact_name: null,
       contact_position: null,
-      contact_phone_code: entry.phoneCode || '+852',
+      contact_phone_code: entry.phoneCode || null,
       contact_phone: entry.phone || null,
       contact_email: entry.email || null,
       contact_fax: entry.fax || null,
@@ -402,7 +440,7 @@ async function main() {
   const existingNameToId = new Map();
   suppliers.forEach((supplier) => {
     const company = companyMap.get(supplier.id);
-    const normalized = normalizeKey(company?.company_name_en || '', company?.business_type || '');
+    const normalized = normalizeKey(company?.company_name_en || '');
     if (normalized) {
       existingNameToId.set(normalized, supplier.id);
     }
@@ -414,7 +452,7 @@ async function main() {
 
   for (let i = 0; i < entries.length; i += 1) {
     const entry = entries[i];
-    const normalized = normalizeKey(entry.companyName, entry.businessType);
+    const normalized = normalizeKey(entry.companyName);
     const existingId = existingNameToId.get(normalized);
     if (existingId) {
       await upsertExistingSupplier(existingId, entry, companyMap, contactMap);

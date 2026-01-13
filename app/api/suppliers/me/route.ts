@@ -64,11 +64,12 @@ export async function GET(request: Request) {
     }
 
     if (!supplierResult.data) {
-      return NextResponse.json({ supplier: null });
+      return NextResponse.json({ supplier: null, status: null });
     }
 
     const supplierId = supplierResult.data.id as string;
     const supplierType = supplierResult.data.supplier_type as string;
+    const supplierStatus = (supplierResult.data.status || null) as string | null;
 
     const [
       companyResult,
@@ -388,7 +389,7 @@ export async function GET(request: Request) {
         submissionDate,
       };
 
-      return NextResponse.json({ supplier, supplierId });
+      return NextResponse.json({ supplier, supplierId, status: supplierStatus });
     }
 
     if (supplierType === 'contractor') {
@@ -465,7 +466,7 @@ export async function GET(request: Request) {
         ...commonFields('contractor'),
       };
 
-      return NextResponse.json({ supplier, supplierId });
+      return NextResponse.json({ supplier, supplierId, status: supplierStatus });
     }
 
     if (supplierType === 'designer') {
@@ -679,7 +680,7 @@ export async function GET(request: Request) {
         ...commonFields('designer'),
       };
 
-      return NextResponse.json({ supplier, supplierId });
+      return NextResponse.json({ supplier, supplierId, status: supplierStatus });
     }
 
     if (supplierType === 'material') {
@@ -841,10 +842,10 @@ export async function GET(request: Request) {
         ...commonFields('material'),
       };
 
-      return NextResponse.json({ supplier, supplierId });
+      return NextResponse.json({ supplier, supplierId, status: supplierStatus });
     }
 
-    return NextResponse.json({ supplier: null });
+    return NextResponse.json({ supplier: null, status: supplierStatus });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unexpected error' },

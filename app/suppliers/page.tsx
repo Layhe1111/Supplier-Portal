@@ -264,11 +264,14 @@ export default function SuppliersDirectoryPage() {
 
                   <div className="space-y-1 text-sm text-gray-700">
                     <p>
-                      <span className="font-medium">T:</span> ({supplier.submitterPhoneCode}) {supplier.submitterPhone}
+                      <span className="font-medium">T:</span>{' '}
+                      {supplier.submitterPhoneCode
+                        ? `(${supplier.submitterPhoneCode}) ${supplier.submitterPhone}`
+                        : supplier.submitterPhone}
                     </p>
                     {supplier.contactFax && (
                       <p>
-                        <span className="font-medium">F:</span> ({supplier.submitterPhoneCode}) {supplier.contactFax}
+                        <span className="font-medium">F:</span> {supplier.contactFax}
                       </p>
                     )}
                     <p>

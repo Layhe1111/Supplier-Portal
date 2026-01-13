@@ -115,6 +115,11 @@ const replaceRows = async (table: string, match: Record<string, any>, rows: any[
   ensureOk(insertResult, `Insert ${table}`);
 };
 
+const deleteRows = async (table: string, match: Record<string, any>) => {
+  const deleteResult = await supabaseAdmin.from(table).delete().match(match);
+  ensureOk(deleteResult, `Delete ${table}`);
+};
+
 const saveDocumentType = async (
   supplierId: string,
   scope: string,
@@ -860,6 +865,70 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ ok: true, supplierId });
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Unexpected error' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const auth = await requireUser(request);
+    if ('error' in auth) return auth.error;
+
+    const url = new URL(request.url);
+    const typeParam = (url.searchParams.get('type') || '').trim();
+    const supplierType = typeParam as SupplierType;
+    if (!supplierType || !SUPPLIER_TYPES.has(supplierType)) {
+      return NextResponse.json({ error: 'Invalid supplier type' }, { status: 400 });
+    }
+
+    const existing = await supabaseAdmin
+      .from('suppliers')
+      .select('id')
+      .eq('user_id', auth.user.id)
+      .eq('supplier_type', supplierType)
+      .maybeSingle();
+    ensureOk(existing, 'Select suppliers');
+
+    const supplierId = existing.data?.id;
+    if (!supplierId) {
+      return NextResponse.json({ ok: true });
+    }
+
+    await deleteRows('product_files', { supplier_id: supplierId });
+    await deleteRows('products', { supplier_id: supplierId });
+    await deleteRows('designer_project_files', { supplier_id: supplierId });
+    await deleteRows('designer_projects', { supplier_id: supplierId });
+    await deleteRows('project_files', { supplier_id: supplierId });
+    await deleteRows('project_highlights', { supplier_id: supplierId });
+    await deleteRows('project_manager_projects', { supplier_id: supplierId });
+    await deleteRows('project_managers', { supplier_id: supplierId });
+    await deleteRows('designers', { supplier_id: supplierId });
+    await deleteRows('supplier_project_types', { supplier_id: supplierId });
+    await deleteRows('supplier_certifications', { supplier_id: supplierId });
+    await deleteRows('supplier_insurances', { supplier_id: supplierId });
+    await deleteRows('supplier_documents', { supplier_id: supplierId });
+    await deleteRows('designer_awards', { supplier_id: supplierId });
+    await deleteRows('designer_fee_structures', { supplier_id: supplierId });
+    await deleteRows('designer_styles', { supplier_id: supplierId });
+    await deleteRows('designer_software', { supplier_id: supplierId });
+    await deleteRows('material_company_types', { supplier_id: supplierId });
+    await deleteRows('material_represented_brands', { supplier_id: supplierId });
+    await deleteRows('material_warehouses', { supplier_id: supplierId });
+    await deleteRows('contractor_profile', { supplier_id: supplierId });
+    await deleteRows('designer_profile', { supplier_id: supplierId });
+    await deleteRows('designer_db_profile', { supplier_id: supplierId });
+    await deleteRows('material_profile', { supplier_id: supplierId });
+    await deleteRows('supplier_commitments', { supplier_id: supplierId });
+    await deleteRows('supplier_contact', { supplier_id: supplierId });
+    await deleteRows('supplier_registration', { supplier_id: supplierId });
+    await deleteRows('supplier_company', { supplier_id: supplierId });
+    await deleteRows('suppliers', { id: supplierId });
+
+    return NextResponse.json({ ok: true });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unexpected error' },
