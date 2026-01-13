@@ -7,6 +7,7 @@ import {
   ContractorFormData,
   DesignerFormData,
   MaterialSupplierFormData,
+  isMaterialSupplierForm,
 } from '@/types/supplier';
 import { supabase } from '@/lib/supabaseClient';
 import { validateLocalPhone } from '@/lib/phoneValidation';
@@ -344,7 +345,7 @@ export default function SupplierRegistrationPage() {
       throw new Error(companyLinkCheck.error || 'Invalid website URL');
     }
 
-    if (Array.isArray(payload.products)) {
+    if (isMaterialSupplierForm(payload) && Array.isArray(payload.products)) {
       for (const product of payload.products) {
         const specCheck = validateOptionalUrl(
           product?.specificationLink,
