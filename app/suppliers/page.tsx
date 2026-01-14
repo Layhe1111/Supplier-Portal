@@ -112,6 +112,40 @@ export default function SuppliersDirectoryPage() {
     setCurrentPage((prev) => Math.min(totalPages, prev + 1));
   };
 
+  const normalizeTerms = (value: string) =>
+    value
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+
+  const escapeRegExp = (value: string) =>
+    value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  const highlightMatches = (text: string, terms: string[]) => {
+    if (!text) return text;
+    if (!terms || terms.length === 0) return text;
+    const uniqueTerms = Array.from(
+      new Set(terms.map((term) => term.trim()).filter(Boolean))
+    ).sort((a, b) => b.length - a.length);
+    if (uniqueTerms.length === 0) return text;
+    const pattern = uniqueTerms.map(escapeRegExp).join('|');
+    const regex = new RegExp(`(${pattern})`, 'gi');
+    const parts = text.split(regex);
+    return parts.map((part, index) => {
+      if (!part) return null;
+      const match = uniqueTerms.some(
+        (term) => part.toLowerCase() === term.toLowerCase()
+      );
+      return match ? (
+        <mark key={index} className="bg-yellow-100 px-0.5 text-gray-900">
+          {part}
+        </mark>
+      ) : (
+        <span key={index}>{part}</span>
+      );
+    });
+  };
+
   const renderPagination = () => (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div className="text-sm text-gray-600">
@@ -269,68 +303,75 @@ export default function SuppliersDirectoryPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {suppliers.map((supplier, index) => (
-                <div
-                  key={`${supplier.companyName}-${index}`}
-                  className="border border-gray-200 p-6 hover:shadow-md transition-shadow"
-                >
-                  <h4 className="text-base font-medium text-gray-900 mb-1">
-                    {supplier.companyName}
-                  </h4>
-                  {supplier.companyNameChinese && (
-                    <p className="text-sm text-gray-700 mb-3">
-                      {supplier.companyNameChinese}
-                    </p>
-                  )}
-
-                  <p className="text-sm text-gray-600 mb-3">
-                    {supplier.officeAddress || '-'}
-                  </p>
-
-                  <div className="space-y-1 text-sm text-gray-700">
-                    <p>
-                      <span className="font-medium">T:</span>{' '}
-                      {supplier.submitterPhoneCode
-                        ? `(${supplier.submitterPhoneCode}) ${supplier.submitterPhone}`
-                        : supplier.submitterPhone}
-                    </p>
-                    {supplier.contactFax && (
-                      <p>
-                        <span className="font-medium">F:</span> {supplier.contactFax}
+              {suppliers.map((supplier, index) => {
+                const nameTerms = normalizeTerms(searchTerm);
+                const typeTerms = typeFilter !== 'all' ? [typeFilter] : [];
+                const businessTerms = [...nameTerms, ...typeTerms];
+                return (
+                  <div
+                    key={`${supplier.companyName}-${index}`}
+                    className="border border-gray-200 p-6 hover:shadow-md transition-shadow"
+                  >
+                    <h4 className="text-base font-medium text-gray-900 mb-1">
+                      {highlightMatches(supplier.companyName, nameTerms)}
+                    </h4>
+                    {supplier.companyNameChinese && (
+                      <p className="text-sm text-gray-700 mb-3">
+                        {highlightMatches(supplier.companyNameChinese, nameTerms)}
                       </p>
                     )}
-                    <p>
-                      <span className="font-medium">E:</span> {supplier.submitterEmail}
+
+                    <p className="text-sm text-gray-600 mb-3">
+                      {supplier.officeAddress || '-'}
                     </p>
-                    {supplier.companySupplementLink && (
+
+                    <div className="space-y-1 text-sm text-gray-700">
                       <p>
-                        <span className="font-medium">W:</span>{' '}
-                        <a
-                          href={supplier.companySupplementLink}
-                          className="text-gray-700 underline hover:text-gray-900"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          {supplier.companySupplementLink}
-                        </a>
+                        <span className="font-medium">T:</span>{' '}
+                        {supplier.submitterPhoneCode
+                          ? `(${supplier.submitterPhoneCode}) ${supplier.submitterPhone}`
+                          : supplier.submitterPhone}
+                      </p>
+                      {supplier.contactFax && (
+                        <p>
+                          <span className="font-medium">F:</span> {supplier.contactFax}
+                        </p>
+                      )}
+                      <p>
+                        <span className="font-medium">E:</span> {supplier.submitterEmail}
+                      </p>
+                      {supplier.companySupplementLink && (
+                        <p>
+                          <span className="font-medium">W:</span>{' '}
+                          <a
+                            href={supplier.companySupplementLink}
+                            className="text-gray-700 underline hover:text-gray-900"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {supplier.companySupplementLink}
+                          </a>
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="mt-3 flex items-center text-sm">
+                      <span className="text-yellow-600 mr-2">▶</span>
+                      <span className="text-gray-700">
+                        <span className="font-medium">
+                          {highlightMatches(supplier.businessType, businessTerms)}
+                        </span>
+                      </span>
+                    </div>
+
+                    {supplier.businessDescription && (
+                      <p className="mt-3 text-sm text-gray-600 italic">
+                        {supplier.businessDescription}
                       </p>
                     )}
                   </div>
-
-                  <div className="mt-3 flex items-center text-sm">
-                    <span className="text-yellow-600 mr-2">▶</span>
-                    <span className="text-gray-700">
-                      <span className="font-medium">{supplier.businessType}</span>
-                    </span>
-                  </div>
-
-                  {supplier.businessDescription && (
-                    <p className="mt-3 text-sm text-gray-600 italic">
-                      {supplier.businessDescription}
-                    </p>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
