@@ -189,7 +189,7 @@ export default function SuppliersDirectoryPage() {
               <div className="flex flex-wrap items-center gap-4">
                 <input
                   type="text"
-                  placeholder="Search by name / 搜索公司名稱"
+                  placeholder="Search / 搜索"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full md:w-64 px-4 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
@@ -216,7 +216,32 @@ export default function SuppliersDirectoryPage() {
                     <option value="designer">Designer / 設計師</option>
                     <option value="contractor">Contractor / 承包商</option>
                     <option value="material">Material/Furniture Supplier / 材料家具供應商</option>
-                    <option value="basic">Other Suppliers / 其他供应商</option>
+                    <option value="Sustainable Development & Growth">
+                      Sustainable Development &amp; Growth / 可持續發展與成長
+                    </option>
+                    <option value="Green Roof System">
+                      Green Roof System / 綠化屋頂系統
+                    </option>
+                    <option value="Flooring">Flooring / 地板</option>
+                    <option value="Energy Saving & Efficiency">
+                      Energy Saving &amp; Efficiency / 節能與效率
+                    </option>
+                    <option value="Indoor Air Quality">
+                      Indoor Air Quality / 室內空氣品質
+                    </option>
+                    <option value="Environmentally Friendly Materials">
+                      Environmentally Friendly Materials / 環保材料
+                    </option>
+                    <option value="Acoustic Products & Materials">
+                      Acoustic Products &amp; Materials / 聲學產品與材料
+                    </option>
+                    <option value="Balustrade, Glass">
+                      Balustrade, Glass / 欄杆及玻璃
+                    </option>
+                    <option value="Claddings">Claddings / 牆面覆層</option>
+                    <option value="Fire Protection Materials & Systems">
+                      Fire Protection Materials &amp; Systems / 防火材料與系統
+                    </option>
                   </select>
                 </label>
               </div>

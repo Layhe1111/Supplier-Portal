@@ -137,7 +137,7 @@ export async function GET(request: Request) {
 
     const allowedSort = sortParam === 'alpha' ? 'alpha' : 'submitted';
     const allowedTypes = new Set(['contractor', 'designer', 'material', 'basic']);
-    const typeFilter = allowedTypes.has(typeParam) ? typeParam : 'all';
+    const typeFilter = typeParam || 'all';
 
     const suppliersResult = await fetchSuppliers();
     if (suppliersResult.error) {
@@ -148,7 +148,7 @@ export async function GET(request: Request) {
     }
 
     let supplierRows = suppliersResult.data || [];
-    if (typeFilter !== 'all') {
+    if (typeFilter !== 'all' && allowedTypes.has(typeFilter)) {
       supplierRows = supplierRows.filter((row) => row.supplier_type === typeFilter);
     }
 
@@ -230,18 +230,23 @@ export async function GET(request: Request) {
     });
 
     const query = q.toLowerCase();
-    const filtered = query
-      ? suppliersWithMeta.filter(({ entry }) => {
-        const nameEn = entry.companyName.toLowerCase();
-        const nameZh = (entry.companyNameChinese || '').toLowerCase();
-        const businessType = entry.businessType.toLowerCase();
-        return (
-          nameEn.includes(query) ||
+    const filtered = suppliersWithMeta.filter(({ entry }) => {
+      const nameEn = entry.companyName.toLowerCase();
+      const nameZh = (entry.companyNameChinese || '').toLowerCase();
+      const businessType = entry.businessType.toLowerCase();
+      const businessDescription = (entry.businessDescription || '').toLowerCase();
+      const matchesQuery = query
+        ? nameEn.includes(query) ||
           nameZh.includes(query) ||
-          businessType.includes(query)
-        );
-      })
-      : suppliersWithMeta;
+          businessType.includes(query) ||
+          businessDescription.includes(query)
+        : true;
+      const matchesTypeFilter =
+        typeFilter === 'all' || allowedTypes.has(typeFilter)
+          ? true
+          : businessType.includes(typeFilter.toLowerCase());
+      return matchesQuery && matchesTypeFilter;
+    });
 
     if (allowedSort === 'alpha') {
       filtered.sort((a, b) => {
