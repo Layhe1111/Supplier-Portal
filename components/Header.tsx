@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useUnsavedChanges } from '@/components/UnsavedChangesProvider';
+import SupportTicketPanel from '@/components/SupportTicketPanel';
 
 export default function Header() {
   const router = useRouter();
@@ -12,6 +13,7 @@ export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [receiveNotifications, setReceiveNotifications] = useState(true);
+  const [isTicketOpen, setIsTicketOpen] = useState(false);
   const { isDirty, saveChanges } = useUnsavedChanges();
 
   // Sample notifications data
@@ -128,6 +130,12 @@ export default function Header() {
 
             {isLoggedIn && (
               <>
+              <button
+                onClick={() => setIsTicketOpen(true)}
+                className="px-4 py-2 text-sm font-light text-gray-700 hover:text-gray-900 border border-gray-300 hover:bg-gray-50 transition-colors"
+              >
+                Support / 工單
+              </button>
               {/* Notification Bell */}
               <div className="relative">
                 <button
@@ -229,6 +237,10 @@ export default function Header() {
           </div>
         </div>
       </div>
+      <SupportTicketPanel
+        isOpen={isTicketOpen}
+        onClose={() => setIsTicketOpen(false)}
+      />
     </header>
   );
 }

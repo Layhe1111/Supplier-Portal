@@ -19,6 +19,54 @@ const BUSINESS_TYPE_LABELS: Record<SupplierType, string> = {
   basic: 'Other Suppliers / 其他供应商',
 };
 
+const containsChinese = (value: string) => /[\u4e00-\u9fff]/.test(value);
+
+const translateBusinessType = async (value: string) => {
+  const trimmed = value.trim();
+  if (!trimmed) return '';
+  if (containsChinese(trimmed)) return trimmed;
+  const apiKey = process.env.DEEPSEEK_API_KEY;
+  if (!apiKey) return '';
+  const model = process.env.DEEPSEEK_TRANSLATION_MODEL || 'deepseek-chat';
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+
+  try {
+    const res = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          {
+            role: 'system',
+            content:
+              'Translate to Simplified Chinese. Return only the translation text without quotes or extra commentary.',
+          },
+          { role: 'user', content: trimmed },
+        ],
+        temperature: 0,
+      }),
+      signal: controller.signal,
+    });
+
+    if (!res.ok) {
+      throw new Error(`Translation request failed (${res.status})`);
+    }
+    const payload = await res.json().catch(() => null);
+    const content = payload?.choices?.[0]?.message?.content?.trim();
+    return content || '';
+  } catch (error) {
+    console.error('Business type translation failed', error);
+    return '';
+  } finally {
+    clearTimeout(timeout);
+  }
+};
+
 const YES = new Set(['yes', 'true', '1']);
 const NO = new Set(['no', 'false', '0']);
 
@@ -566,6 +614,7 @@ export async function POST(request: Request) {
 
     const resolvedBusinessType =
       toText(payload.businessType) || BUSINESS_TYPE_LABELS[supplierType];
+    const businessTypeZh = await translateBusinessType(resolvedBusinessType);
 
     let supplierId = existing.data?.id;
     if (!supplierId) {
@@ -606,6 +655,7 @@ export async function POST(request: Request) {
       office_address: toText(payload.officeAddress),
       hk_work_eligible_employees: toText(payload.hkWorkEligibleEmployees),
       business_type: resolvedBusinessType,
+      business_type_zh: toText(businessTypeZh),
       business_description: toText(payload.businessDescription),
       company_supplement_link: toText(payload.companySupplementLink),
       company_logo_path: toPath(payload.companyLogo),

@@ -85,7 +85,7 @@ const fetchCompanyRows = async (supplierIds: string[]) => {
     const result = await supabaseAdmin
       .from('supplier_company')
       .select(
-        'supplier_id, company_name_en, company_name_zh, country, office_address, business_type, business_description, company_supplement_link, company_logo_path'
+        'supplier_id, company_name_en, company_name_zh, country, office_address, business_type, business_type_zh, business_description, company_supplement_link, company_logo_path'
       )
       .in('supplier_id', chunk);
     if (result.error) {
@@ -224,27 +224,31 @@ export async function GET(request: Request) {
           contactFax: contact?.contact_fax ?? '',
           submissionDate: contact?.submission_date ?? '',
         },
+        businessTypeZh: company?.business_type_zh ?? '',
         sortName,
         submissionSortKey,
       };
     });
 
     const query = q.toLowerCase();
-    const filtered = suppliersWithMeta.filter(({ entry }) => {
+    const filtered = suppliersWithMeta.filter(({ entry, businessTypeZh }) => {
       const nameEn = entry.companyName.toLowerCase();
       const nameZh = (entry.companyNameChinese || '').toLowerCase();
       const businessType = entry.businessType.toLowerCase();
+      const businessTypeZhLower = (businessTypeZh || '').toLowerCase();
       const businessDescription = (entry.businessDescription || '').toLowerCase();
       const matchesQuery = query
         ? nameEn.includes(query) ||
           nameZh.includes(query) ||
           businessType.includes(query) ||
+          businessTypeZhLower.includes(query) ||
           businessDescription.includes(query)
         : true;
       const matchesTypeFilter =
         typeFilter === 'all' || allowedTypes.has(typeFilter)
           ? true
-          : businessType.includes(typeFilter.toLowerCase());
+          : businessType.includes(typeFilter.toLowerCase()) ||
+            businessTypeZhLower.includes(typeFilter.toLowerCase());
       return matchesQuery && matchesTypeFilter;
     });
 

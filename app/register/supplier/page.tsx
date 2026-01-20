@@ -37,8 +37,11 @@ export default function SupplierRegistrationPage() {
   const [error, setError] = useState('');
   const [supplierId, setSupplierId] = useState<string | null>(null);
   const [showAutoSaveNotice, setShowAutoSaveNotice] = useState(false);
+  const [showSaveNotice, setShowSaveNotice] = useState(false);
   const autoSaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoSaveNoticeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const saveNoticeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const saveRedirectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasUserInteractedRef = useRef(false);
   const isSubmittingRef = useRef(false);
   const isAutoSavingRef = useRef(false);
@@ -439,6 +442,13 @@ export default function SupplierRegistrationPage() {
       if (changeCounterRef.current === saveVersion) {
         setDirty(false);
       }
+      setShowSaveNotice(true);
+      if (saveRedirectTimeoutRef.current) {
+        clearTimeout(saveRedirectTimeoutRef.current);
+      }
+      saveRedirectTimeoutRef.current = setTimeout(() => {
+        router.push('/dashboard');
+      }, 1200);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save draft');
       return false;
@@ -579,6 +589,30 @@ export default function SupplierRegistrationPage() {
     };
   }, [showAutoSaveNotice]);
 
+  useEffect(() => {
+    if (!showSaveNotice) return;
+    if (saveNoticeTimeoutRef.current) {
+      clearTimeout(saveNoticeTimeoutRef.current);
+    }
+    saveNoticeTimeoutRef.current = setTimeout(() => {
+      setShowSaveNotice(false);
+    }, 1000);
+
+    return () => {
+      if (saveNoticeTimeoutRef.current) {
+        clearTimeout(saveNoticeTimeoutRef.current);
+      }
+    };
+  }, [showSaveNotice]);
+
+  useEffect(() => {
+    return () => {
+      if (saveRedirectTimeoutRef.current) {
+        clearTimeout(saveRedirectTimeoutRef.current);
+      }
+    };
+  }, []);
+
   // Show loading while checking authentication
   if (isCheckingAuth) {
     return (
@@ -695,6 +729,18 @@ export default function SupplierRegistrationPage() {
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div
         className={`fixed top-4 right-4 z-50 transform transition-all duration-300 ease-out ${
+          showSaveNotice
+            ? 'translate-x-0 opacity-100'
+            : 'translate-x-full opacity-0 pointer-events-none'
+        }`}
+        aria-live="polite"
+      >
+        <div className="bg-gray-900 text-white text-sm font-light px-4 py-3 shadow-lg">
+          Saved / 已保存
+        </div>
+      </div>
+      <div
+        className={`fixed top-16 right-4 z-50 transform transition-all duration-300 ease-out ${
           showAutoSaveNotice
             ? 'translate-x-0 opacity-100'
             : 'translate-x-full opacity-0 pointer-events-none'

@@ -19,6 +19,7 @@ export default function DashboardPage() {
   const [editingIndex, setEditingIndex] = useState<number | undefined>(undefined);
   const [products, setProducts] = useState<Product[]>([]);
   const [error, setError] = useState('');
+  const [supplierStatus, setSupplierStatus] = useState<'draft' | 'submitted' | null>(null);
 
   const syncProducts = async (nextProducts: Product[]) => {
     const { data: sessionData } = await supabase.auth.getSession();
@@ -75,14 +76,8 @@ export default function DashboardPage() {
         }
 
         const supplier = meBody.supplier as SupplierFormData;
-        const supplierStatus = meBody.status as 'draft' | 'submitted' | null;
-        if (supplierStatus === 'draft') {
-          setIsLoading(false);
-          router.replace(
-            supplier.supplierType === 'basic' ? '/register/basic' : '/register/supplier'
-          );
-          return;
-        }
+        const status = meBody.status as 'draft' | 'submitted' | null;
+        setSupplierStatus(status);
         setUserData(supplier);
         setProducts(supplier.supplierType === 'material' ? supplier.products || [] : []);
 
@@ -182,6 +177,21 @@ export default function DashboardPage() {
         {error && (
           <div className="mb-4 rounded border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {error}
+          </div>
+        )}
+        {supplierStatus === 'draft' && userData && (
+          <div className="mb-4 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            Draft saved. Please complete your registration / 草稿已保存，請繼續完成註冊。
+            <button
+              className="ml-3 font-medium underline hover:text-amber-900"
+              onClick={() =>
+                router.push(
+                  userData.supplierType === 'basic' ? '/register/basic' : '/register/supplier'
+                )
+              }
+            >
+              Continue / 繼續
+            </button>
           </div>
         )}
         {/* Welcome Section */}
@@ -440,15 +450,33 @@ export default function DashboardPage() {
                 {userData?.supplierType === 'designer' && 'Designer Dashboard / 設計師儀表板'}
               </h3>
               <p className="mt-2 text-sm text-gray-600">
-                Your profile has been successfully registered.
-                <br />
-                您的檔案已成功註冊。
+                {supplierStatus === 'draft' ? (
+                  <>
+                    Draft saved. Please complete your registration.
+                    <br />
+                    草稿已保存，請繼續完成註冊。
+                  </>
+                ) : (
+                  <>
+                    Your profile has been successfully registered.
+                    <br />
+                    您的檔案已成功註冊。
+                  </>
+                )}
               </p>
               <button
-                onClick={() => router.push('/register/supplier')}
+                onClick={() =>
+                  router.push(
+                    userData?.supplierType === 'basic'
+                      ? '/register/basic'
+                      : '/register/supplier'
+                  )
+                }
                 className="mt-6 px-6 py-2.5 bg-gray-900 text-white text-sm font-light hover:bg-gray-800 transition-colors"
               >
-                Edit Profile / 編輯檔案
+                {supplierStatus === 'draft'
+                  ? 'Continue Registration / 繼續填寫'
+                  : 'Edit Profile / 編輯檔案'}
               </button>
             </div>
           </div>

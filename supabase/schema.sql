@@ -38,6 +38,7 @@ create table if not exists public.supplier_company (
   office_address text,
   hk_work_eligible_employees text,
   business_type text,
+  business_type_zh text,
   business_description text,
   company_supplement_link text,
   company_logo_path text,

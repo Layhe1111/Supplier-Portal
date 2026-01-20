@@ -114,6 +114,63 @@ export default function ContractorQuestionnaire({
     onChange('projectHighlights', updatedProjects);
   };
 
+  const [showAutofillDialog, setShowAutofillDialog] = React.useState(false);
+  const [autofillSource, setAutofillSource] = React.useState<DesignerProject | null>(null);
+  const [autofillTarget, setAutofillTarget] = React.useState<{
+    pmIndex: number;
+    projectIndex: number;
+  } | null>(null);
+
+  const findHighlightByName = (projectName: string) => {
+    const trimmedName = projectName.trim().toLowerCase();
+    if (!trimmedName) return null;
+    return (data.projectHighlights || []).find(
+      (project) => project.projectName.trim().toLowerCase() === trimmedName
+    );
+  };
+
+  const handleProjectNameBlur = (
+    pmIndex: number,
+    projectIndex: number,
+    projectName: string
+  ) => {
+    const highlight = findHighlightByName(projectName);
+    if (!highlight) return;
+    setAutofillSource(highlight);
+    setAutofillTarget({ pmIndex, projectIndex });
+    setShowAutofillDialog(true);
+  };
+
+  const handleAutofillConfirm = () => {
+    if (!autofillSource || !autofillTarget) return;
+    const updated = [...(data.projectManagers || [])];
+    const manager = updated[autofillTarget.pmIndex];
+    if (!manager) return;
+    const updatedProjects = [...(manager.projects || [])];
+    const target = updatedProjects[autofillTarget.projectIndex];
+    if (!target) return;
+    updatedProjects[autofillTarget.projectIndex] = {
+      ...target,
+      year: autofillSource.year,
+      buildingName: autofillSource.address,
+      area: autofillSource.area,
+    };
+    updated[autofillTarget.pmIndex] = {
+      ...manager,
+      projects: updatedProjects,
+    };
+    onChange('projectManagers', updated);
+    setShowAutofillDialog(false);
+    setAutofillSource(null);
+    setAutofillTarget(null);
+  };
+
+  const handleAutofillCancel = () => {
+    setShowAutofillDialog(false);
+    setAutofillSource(null);
+    setAutofillTarget(null);
+  };
+
   const toggleIsoCertification = (isoValue: string) => {
     const current = data.isocertifications || [];
     const exists = current.includes(isoValue);
@@ -897,6 +954,7 @@ export default function ContractorQuestionnaire({
                                 };
                                 onChange('projectManagers', updated);
                               }}
+                              onBlur={(v) => handleProjectNameBlur(pmIndex, projectIndex, v)}
                             />
 
                             <FormInput
@@ -1356,6 +1414,50 @@ export default function ContractorQuestionnaire({
           )}
         </div>
       </FormSection>
+      {/* Project Autofill Confirmation Dialog */}
+      {showAutofillDialog && autofillSource && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4">
+            <div className="p-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-2 whitespace-nowrap">
+                Duplicate Project Name Detected / 檢測到重複的項目名稱
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                A project with the name "{autofillSource.projectName}" already exists. Would you like to autofill the project details?
+                <br />
+                <br />
+                已存在名為 "{autofillSource.projectName}" 的項目。是否需要自動填充項目信息？
+              </p>
+
+              <div className="bg-gray-50 rounded p-3 mb-4 text-xs">
+                <p className="font-medium text-gray-700 mb-2 whitespace-nowrap">Existing project details / 現有項目詳情:</p>
+                <div className="space-y-1 text-gray-600">
+                  {autofillSource.year && <div className="whitespace-nowrap">Year / 年份: {autofillSource.year}</div>}
+                  {autofillSource.area && <div className="whitespace-nowrap">Area / 面積: {autofillSource.area}</div>}
+                  {autofillSource.address && <div className="whitespace-nowrap">Building Name / 大廈名稱: {autofillSource.address}</div>}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={handleAutofillCancel}
+                  className="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap"
+                >
+                  No, Keep Current / 否，保持當前
+                </button>
+                <button
+                  type="button"
+                  onClick={handleAutofillConfirm}
+                  className="px-4 py-2 bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition-colors whitespace-nowrap"
+                >
+                  Yes, Autofill / 是，自動填充
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

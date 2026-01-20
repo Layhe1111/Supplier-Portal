@@ -14,8 +14,12 @@ export async function POST(request: Request) {
       typeof (error as { status?: number })?.status === 'number'
         ? (error as { status: number }).status
         : 500;
+    const rawMessage = error instanceof Error ? error.message : 'Unexpected error';
+    const message = rawMessage.includes('Messages to China require use case vetting')
+      ? '中国号码暂时未支持，正在开发中。'
+      : rawMessage;
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Unexpected error' },
+      { error: message },
       { status }
     );
   }
