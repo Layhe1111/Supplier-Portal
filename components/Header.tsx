@@ -14,40 +14,155 @@ export default function Header() {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [receiveNotifications, setReceiveNotifications] = useState(true);
   const [isTicketOpen, setIsTicketOpen] = useState(false);
+  const [notifications, setNotifications] = useState<
+    { id: string; title: string; body: string; createdAt: string; read: boolean }[]
+  >([]);
+  const [isLoadingNotifications, setIsLoadingNotifications] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [notifyEmailAddress, setNotifyEmailAddress] = useState('');
+  const [hasAccountEmail, setHasAccountEmail] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [emailInput, setEmailInput] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [dismissedEmailHint, setDismissedEmailHint] = useState(false);
   const { isDirty, saveChanges } = useUnsavedChanges();
 
-  // Sample notifications data
-  const notifications = [
-    {
-      id: 1,
-      title: 'Product Update / 產品更新',
-      message: 'Your product catalog has been reviewed / 您的產品目錄已被審核',
-      time: '2 hours ago / 2小時前',
-      unread: true,
-    },
-    {
-      id: 2,
-      title: 'System Notice / 系統通知',
-      message: 'New features available in the portal / 門戶網站提供新功能',
-      time: '1 day ago / 1天前',
-      unread: true,
-    },
-    {
-      id: 3,
-      title: 'Profile Update / 檔案更新',
-      message: 'Please update your contact information / 請更新您的聯繫方式',
-      time: '3 days ago / 3天前',
-      unread: false,
-    },
-  ];
+  const unreadCount = notifications.filter((item) => !item.read).length;
 
   useEffect(() => {
     const checkSession = async () => {
       const { data } = await supabase.auth.getSession();
-      setIsLoggedIn(!!data.session?.user);
+      const hasUser = !!data.session?.user;
+      setIsLoggedIn(hasUser);
+      if (!hasUser) {
+        setIsAdmin(false);
+        return;
+      }
+      setHasAccountEmail(Boolean(data.session?.user?.email));
+      const token = data.session?.access_token;
+      if (token) {
+        const prefRes = await fetch('/api/notifications/preferences', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const prefBody = await prefRes.json().catch(() => ({}));
+        if (prefRes.ok) {
+          setReceiveNotifications(Boolean(prefBody.notifyEmail));
+          setNotifyEmailAddress(prefBody.notifyEmailAddress || '');
+        }
+      }
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('user_id', data.session?.user?.id)
+        .maybeSingle();
+      if (error) {
+        setIsAdmin(false);
+        return;
+      }
+      setIsAdmin(profile?.role === 'admin');
     };
     checkSession();
   }, [pathname]);
+
+  const loadNotifications = async () => {
+    if (!isLoggedIn) return;
+    setIsLoadingNotifications(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) return;
+      const res = await fetch('/api/notifications', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        console.error(body.error || 'Failed to load notifications');
+        return;
+      }
+      setNotifications(body.notifications || []);
+    } finally {
+      setIsLoadingNotifications(false);
+    }
+  };
+
+  const markAllRead = async () => {
+    if (!isLoggedIn) return;
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData.session?.access_token;
+    if (!token) return;
+    await fetch('/api/notifications', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ markAll: true }),
+    });
+    setNotifications((prev) => prev.map((item) => ({ ...item, read: true })));
+  };
+
+  const markRead = async (id: string) => {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData.session?.access_token;
+    if (!token) return;
+    await fetch('/api/notifications', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ notificationId: id }),
+    });
+    setNotifications((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, read: true } : item))
+    );
+  };
+
+  const updateNotificationPrefs = async (nextValue: boolean) => {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData.session?.access_token;
+    if (!token) return;
+    await fetch('/api/notifications/preferences', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        notifyEmail: nextValue,
+        notifySms: false,
+        notifyEmailAddress: notifyEmailAddress || null,
+      }),
+    });
+    setReceiveNotifications(nextValue);
+  };
+
+  const openEmailModal = () => {
+    setEmailError('');
+    setEmailInput(notifyEmailAddress || '');
+    setShowEmailModal(true);
+  };
+
+  const submitNotificationEmail = async () => {
+    setEmailError('');
+    const email = emailInput.trim();
+    if (!email) {
+      setEmailError('Please enter an email / 請輸入電郵');
+      return;
+    }
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData.session?.access_token;
+    if (!token) return;
+    const res = await fetch('/api/notifications/preferences', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        notifyEmail: true,
+        notifySms: false,
+        notifyEmailAddress: email,
+      }),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      setEmailError(body.error || 'Failed to save email');
+      return;
+    }
+    setNotifyEmailAddress(email);
+    setReceiveNotifications(true);
+    setShowEmailModal(false);
+    setEmailInput('');
+  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -136,10 +251,24 @@ export default function Header() {
               >
                 Support / 工單
               </button>
+              {isAdmin && (
+                <button
+                  onClick={() => router.push(pathname === '/admin' ? '/dashboard' : '/admin')}
+                  className="px-4 py-2 text-sm font-light text-gray-700 hover:text-gray-900 border border-gray-300 hover:bg-gray-50 transition-colors"
+                >
+                  {pathname === '/admin' ? 'Return to Portal / 返回前台' : 'Admin / 後台管理'}
+                </button>
+              )}
               {/* Notification Bell */}
               <div className="relative">
                 <button
-                  onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                  onClick={() => {
+                    const nextOpen = !isNotificationOpen;
+                    setIsNotificationOpen(nextOpen);
+                    if (nextOpen) {
+                      loadNotifications();
+                    }
+                  }}
                   className="relative p-2 text-gray-700 hover:text-gray-900 hover:bg-gray-50 border border-gray-300 transition-colors"
                   aria-label="Notifications"
                 >
@@ -157,7 +286,7 @@ export default function Header() {
                     />
                   </svg>
                   {/* Notification badge */}
-                  {notifications.filter(n => n.unread).length > 0 && (
+                  {unreadCount > 0 && (
                     <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full" />
                   )}
                 </button>
@@ -180,11 +309,59 @@ export default function Header() {
 
                       {/* Notifications List */}
                       <div className="max-h-96 overflow-y-auto">
+                        {!dismissedEmailHint && !notifyEmailAddress && (
+                          <div className="p-4 border-b border-amber-200 bg-amber-50 text-xs text-amber-800 flex items-start justify-between gap-3">
+                            <span>
+                              {hasAccountEmail
+                                ? '是否想用其他電郵接收推送通知？'
+                                : '建議補充電郵以接收推送通知。'}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={openEmailModal}
+                              className="ml-2 underline"
+                            >
+                              {hasAccountEmail ? 'Change / 更換' : 'Add Email / 補充電郵'}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setDismissedEmailHint(true)}
+                              className="text-gray-500 hover:text-gray-700"
+                              aria-label="Dismiss"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        )}
+                        {notifyEmailAddress && (
+                          <div className="p-4 border-b border-gray-200 text-xs text-gray-700">
+                            Notification email: {notifyEmailAddress}
+                            <button
+                              type="button"
+                              onClick={openEmailModal}
+                              className="ml-2 underline"
+                            >
+                              Edit / 修改
+                            </button>
+                          </div>
+                        )}
+                        {isLoadingNotifications && (
+                          <div className="p-4 text-sm text-gray-500">
+                            Loading... / 載入中...
+                          </div>
+                        )}
+                        {!isLoadingNotifications && notifications.length === 0 && (
+                          <div className="p-4 text-sm text-gray-500">
+                            No notifications yet. / 暫無通知
+                          </div>
+                        )}
                         {notifications.map((notification) => (
-                          <div
+                          <button
+                            type="button"
                             key={notification.id}
-                            className={`p-4 border-b border-gray-200 hover:bg-gray-50 cursor-pointer ${
-                              notification.unread ? 'bg-blue-50' : ''
+                            onClick={() => markRead(notification.id)}
+                            className={`w-full text-left p-4 border-b border-gray-200 hover:bg-gray-50 ${
+                              notification.read ? '' : 'bg-blue-50'
                             }`}
                           >
                             <div className="flex items-start gap-3">
@@ -193,33 +370,35 @@ export default function Header() {
                                   {notification.title}
                                 </p>
                                 <p className="text-xs text-gray-600 mb-2">
-                                  {notification.message}
+                                  {notification.body}
                                 </p>
                                 <p className="text-xs text-gray-500">
-                                  {notification.time}
+                                  {new Date(notification.createdAt).toLocaleString()}
                                 </p>
                               </div>
-                              {notification.unread && (
+                              {!notification.read && (
                                 <div className="w-2 h-2 bg-blue-500 rounded-full mt-1" />
                               )}
                             </div>
-                          </div>
+                          </button>
                         ))}
                       </div>
 
                       {/* Notification Settings Footer */}
                       <div className="p-4 bg-gray-50 border-t border-gray-200">
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={receiveNotifications}
-                            onChange={(e) => setReceiveNotifications(e.target.checked)}
-                            className="w-4 h-4 text-gray-900 border-gray-300 focus:ring-gray-900"
-                          />
-                          <span className="text-sm text-gray-700">
-                            Receive notifications / 接收通知
-                          </span>
-                        </label>
+                        <div className="flex items-center justify-between">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={receiveNotifications}
+                              onChange={(e) => updateNotificationPrefs(e.target.checked)}
+                              className="w-4 h-4 text-gray-900 border-gray-300 focus:ring-gray-900"
+                            />
+                            <span className="text-sm text-gray-700">
+                              Receive email notifications / 接收電郵通知
+                            </span>
+                          </label>
+                        </div>
                       </div>
                     </div>
                   </>
@@ -237,6 +416,47 @@ export default function Header() {
           </div>
         </div>
       </div>
+      {showEmailModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="bg-white border border-gray-200 w-full max-w-md p-6">
+            <h3 className="text-lg font-medium text-gray-900">
+              Add Notification Email / 補充通知電郵
+            </h3>
+            <p className="mt-2 text-sm text-gray-600">
+              This email is only used for receiving notifications.
+              <br />
+              此電郵僅用於接收推送通知，不作為帳號識別。
+            </p>
+            <div className="mt-4">
+              <input
+                value={emailInput}
+                onChange={(e) => setEmailInput(e.target.value)}
+                className="w-full border border-gray-300 px-3 py-2 text-sm"
+                placeholder="email@example.com"
+              />
+              {emailError && (
+                <p className="mt-2 text-xs text-red-600">{emailError}</p>
+              )}
+            </div>
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowEmailModal(false)}
+                className="px-3 py-2 text-sm border border-gray-300 text-gray-700"
+              >
+                Cancel / 取消
+              </button>
+              <button
+                type="button"
+                onClick={submitNotificationEmail}
+                className="px-3 py-2 text-sm bg-gray-900 text-white"
+              >
+                Save / 保存
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <SupportTicketPanel
         isOpen={isTicketOpen}
         onClose={() => setIsTicketOpen(false)}

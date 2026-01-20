@@ -27,6 +27,20 @@ create index if not exists suppliers_type_status_idx on public.suppliers(supplie
 create trigger set_suppliers_updated_at before update on public.suppliers
   for each row execute procedure public.set_updated_at();
 
+-- Profiles (role)
+create table if not exists public.profiles (
+  user_id uuid primary key references auth.users (id) on delete cascade,
+  role text not null default 'user' check (role in ('user', 'admin')),
+  invite_code_id integer references public.invite_codes(id) on delete set null,
+  notify_email boolean not null default true,
+  notify_sms boolean not null default false,
+  notify_email_address text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+create trigger set_profiles_updated_at before update on public.profiles
+  for each row execute procedure public.set_updated_at();
+
 -- Company profile (shared fields)
 create table if not exists public.supplier_company (
   supplier_id uuid primary key references public.suppliers(id) on delete cascade,
@@ -75,6 +89,55 @@ create table if not exists public.supplier_contact (
 );
 create trigger set_supplier_contact_updated_at before update on public.supplier_contact
   for each row execute procedure public.set_updated_at();
+
+-- Support tickets
+create table if not exists public.support_tickets (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  subject text not null,
+  category text,
+  status text not null default 'open' check (status in ('open', 'pending', 'closed')),
+  requester_email text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+create index if not exists support_tickets_user_idx on public.support_tickets(user_id);
+create index if not exists support_tickets_status_idx on public.support_tickets(status);
+create index if not exists support_tickets_updated_idx on public.support_tickets(updated_at desc);
+create trigger set_support_tickets_updated_at before update on public.support_tickets
+  for each row execute procedure public.set_updated_at();
+
+create table if not exists public.support_messages (
+  id uuid primary key default gen_random_uuid(),
+  ticket_id uuid not null references public.support_tickets(id) on delete cascade,
+  sender_role text not null check (sender_role in ('user', 'support')),
+  sender_id uuid references auth.users (id) on delete set null,
+  message text not null,
+  created_at timestamptz default now()
+);
+create index if not exists support_messages_ticket_idx on public.support_messages(ticket_id);
+create index if not exists support_messages_created_idx on public.support_messages(created_at);
+
+-- Notifications
+create table if not exists public.notifications (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  body text not null,
+  audience text not null default 'all' check (audience in ('all', 'user')),
+  target_user_id uuid references auth.users (id) on delete cascade,
+  created_by uuid references auth.users (id) on delete set null,
+  created_at timestamptz default now()
+);
+create index if not exists notifications_created_idx on public.notifications(created_at desc);
+create index if not exists notifications_target_idx on public.notifications(target_user_id);
+
+create table if not exists public.notification_reads (
+  notification_id uuid not null references public.notifications(id) on delete cascade,
+  user_id uuid not null references auth.users (id) on delete cascade,
+  read_at timestamptz default now(),
+  primary key (notification_id, user_id)
+);
+create index if not exists notification_reads_user_idx on public.notification_reads(user_id);
 
 -- Quality commitments
 create table if not exists public.supplier_commitments (
@@ -454,6 +517,7 @@ $$;
 
 -- Row-Level Security
 alter table public.suppliers enable row level security;
+alter table public.profiles enable row level security;
 alter table public.supplier_company enable row level security;
 alter table public.supplier_registration enable row level security;
 alter table public.supplier_contact enable row level security;
@@ -484,6 +548,10 @@ alter table public.products enable row level security;
 alter table public.product_files enable row level security;
 alter table public.email_otps enable row level security;
 alter table public.invite_codes enable row level security;
+alter table public.support_tickets enable row level security;
+alter table public.support_messages enable row level security;
+alter table public.notifications enable row level security;
+alter table public.notification_reads enable row level security;
 
 create policy suppliers_select_own on public.suppliers
   for select using (user_id = auth.uid());
@@ -493,6 +561,13 @@ create policy suppliers_update_own on public.suppliers
   for update using (user_id = auth.uid()) with check (user_id = auth.uid());
 create policy suppliers_delete_own on public.suppliers
   for delete using (user_id = auth.uid());
+
+create policy profiles_select_own on public.profiles
+  for select using (user_id = auth.uid());
+create policy profiles_insert_own on public.profiles
+  for insert with check (user_id = auth.uid());
+create policy profiles_update_own on public.profiles
+  for update using (user_id = auth.uid()) with check (user_id = auth.uid());
 
 create policy supplier_company_select_own on public.supplier_company
   for select using (public.is_supplier_owner(supplier_id));
@@ -745,6 +820,36 @@ create policy product_files_update_own on public.product_files
   for update using (public.is_supplier_owner(supplier_id)) with check (public.is_supplier_owner(supplier_id));
 create policy product_files_delete_own on public.product_files
   for delete using (public.is_supplier_owner(supplier_id));
+
+create policy support_tickets_select_own on public.support_tickets
+  for select using (user_id = auth.uid());
+create policy support_tickets_insert_own on public.support_tickets
+  for insert with check (user_id = auth.uid());
+
+create policy support_messages_select_own on public.support_messages
+  for select using (
+    exists (
+      select 1 from public.support_tickets st
+      where st.id = ticket_id and st.user_id = auth.uid()
+    )
+  );
+create policy support_messages_insert_own on public.support_messages
+  for insert with check (
+    exists (
+      select 1 from public.support_tickets st
+      where st.id = ticket_id and st.user_id = auth.uid()
+    )
+  );
+
+create policy notifications_select_own on public.notifications
+  for select using (
+    audience = 'all' or target_user_id = auth.uid()
+  );
+
+create policy notification_reads_select_own on public.notification_reads
+  for select using (user_id = auth.uid());
+create policy notification_reads_insert_own on public.notification_reads
+  for insert with check (user_id = auth.uid());
 
 -- Storage: create bucket (private by default)
 insert into storage.buckets (id, name, public)

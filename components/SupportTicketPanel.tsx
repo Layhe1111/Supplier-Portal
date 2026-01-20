@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { supabase } from '@/lib/supabaseClient';
 
 type TicketMessage = {
   id: string;
@@ -13,7 +14,7 @@ type Ticket = {
   id: string;
   subject: string;
   category: string;
-  status: 'Open' | 'Pending' | 'Closed';
+  status: 'open' | 'pending' | 'closed';
   createdAt: string;
 };
 
@@ -26,6 +27,25 @@ const nowLabel = () =>
     day: '2-digit',
   });
 
+const formatTime = (value: string) => {
+  const parsed = Date.parse(value);
+  if (Number.isNaN(parsed)) return value;
+  return new Date(parsed).toLocaleString();
+};
+
+const formatStatus = (status: Ticket['status']) => {
+  switch (status) {
+    case 'open':
+      return 'Open / 開啟';
+    case 'pending':
+      return 'Pending / 待處理';
+    case 'closed':
+      return 'Closed / 已結案';
+    default:
+      return status;
+  }
+};
+
 export default function SupportTicketPanel({
   isOpen,
   onClose,
@@ -37,9 +57,14 @@ export default function SupportTicketPanel({
   const [category, setCategory] = useState('account');
   const [description, setDescription] = useState('');
   const [ticket, setTicket] = useState<Ticket | null>(null);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
   const [messages, setMessages] = useState<TicketMessage[]>([]);
   const [chatInput, setChatInput] = useState('');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [isLoadingTicket, setIsLoadingTicket] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const listRef = useRef<HTMLDivElement | null>(null);
 
   const canSubmit = subject.trim() && description.trim();
@@ -48,6 +73,7 @@ export default function SupportTicketPanel({
   useEffect(() => {
     if (!isOpen) return;
     setError('');
+    void loadTickets();
   }, [isOpen]);
 
   useEffect(() => {
@@ -55,8 +81,8 @@ export default function SupportTicketPanel({
     listRef.current.scrollTop = listRef.current.scrollHeight;
   }, [messages]);
 
-  const categoryLabel = useMemo(() => {
-    switch (category) {
+  const getCategoryLabelFor = (value: string) => {
+    switch (value) {
       case 'account':
         return 'Account / 帳號';
       case 'registration':
@@ -68,7 +94,7 @@ export default function SupportTicketPanel({
       default:
         return 'Other / 其他';
     }
-  }, [category]);
+  };
 
   const resetForm = () => {
     setSubject('');
@@ -78,71 +104,142 @@ export default function SupportTicketPanel({
     setError('');
   };
 
-  const handleCreateTicket = () => {
+  const handleCreateTicket = async () => {
     if (!canSubmit) {
       setError('Please fill in subject and description / 請填寫標題與問題描述');
       return;
     }
 
-    const createdAt = nowLabel();
-    const newTicket: Ticket = {
-      id: `ticket-${Date.now()}`,
-      subject: subject.trim(),
-      category,
-      status: 'Open',
-      createdAt,
-    };
-
-    const initialMessages: TicketMessage[] = [
-      {
-        id: `msg-${Date.now()}-user`,
-        role: 'user',
-        text: description.trim(),
-        time: createdAt,
-      },
-      {
-        id: `msg-${Date.now()}-support`,
-        role: 'support',
-        text:
-          'We received your ticket. Our team will reply here soon. / 已收到您的工單，我們將盡快回覆。',
-        time: nowLabel(),
-      },
-    ];
-
-    setTicket(newTicket);
-    setMessages(initialMessages);
-    setChatInput('');
+    setIsSubmitting(true);
     setError('');
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) {
+        throw new Error('Please sign in to submit a ticket / 請先登入');
+      }
+      const res = await fetch('/api/support/tickets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          subject: subject.trim(),
+          category,
+          description: description.trim(),
+        }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(body.error || 'Failed to create ticket');
+      }
+      setTicket(body.ticket as Ticket);
+      setTickets((prev) => [body.ticket as Ticket, ...prev]);
+      setMessages(
+        (body.messages || []).map((msg: any) => ({
+          id: msg.id,
+          role: msg.role,
+          text: msg.text,
+          time: msg.time,
+        }))
+      );
+      setChatInput('');
+      setIsCreating(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create ticket');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleSendMessage = () => {
-    if (!canSend) return;
-    const newMessage: TicketMessage = {
-      id: `msg-${Date.now()}-user`,
-      role: 'user',
-      text: chatInput.trim(),
-      time: nowLabel(),
-    };
-    setMessages((prev) => [...prev, newMessage]);
-    setChatInput('');
+  const loadTickets = async () => {
+    setIsLoadingTicket(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) return;
+      const res = await fetch('/api/support/tickets', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(body.error || 'Failed to load ticket');
+      }
+      const list = (body.tickets || []).map((item: any) => ({
+        id: item.id,
+        subject: item.subject,
+        category: item.category,
+        status: item.status,
+        createdAt: item.createdAt,
+      }));
+      setTickets(list);
+      if (list.length === 0) return;
+      if (isCreating) return;
+      const active = ticket?.id
+        ? list.find((item) => item.id === ticket.id) || list[0]
+        : list[0];
+      setTicket(active);
+      await loadMessages(active.id);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load ticket');
+    } finally {
+      setIsLoadingTicket(false);
+    }
+  };
 
-    setTimeout(() => {
+  const loadMessages = async (ticketId: string) => {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData.session?.access_token;
+    if (!token) return;
+    const res = await fetch(`/api/support/tickets/${ticketId}/messages`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(body.error || 'Failed to load messages');
+    }
+    setMessages(body.messages || []);
+  };
+
+  const handleSendMessage = async () => {
+    if (!canSend) return;
+    if (!ticket) return;
+    setIsSending(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) {
+        throw new Error('Please sign in to reply / 請先登入');
+      }
+      const res = await fetch(`/api/support/tickets/${ticket.id}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ message: chatInput.trim() }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(body.error || 'Failed to send message');
+      }
       setMessages((prev) => [
         ...prev,
         {
-          id: `msg-${Date.now()}-support`,
-          role: 'support',
-          text: 'Thanks for the details. We are looking into it. / 感謝補充，我們正在處理。',
-          time: nowLabel(),
+          id: body.message.id,
+          role: body.message.role,
+          text: body.message.text,
+          time: body.message.time,
         },
       ]);
-    }, 900);
+      setChatInput('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to send message');
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const handleNewTicket = () => {
     setTicket(null);
     setMessages([]);
     resetForm();
+    setIsCreating(true);
   };
 
   if (!isOpen) return null;
@@ -154,14 +251,14 @@ export default function SupportTicketPanel({
         onClick={onClose}
         aria-hidden="true"
       />
-      <div className="absolute right-0 top-0 h-full w-full max-w-xl bg-white shadow-2xl">
+      <div className="absolute right-0 top-0 h-full w-full max-w-5xl bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
           <div>
             <h2 className="text-lg font-medium text-gray-900">
               Support Ticket / 工單
             </h2>
             <p className="text-xs text-gray-500">
-              Frontend demo only. Messages are not persisted. / 目前僅前台展示，訊息不會保存。
+              Tickets are saved for admin review. / 工單會保存供後台查看。
             </p>
           </div>
           <button
@@ -173,10 +270,120 @@ export default function SupportTicketPanel({
           </button>
         </div>
 
-        <div className="flex h-[calc(100%-72px)] flex-col">
-          <div className="flex-1 overflow-y-auto px-6 py-4">
-            {!ticket ? (
+        <div className="flex h-[calc(100%-72px)]">
+          <aside className="w-64 border-r border-gray-200 flex flex-col">
+            <div className="p-4 border-b border-gray-200 space-y-2">
+              <button
+                type="button"
+                onClick={handleNewTicket}
+                className="w-full px-3 py-2 text-sm bg-gray-900 text-white"
+              >
+                New Ticket / 新建工單
+              </button>
+              <button
+                type="button"
+                onClick={() => loadTickets()}
+                className="w-full px-3 py-2 text-xs border border-gray-300 text-gray-600"
+              >
+                Refresh / 刷新
+              </button>
+              {isLoadingTicket && (
+                <p className="text-xs text-gray-500">Loading... / 載入中...</p>
+              )}
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              {tickets.length === 0 && (
+                <p className="p-4 text-xs text-gray-500">No tickets yet.</p>
+              )}
+              {tickets.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={async () => {
+                    setIsCreating(false);
+                    setTicket(item);
+                    await loadMessages(item.id);
+                  }}
+                  className={`w-full text-left px-4 py-3 border-b border-gray-200 ${
+                    item.id === ticket?.id
+                      ? 'bg-gray-50 text-gray-900'
+                      : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <p className="text-sm font-medium truncate">{item.subject}</p>
+                  <p className="text-[11px] text-gray-400 mt-1">
+                    {formatStatus(item.status)}
+                  </p>
+                </button>
+              ))}
+            </div>
+          </aside>
+
+          <section className="flex-1 overflow-y-auto px-6 py-4">
+            {ticket && !isCreating ? (
               <div className="space-y-4">
+                <div className="rounded border border-gray-200 bg-gray-50 px-4 py-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">
+                        {ticket.subject}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {getCategoryLabelFor(ticket.category)} · {ticket.createdAt}
+                      </p>
+                    </div>
+                    <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs text-emerald-700">
+                      {formatStatus(ticket.status)}
+                    </span>
+                  </div>
+                </div>
+
+                <div
+                  ref={listRef}
+                  className="space-y-3 rounded border border-gray-200 bg-white p-4 max-h-[420px] overflow-y-auto"
+                >
+                  {messages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={`flex ${
+                        message.role === 'user' ? 'justify-end' : 'justify-start'
+                      }`}
+                    >
+                      <div
+                        className={`max-w-[80%] rounded px-3 py-2 text-sm ${
+                          message.role === 'user'
+                            ? 'bg-gray-900 text-white'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
+                        <p>{message.text}</p>
+                        <p className="mt-1 text-[10px] opacity-70">
+                          {formatTime(message.time)}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex gap-2">
+                  <input
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    className="flex-1 border border-gray-300 px-3 py-2 text-sm"
+                    placeholder="Reply here / 在此回覆"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSendMessage}
+                    disabled={!canSend || isSending}
+                    className="px-4 py-2 text-sm bg-gray-900 text-white disabled:bg-gray-300"
+                  >
+                    {isSending ? 'Sending... / 發送中' : 'Send / 發送'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4 max-w-xl">
                 <div>
                   <label className="block text-sm text-gray-700 mb-1">
                     Category / 類別
@@ -224,82 +431,14 @@ export default function SupportTicketPanel({
                 <button
                   type="button"
                   onClick={handleCreateTicket}
-                  className="w-full bg-gray-900 text-white py-2 text-sm hover:bg-gray-800"
+                  disabled={isSubmitting}
+                  className="w-full bg-gray-900 text-white py-2 text-sm hover:bg-gray-800 disabled:bg-gray-300"
                 >
-                  Create Ticket / 提交工單
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="rounded border border-gray-200 bg-gray-50 px-4 py-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">
-                        {ticket.subject}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {categoryLabel} · {ticket.createdAt}
-                      </p>
-                    </div>
-                    <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs text-emerald-700">
-                      {ticket.status}
-                    </span>
-                  </div>
-                </div>
-
-                <div
-                  ref={listRef}
-                  className="space-y-3 rounded border border-gray-200 bg-white p-4 max-h-[360px] overflow-y-auto"
-                >
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex ${
-                        message.role === 'user' ? 'justify-end' : 'justify-start'
-                      }`}
-                    >
-                      <div
-                        className={`max-w-[80%] rounded px-3 py-2 text-sm ${
-                          message.role === 'user'
-                            ? 'bg-gray-900 text-white'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}
-                      >
-                        <p>{message.text}</p>
-                        <p className="mt-1 text-[10px] opacity-70">
-                          {message.time}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex gap-2">
-                  <input
-                    value={chatInput}
-                    onChange={(e) => setChatInput(e.target.value)}
-                    className="flex-1 border border-gray-300 px-3 py-2 text-sm"
-                    placeholder="Reply here / 在此回覆"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleSendMessage}
-                    disabled={!canSend}
-                    className="px-4 py-2 text-sm bg-gray-900 text-white disabled:bg-gray-300"
-                  >
-                    Send / 發送
-                  </button>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleNewTicket}
-                  className="text-xs text-gray-600 underline hover:text-gray-900"
-                >
-                  Create another ticket / 新建工單
+                  {isSubmitting ? 'Submitting... / 提交中' : 'Create Ticket / 提交工單'}
                 </button>
               </div>
             )}
-          </div>
+          </section>
         </div>
       </div>
     </div>

@@ -2,9 +2,39 @@ import { NextResponse } from 'next/server';
 import { createHash } from 'crypto';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
+const validateInviteCode = async (code: string) => {
+  const trimmed = code.trim();
+  if (!trimmed) return null;
+  const { data, error } = await supabaseAdmin
+    .from('invite_codes')
+    .select('*')
+    .eq('code', trimmed)
+    .maybeSingle();
+  if (error || !data) {
+    throw new Error('Invalid invitation code');
+  }
+  if (data.status !== 'active') {
+    throw new Error('Invitation code inactive');
+  }
+  if (data.expires_at && new Date(data.expires_at).getTime() < Date.now()) {
+    throw new Error('Invitation code expired');
+  }
+  if (typeof data.max_uses === 'number' && data.used_count >= data.max_uses) {
+    throw new Error('Invitation code exhausted');
+  }
+  const { error: updateError } = await supabaseAdmin
+    .from('invite_codes')
+    .update({ used_count: (data.used_count || 0) + 1 })
+    .eq('id', data.id);
+  if (updateError) {
+    throw new Error('Failed to redeem invitation code');
+  }
+  return data.id as number;
+};
+
 export async function POST(request: Request) {
   try {
-    const { email, code, password, accountType } = await request.json();
+    const { email, code, password, accountType, invitationCode } = await request.json();
     if (!email || !code || !password) {
       return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
     }
@@ -33,6 +63,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Code expired' }, { status: 400 });
     }
 
+    const inviteCodeId =
+      typeof invitationCode === 'string' && invitationCode.trim()
+        ? await validateInviteCode(invitationCode)
+        : null;
+
     // Create user as confirmed
     const { data: created, error: createError } = await supabaseAdmin.auth.admin.createUser({
       email,
@@ -43,6 +78,16 @@ export async function POST(request: Request) {
 
     if (createError) {
       return NextResponse.json({ error: createError.message }, { status: 400 });
+    }
+
+    if (created.user?.id) {
+      await supabaseAdmin.from('profiles').upsert({
+        user_id: created.user.id,
+        role: 'user',
+        invite_code_id: inviteCodeId,
+        notify_email: true,
+        notify_sms: false,
+      });
     }
 
     // Clean up OTP

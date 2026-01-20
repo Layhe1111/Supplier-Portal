@@ -143,6 +143,7 @@ export default function SignupPage() {
             phone,
             password: formData.password,
             code: formData.otp,
+            invitationCode: formData.invitationCode,
           }),
         });
 
@@ -177,6 +178,7 @@ export default function SignupPage() {
             email: emailCheck.normalized,
             password: formData.password,
             code: formData.otp,
+            invitationCode: formData.invitationCode,
           }),
         });
 
