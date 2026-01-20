@@ -26,7 +26,7 @@ export async function GET(request: Request) {
 
     const result = await supabaseAdmin
       .from('profiles')
-      .select('notify_email, notify_sms')
+      .select('notify_email, notify_sms, notify_email_address')
       .eq('user_id', auth.user.id)
       .maybeSingle();
 

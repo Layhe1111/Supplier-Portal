@@ -71,7 +71,7 @@ export async function GET(request: Request) {
             user_id: string;
             role: string;
             invite_code_id: number | null;
-            invite_codes?: { code: string } | null;
+            invite_codes?: { code: string } | { code: string }[] | null;
           }[],
         };
     const rolesMap = new Map(
@@ -79,7 +79,9 @@ export async function GET(request: Request) {
         row.user_id,
         {
           role: row.role,
-          inviteCode: row.invite_codes?.code || null,
+          inviteCode: Array.isArray(row.invite_codes)
+            ? row.invite_codes[0]?.code || null
+            : row.invite_codes?.code || null,
         },
       ])
     );

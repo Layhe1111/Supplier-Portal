@@ -112,16 +112,19 @@ const resolveUsersByAudience = async (
   return users;
 };
 
+type NotificationPreference = {
+  notify_email: boolean;
+  notify_sms: boolean;
+  notify_email_address: string | null;
+};
+
 const loadPreferences = async (userIds: string[]) => {
-  if (userIds.length === 0) return new Map<string, { notify_email: boolean; notify_sms: boolean }>();
+  if (userIds.length === 0) return new Map<string, NotificationPreference>();
   const result = await supabaseAdmin
     .from('profiles')
     .select('user_id, notify_email, notify_sms, notify_email_address')
     .in('user_id', userIds);
-  const map = new Map<
-    string,
-    { notify_email: boolean; notify_sms: boolean; notify_email_address: string | null }
-  >();
+  const map = new Map<string, NotificationPreference>();
   (result.data || []).forEach((row) => {
     map.set(row.user_id, {
       notify_email: row.notify_email ?? true,

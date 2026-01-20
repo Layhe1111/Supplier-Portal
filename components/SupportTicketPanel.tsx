@@ -163,7 +163,7 @@ export default function SupportTicketPanel({
       if (!res.ok) {
         throw new Error(body.error || 'Failed to load ticket');
       }
-      const list = (body.tickets || []).map((item: any) => ({
+      const list: Ticket[] = (body.tickets || []).map((item: any) => ({
         id: item.id,
         subject: item.subject,
         category: item.category,
