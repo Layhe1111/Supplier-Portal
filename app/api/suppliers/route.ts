@@ -323,7 +323,6 @@ const saveDesigners = async (supplierId: string, designers: any[]) => {
     supplier_id: supplierId,
     name: toText(designer.name),
     experience: toText(designer.experience),
-    languages: toText(designer.languages),
     cv_path: toPath(designer.cv),
   }));
 
