@@ -18,6 +18,16 @@ const requireUser = async (request: Request) => {
   return { user: data.user };
 };
 
+const getUserRole = async (userId: string) => {
+  const { data, error } = await supabaseAdmin
+    .from('profiles')
+    .select('role')
+    .eq('user_id', userId)
+    .maybeSingle();
+  if (error) return 'user';
+  return data?.role || 'user';
+};
+
 const toNumberString = (value: number | null) =>
   value == null || Number.isNaN(value) ? '' : String(value);
 
@@ -43,11 +53,21 @@ export async function GET(request: Request) {
 
     const url = new URL(request.url);
     const typeParam = url.searchParams.get('type');
+    const userIdParam = url.searchParams.get('userId');
+    let targetUserId = auth.user.id;
+
+    if (userIdParam && userIdParam !== auth.user.id) {
+      const role = await getUserRole(auth.user.id);
+      if (role !== 'admin') {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
+      targetUserId = userIdParam;
+    }
 
     let supplierQuery = supabaseAdmin
       .from('suppliers')
       .select('id, supplier_type, status, submitted_at, updated_at')
-      .eq('user_id', auth.user.id);
+      .eq('user_id', targetUserId);
 
     if (typeParam) {
       supplierQuery = supplierQuery.eq('supplier_type', typeParam);
@@ -510,7 +530,7 @@ export async function GET(request: Request) {
           .eq('supplier_id', supplierId),
         supabaseAdmin
           .from('designers')
-          .select('id, name, experience, languages, cv_path, created_at')
+          .select('id, name, experience, cv_path, created_at')
           .eq('supplier_id', supplierId)
           .order('created_at', { ascending: true }),
       ]);

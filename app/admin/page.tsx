@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
+import { extractOriginalFilename } from '@/lib/sanitizeFilename';
 
 type Ticket = {
   id: string;
@@ -84,6 +85,12 @@ export default function AdminTicketsPage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [userQuery, setUserQuery] = useState('');
   const [userLoading, setUserLoading] = useState(false);
+  const [infoLoading, setInfoLoading] = useState(false);
+  const [infoLoadingUserId, setInfoLoadingUserId] = useState<string | null>(null);
+  const [infoOpen, setInfoOpen] = useState(false);
+  const [infoPayload, setInfoPayload] = useState<any | null>(null);
+  const [infoEmail, setInfoEmail] = useState<string>('');
+  const [fileLoadingPath, setFileLoadingPath] = useState<string | null>(null);
 
   const [inviteCodes, setInviteCodes] = useState<InviteCode[]>([]);
   const [inviteLoading, setInviteLoading] = useState(false);
@@ -97,6 +104,182 @@ export default function AdminTicketsPage() {
   const [notificationAudience, setNotificationAudience] = useState<'all' | 'user'>('all');
   const [notificationTargetEmail, setNotificationTargetEmail] = useState('');
   const [notificationTargetPhone, setNotificationTargetPhone] = useState('');
+
+  const infoSupplier = infoPayload?.supplier || null;
+  const infoStatus = infoPayload?.status || '';
+  const infoSupplierId = infoPayload?.supplierId || '';
+
+  const isProbablyUrl = (value: string) => /^https?:\/\//i.test(value);
+  const isProbablyStoragePath = (value: string) =>
+    !isProbablyUrl(value) && value.includes('/') && /\.[a-z0-9]{2,6}$/i.test(value);
+
+  const openFilePreview = async (path: string) => {
+    if (!path) return;
+    if (isProbablyUrl(path)) {
+      window.open(path, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    setFileLoadingPath(path);
+    try {
+      const token = await getToken();
+      if (!token) return;
+      const res = await fetch('/api/admin/storage/sign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ path }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(body.error || 'Failed to load file');
+      }
+      if (body.signedUrl) {
+        window.open(body.signedUrl, '_blank', 'noopener,noreferrer');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load file');
+    } finally {
+      setFileLoadingPath(null);
+    }
+  };
+
+  const renderFileItem = (path: string, index?: number) => {
+    const displayName = extractOriginalFilename(path);
+    const isLoading = fileLoadingPath === path;
+    return (
+      <div key={`${path}-${index ?? 0}`} className="flex items-center gap-2">
+        <span className="text-sm text-gray-700 break-all">{displayName || path}</span>
+        <button
+          type="button"
+          onClick={() => openFilePreview(path)}
+          className="text-xs underline text-gray-600"
+          disabled={isLoading}
+        >
+          {isLoading ? 'Loading...' : 'Preview'}
+        </button>
+      </div>
+    );
+  };
+
+  const renderValue = (value: unknown) => {
+    if (value == null) return <span className="text-gray-400">-</span>;
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      if (!trimmed) return <span className="text-gray-400">-</span>;
+      if (isProbablyStoragePath(trimmed)) {
+        return renderFileItem(trimmed);
+      }
+      if (isProbablyUrl(trimmed)) {
+        return (
+          <a
+            href={trimmed}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-blue-600 underline break-all"
+          >
+            {trimmed}
+          </a>
+        );
+      }
+      return trimmed;
+    }
+    if (typeof value === 'number') return String(value);
+    if (typeof value === 'boolean') return value ? 'Yes' : 'No';
+    if (Array.isArray(value)) {
+      const items = value.filter((item) => item != null && String(item).trim().length > 0);
+      if (items.length === 0) return <span className="text-gray-400">-</span>;
+      const allStrings = items.every((item) => typeof item === 'string');
+      if (allStrings) {
+        const stringItems = items as string[];
+        const allFiles = stringItems.every((item) => isProbablyStoragePath(item));
+        if (allFiles) {
+          return <div className="space-y-1">{stringItems.map(renderFileItem)}</div>;
+        }
+        const allUrls = stringItems.every((item) => isProbablyUrl(item));
+        if (allUrls) {
+          return (
+            <ul className="list-disc pl-4 space-y-1">
+              {stringItems.map((item, idx) => (
+                <li key={`${item}-${idx}`}>
+                  <a
+                    href={item}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 underline break-all"
+                  >
+                    {item}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          );
+        }
+      }
+      return (
+        <ul className="list-disc pl-4 space-y-1">
+          {items.map((item, idx) => (
+            <li key={`${String(item)}-${idx}`} className="text-sm text-gray-700 break-words">
+              {String(item)}
+            </li>
+          ))}
+        </ul>
+      );
+    }
+    return String(value);
+  };
+
+  const renderField = (label: string, value: unknown) => {
+    return (
+      <div key={label} className="grid grid-cols-[160px_minmax(0,1fr)] gap-3 py-2 border-b border-gray-100">
+        <div className="text-[11px] uppercase tracking-wide text-gray-400">{label}</div>
+        <div className="text-sm text-gray-700 break-words">{renderValue(value)}</div>
+      </div>
+    );
+  };
+
+  const renderSection = (title: string, fields: Array<[string, unknown]>) => {
+    const rows = fields.map(([label, value]) => renderField(label, value));
+    return (
+      <section className="space-y-1">
+        <h3 className="text-sm font-medium text-gray-900">{title}</h3>
+        <div className="border border-gray-100">{rows}</div>
+      </section>
+    );
+  };
+
+  const renderItemFields = (fields: Array<[string, unknown]>) => (
+    <div className="space-y-1">
+      {fields.map(([label, value]) => (
+        <div key={label} className="grid grid-cols-[140px_minmax(0,1fr)] gap-3 py-1">
+          <div className="text-[11px] uppercase tracking-wide text-gray-400">{label}</div>
+          <div className="text-sm text-gray-700 break-words">{renderValue(value)}</div>
+        </div>
+      ))}
+    </div>
+  );
+
+  const renderListSection = (
+    title: string,
+    items: any[] | undefined,
+    renderItem: (item: any, index: number) => ReactNode
+  ) => {
+    const safeItems = Array.isArray(items) ? items : [];
+    return (
+      <section className="space-y-2">
+        <h3 className="text-sm font-medium text-gray-900">{title}</h3>
+        {safeItems.length > 0 ? (
+          <div className="space-y-3">
+            {safeItems.map((item, index) => (
+              <div key={item.id || index} className="border border-gray-100 p-3">
+                {renderItem(item, index)}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="border border-gray-100 p-3 text-sm text-gray-400">-</div>
+        )}
+      </section>
+    );
+  };
 
   const selectedTicket = useMemo(
     () => tickets.find((ticket) => ticket.id === selectedId) || null,
@@ -217,6 +400,36 @@ export default function AdminTicketsPage() {
       return;
     }
     setUsers((prev) => prev.map((user) => (user.id === userId ? { ...user, role } : user)));
+  };
+
+  const openUserInfo = async (userId: string, email?: string | null) => {
+    setInfoLoading(true);
+    setInfoLoadingUserId(userId);
+    setInfoPayload(null);
+    setInfoEmail(email || '');
+    const token = await getToken();
+    if (!token) {
+      setInfoLoading(false);
+      setInfoLoadingUserId(null);
+      return;
+    }
+    try {
+      const params = new URLSearchParams({ userId });
+      const res = await fetch(`/api/suppliers/me?${params.toString()}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(body.error || 'Failed to load user information');
+      }
+      setInfoPayload(body);
+      setInfoOpen(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load user information');
+    } finally {
+      setInfoLoading(false);
+      setInfoLoadingUserId(null);
+    }
   };
 
   const loadInviteCodes = async () => {
@@ -567,6 +780,7 @@ export default function AdminTicketsPage() {
                       <th className="py-2">Invite</th>
                       <th className="py-2">Last Sign-in</th>
                       <th className="py-2">Created</th>
+                      <th className="py-2">Information</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -596,10 +810,364 @@ export default function AdminTicketsPage() {
                         <td className="py-2 text-xs text-gray-500">
                           {user.createdAt ? new Date(user.createdAt).toLocaleString() : '-'}
                         </td>
+                        <td className="py-2">
+                          <button
+                            type="button"
+                            onClick={() => openUserInfo(user.id, user.email)}
+                            className="text-xs underline"
+                            disabled={infoLoadingUserId === user.id}
+                          >
+                            {infoLoadingUserId === user.id ? 'Loading...' : 'Open'}
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+              </div>
+            )}
+            {infoOpen && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+                <div className="w-full max-w-3xl bg-white border border-gray-200 shadow-lg">
+                  <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">User Information</p>
+                      <p className="text-xs text-gray-500">{infoEmail || 'Unknown user'}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setInfoOpen(false)}
+                      className="text-sm text-gray-600 hover:text-gray-900"
+                    >
+                      Close
+                    </button>
+                  </div>
+                  <div className="max-h-[70vh] overflow-y-auto px-4 py-3">
+                    {infoSupplier ? (
+                      <div className="space-y-6">
+                        {renderSection('Overview', [
+                          ['Supplier Type', infoSupplier.supplierType],
+                          ['Status', infoStatus],
+                          ['Supplier ID', infoSupplierId],
+                        ])}
+
+                        {infoSupplier.supplierType === 'basic' && (
+                          <>
+                            {renderSection('Basic Supplier Info', [
+                              ['Company Name', infoSupplier.companyName],
+                              ['Company Name (ZH)', infoSupplier.companyNameChinese],
+                              ['Country', infoSupplier.country],
+                              ['Office Address', infoSupplier.officeAddress],
+                              ['Business Type', infoSupplier.businessType],
+                              ['Submitter Name', infoSupplier.submitterName],
+                              ['Submitter Position', infoSupplier.submitterPosition],
+                              [
+                                'Submitter Phone',
+                                [infoSupplier.submitterPhoneCode, infoSupplier.submitterPhone]
+                                  .filter(Boolean)
+                                  .join(' '),
+                              ],
+                              ['Submitter Email', infoSupplier.submitterEmail],
+                              ['Contact Fax', infoSupplier.contactFax],
+                              ['Business Description', infoSupplier.businessDescription],
+                              ['Company Supplement Link', infoSupplier.companySupplementLink],
+                              ['Company Logo', infoSupplier.companyLogo],
+                              ['Submission Date', infoSupplier.submissionDate],
+                            ])}
+                          </>
+                        )}
+
+                        {infoSupplier.supplierType !== 'basic' && (
+                          <>
+                            {renderSection('Company Profile', [
+                              ['Company Name', infoSupplier.companyName],
+                              ['Company Name (ZH)', infoSupplier.companyNameChinese],
+                              ['Year Established', infoSupplier.yearEstablished],
+                              ['Registered Capital', infoSupplier.registeredCapital],
+                              ['Country', infoSupplier.country],
+                              ['Office Address', infoSupplier.officeAddress],
+                              ['Business Type', infoSupplier.businessType],
+                              ['Business Type (ZH)', infoSupplier.businessTypeZh],
+                              ['Business Description', infoSupplier.businessDescription],
+                              ['HK Work Eligible Employees', infoSupplier.hkWorkEligibleEmployees],
+                              ['Company Supplement File', infoSupplier.companySupplementFile],
+                              ['Company Supplement Link', infoSupplier.companySupplementLink],
+                            ])}
+
+                            {renderSection('Registration & Contact', [
+                              ['HK Business Registration No.', infoSupplier.hkBusinessRegistrationNumber],
+                              ['CN Business Registration No.', infoSupplier.cnBusinessRegistrationNumber],
+                              ['CN Unified Social Credit Code', infoSupplier.cnUnifiedSocialCreditCode],
+                              ['Submitter Name', infoSupplier.submitterName],
+                              ['Submitter Position', infoSupplier.submitterPosition],
+                              [
+                                'Submitter Phone',
+                                [infoSupplier.submitterPhoneCode, infoSupplier.submitterPhone]
+                                  .filter(Boolean)
+                                  .join(' '),
+                              ],
+                              ['Submitter Email', infoSupplier.submitterEmail],
+                              ['Contact Fax', infoSupplier.contactFax],
+                              ['Submission Date', infoSupplier.submissionDate],
+                            ])}
+
+                            {renderSection('Documents & Commitments', [
+                              ['Business Registration', infoSupplier.businessRegistration],
+                              ['Company Photos', infoSupplier.companyPhotos],
+                              ['Company Logo', infoSupplier.companyLogo],
+                              ['Guarantee Info True', infoSupplier.guaranteeInfoTrue],
+                              ['Accept Quality Supervision', infoSupplier.acceptQualitySupervision],
+                              ['Agree Info Sharing', infoSupplier.agreeInfoSharing],
+                            ])}
+                          </>
+                        )}
+
+                        {infoSupplier.supplierType === 'contractor' && (
+                          <>
+                            {renderSection('Certifications', [
+                              ['Construction Grade', infoSupplier.constructionGrade],
+                              ['License Number', infoSupplier.licenseNumber],
+                              ['Certificate Upload', infoSupplier.certificateUpload],
+                              ['ISO Certifications', infoSupplier.isocertifications],
+                              ['ISO Certificate Uploads', infoSupplier.isoCertificateUploads ? Object.entries(infoSupplier.isoCertificateUploads).map(([iso, file]) => `${iso}: ${file || '-'}`) : []],
+                              ['Other Certifications', infoSupplier.otherCertifications?.map((item: any) => item.name)],
+                            ])}
+
+                            {renderSection('Construction Capability', [
+                              ['Project Types', infoSupplier.projectTypes],
+                              ['Annual Construction Capacity', infoSupplier.annualConstructionCapacity],
+                              ['Max Concurrent Projects', infoSupplier.maxConcurrentProjects],
+                              ['Largest Project Value', infoSupplier.largestProjectValue],
+                            ])}
+
+                            {renderListSection('Project Highlights', infoSupplier.projectHighlights, (item) =>
+                              renderItemFields([
+                                ['Project Name', item.projectName],
+                                ['Year', item.year],
+                                ['Address', item.address],
+                                ['Area', item.area],
+                                ['Renovation Type', item.renovationType],
+                                ['Project Types', item.projectTypes],
+                                ['Highlight', item.projectHighlight],
+                                ['Photos', item.photos],
+                              ])
+                            )}
+
+                            {renderListSection('Project Managers', infoSupplier.projectManagers, (item) =>
+                              renderItemFields([
+                                ['Name', item.name],
+                                ['Years Experience', item.yearsExperience],
+                                ['Languages', item.languages],
+                                ['Main Project', item.mainProject],
+                                ['Year', item.year],
+                                ['Address', item.address],
+                                ['Area', item.area],
+                                ['CV', item.cv],
+                                ['Projects', item.projects?.map((p: any) => p.projectName)],
+                              ])
+                            )}
+
+                            {renderSection('Personnel', [
+                              ['Organization Chart', infoSupplier.organizationChart],
+                              ['Has Safety Officer', infoSupplier.hasSafetyOfficer],
+                              ['Number of Safety Officers', infoSupplier.numberOfSafetyOfficers],
+                              ['Has Construction Manager', infoSupplier.hasConstructionManager],
+                              ['Number of Construction Managers', infoSupplier.numberOfConstructionManagers],
+                              ['Has MEP Lead', infoSupplier.hasMepLead],
+                              ['Number of MEP Leads', infoSupplier.numberOfMepLeads],
+                              ['CN/HK Project Compliance', infoSupplier.cnHkProjectCompliance],
+                            ])}
+
+                            {renderListSection('Insurances', infoSupplier.insurances, (item) =>
+                              renderItemFields([
+                                ['Type', item.type],
+                                ['Provider', item.provider],
+                                ['Expiry Date', item.expiryDate],
+                                ['File', item.file],
+                              ])
+                            )}
+
+                            {renderSection('Compliance & Governance', [
+                              ['Has Environmental Health & Safety', infoSupplier.hasEnvironmentalHealthSafety],
+                              ['Environmental Health & Safety File', infoSupplier.environmentalHealthSafetyFile],
+                              ['Has Incidents Past 3 Years', infoSupplier.hasIncidentsPast3Years],
+                              ['Incident Report File', infoSupplier.incidentsFile],
+                              ['Has Litigation Past 3 Years', infoSupplier.hasLitigationPast3Years],
+                              ['Litigation Report File', infoSupplier.litigationFile],
+                            ])}
+                          </>
+                        )}
+
+                        {infoSupplier.supplierType === 'designer' && (
+                          <>
+                            {renderSection('Design Company Overview', [
+                              ['Design Awards', infoSupplier.designAwards],
+                              ['Design Team Size', infoSupplier.designTeamSize],
+                              ['Fee Structure', infoSupplier.feeStructure],
+                              ['Design Highlights', infoSupplier.designHighlights?.map((item: any) => item.projectName)],
+                            ])}
+
+                            {renderSection('Design Specialization', [
+                              ['Design Styles', infoSupplier.designStyles],
+                              ['Project Types', infoSupplier.projectTypes],
+                              ['BIM Capability', infoSupplier.bimCapability],
+                              ['Main Software', infoSupplier.mainSoftware],
+                            ])}
+
+                            {renderListSection('Design Highlights', infoSupplier.designHighlights, (item) =>
+                              renderItemFields([
+                                ['Project Name', item.projectName],
+                                ['Year', item.year],
+                                ['Address', item.address],
+                                ['Area', item.area],
+                                ['Renovation Type', item.renovationType],
+                                ['Project Types', item.projectTypes],
+                                ['Highlight', item.projectHighlight],
+                                ['Photos', item.photos],
+                              ])
+                            )}
+
+                            {renderListSection('Designers', infoSupplier.designers, (item) =>
+                              renderItemFields([
+                                ['Name', item.name],
+                                ['Experience', item.experience],
+                                ['Languages', item.languages],
+                                ['CV', item.cv],
+                                ['Projects', item.projects?.map((p: any) => p.projectName)],
+                              ])
+                            )}
+
+                            {renderSection('Design & Build Capability', [
+                              ['Can Do Design Build', infoSupplier.canDoDesignBuild],
+                              ['Organization Chart', infoSupplier.organizationChart],
+                            ])}
+
+                            {renderSection('DB Contractor Info', [
+                              ['DB Construction Grade', infoSupplier.dbConstructionGrade],
+                              ['DB License Number', infoSupplier.dbLicenseNumber],
+                              ['DB Certificate Upload', infoSupplier.dbCertificateUpload],
+                              ['DB ISO Certifications', infoSupplier.dbIsocertifications],
+                              ['DB ISO Certificate Uploads', infoSupplier.dbIsoCertificateUploads ? Object.entries(infoSupplier.dbIsoCertificateUploads).map(([iso, file]) => `${iso}: ${file || '-'}`) : []],
+                              ['DB Other Certifications', infoSupplier.dbOtherCertifications?.map((item: any) => item.name)],
+                              ['DB Project Types', infoSupplier.dbProjectTypes],
+                              ['DB Annual Construction Capacity', infoSupplier.dbAnnualConstructionCapacity],
+                              ['DB Max Concurrent Projects', infoSupplier.dbMaxConcurrentProjects],
+                              ['DB Largest Project Value', infoSupplier.dbLargestProjectValue],
+                              ['DB Organization Chart', infoSupplier.dbOrganizationChart],
+                              ['DB Has Safety Officer', infoSupplier.dbHasSafetyOfficer],
+                              ['DB Number of Safety Officers', infoSupplier.dbNumberOfSafetyOfficers],
+                              ['DB Has Construction Manager', infoSupplier.dbHasConstructionManager],
+                              ['DB Number of Construction Managers', infoSupplier.dbNumberOfConstructionManagers],
+                              ['DB Has MEP Lead', infoSupplier.dbHasMepLead],
+                              ['DB Number of MEP Leads', infoSupplier.dbNumberOfMepLeads],
+                              ['DB CN/HK Project Compliance', infoSupplier.dbCnHkProjectCompliance],
+                              ['DB Has Environmental Health & Safety', infoSupplier.dbHasEnvironmentalHealthSafety],
+                              ['DB Environmental Health & Safety File', infoSupplier.dbEnvironmentalHealthSafetyFile],
+                              ['DB Has Incidents Past 3 Years', infoSupplier.dbHasIncidentsPast3Years],
+                              ['DB Incident Report File', infoSupplier.dbIncidentsFile],
+                              ['DB Has Litigation Past 3 Years', infoSupplier.dbHasLitigationPast3Years],
+                              ['DB Litigation Report File', infoSupplier.dbLitigationFile],
+                            ])}
+
+                            {renderListSection('DB Project Highlights', infoSupplier.dbProjectHighlights, (item) =>
+                              renderItemFields([
+                                ['Project Name', item.projectName],
+                                ['Year', item.year],
+                                ['Address', item.address],
+                                ['Area', item.area],
+                                ['Renovation Type', item.renovationType],
+                                ['Project Types', item.projectTypes],
+                                ['Highlight', item.projectHighlight],
+                                ['Photos', item.photos],
+                              ])
+                            )}
+
+                            {renderListSection('DB Project Managers', infoSupplier.dbProjectManagers, (item) =>
+                              renderItemFields([
+                                ['Name', item.name],
+                                ['Years Experience', item.yearsExperience],
+                                ['Languages', item.languages],
+                                ['Main Project', item.mainProject],
+                                ['Year', item.year],
+                                ['Address', item.address],
+                                ['Area', item.area],
+                                ['CV', item.cv],
+                                ['Projects', item.projects?.map((p: any) => p.projectName)],
+                              ])
+                            )}
+
+                            {renderListSection('DB Insurances', infoSupplier.dbInsurances, (item) =>
+                              renderItemFields([
+                                ['Type', item.type],
+                                ['Provider', item.provider],
+                                ['Expiry Date', item.expiryDate],
+                                ['File', item.file],
+                              ])
+                            )}
+                          </>
+                        )}
+
+                        {infoSupplier.supplierType === 'material' && (
+                          <>
+                            {renderSection('Material Supplier Details', [
+                              ['Company Type', infoSupplier.companyType],
+                              ['Represented Brands', infoSupplier.representedBrands],
+                              ['Company Supplement File', infoSupplier.companySupplementFile],
+                              ['Company Supplement Link', infoSupplier.companySupplementLink],
+                              ['Sample Provided', infoSupplier.sampleProvided],
+                              ['Sample Cost', infoSupplier.sampleCost],
+                              ['Sample Delivery Time', infoSupplier.sampleDeliveryTime],
+                              ['Free Shipping To HK', infoSupplier.freeShippingToHK],
+                            ])}
+
+                            {renderListSection('Warehouses', infoSupplier.warehouses, (item) =>
+                              renderItemFields([
+                                ['Address', item.address],
+                                ['Capacity', item.capacity],
+                              ])
+                            )}
+
+                            {renderListSection('Products', infoSupplier.products, (item) =>
+                              renderItemFields([
+                                ['SKU', item.sku],
+                                ['Product Name', item.productName],
+                                ['Category', item.category],
+                                ['Brand', item.brand],
+                                ['Series', item.series],
+                                ['Specification', item.spec],
+                                ['Material', item.material],
+                                ['Unit Price', item.unitPrice],
+                                ['MOQ', item.moq],
+                                ['Origin', item.origin],
+                                ['Lead Time', item.leadTime],
+                                ['Current Stock', item.currentStock],
+                                ['Photos', item.photos],
+                                ['Specification File', item.specificationFile],
+                                ['Specification Link', item.specificationLink],
+                                ['3D Model', item.model3D],
+                              ])
+                            )}
+
+                            {renderListSection('Project Highlights', infoSupplier.projectHighlights, (item) =>
+                              renderItemFields([
+                                ['Project Name', item.projectName],
+                                ['Year', item.year],
+                                ['Address', item.address],
+                                ['Area', item.area],
+                                ['Renovation Type', item.renovationType],
+                                ['Project Types', item.projectTypes],
+                                ['Highlight', item.projectHighlight],
+                                ['Photos', item.photos],
+                              ])
+                            )}
+                          </>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500">No information available.</p>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
           </div>
