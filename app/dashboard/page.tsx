@@ -65,6 +65,11 @@ export default function DashboardPage() {
 
         if (!meRes.ok) {
           const body = await meRes.json().catch(() => ({}));
+          if (meRes.status === 401 || String(body.error || '').includes('Invalid auth token')) {
+            await supabase.auth.signOut({ scope: 'local' });
+            router.replace('/');
+            return;
+          }
           throw new Error(body.error || 'Failed to load supplier data');
         }
 

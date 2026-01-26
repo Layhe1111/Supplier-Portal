@@ -11,6 +11,7 @@ interface FormInputProps {
   onBlur?: (value: string) => void;
   className?: string;
   min?: string;
+  useThousandsSeparator?: boolean;
 }
 
 const normalizeNumericInput = (input: string) => {
@@ -48,10 +49,21 @@ export default function FormInput({
   onBlur,
   className = '',
   min,
+  useThousandsSeparator,
 }: FormInputProps) {
   const isNumberInput = type === 'number';
+  const isYearField =
+    /year/i.test(name) ||
+    /year/i.test(label) ||
+    /年份/.test(label);
+  const allowThousandsSeparator =
+    isNumberInput && (useThousandsSeparator ?? !isYearField);
   const normalizedValue = isNumberInput ? normalizeNumericInput(value) : value;
-  const displayValue = isNumberInput ? formatWithCommas(normalizedValue) : value;
+  const displayValue = isNumberInput
+    ? allowThousandsSeparator
+      ? formatWithCommas(normalizedValue)
+      : normalizedValue
+    : value;
   const handleChange = (nextValue: string) => {
     if (!isNumberInput) {
       onChange(nextValue);

@@ -68,6 +68,7 @@ export default function BasicSupplierRegistrationPage() {
     submitterPhone: '',
     submitterPhoneCode: '+852',
     submitterEmail: '',
+    contactFaxCode: '+852',
     contactFax: '',
     businessDescription: '',
     companySupplementLink: '',
@@ -168,6 +169,20 @@ export default function BasicSupplierRegistrationPage() {
         if (normalized.submitterEmail == null) {
           normalized.submitterEmail = '';
           changed = true;
+        }
+
+        if (normalized.contactFaxCode == null) {
+          normalized.contactFaxCode = '+852';
+          changed = true;
+        }
+
+        if (typeof normalized.contactFax === 'string' && normalized.contactFax.trim()) {
+          const match = normalized.contactFax.trim().match(/^(\+\d+)\s*(.*)$/);
+          if (match) {
+            normalized.contactFaxCode = match[1];
+            normalized.contactFax = match[2].trim();
+            changed = true;
+          }
         }
 
         if (typeof normalized.submissionDate === 'string' && normalized.submissionDate.includes('T')) {
@@ -571,13 +586,31 @@ export default function BasicSupplierRegistrationPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormInput
-                label="Contact Fax / 聯絡傳真"
-                name="contactFax"
-                value={formData.contactFax || ''}
-                onChange={(value) => handleInputChange('contactFax', value)}
-                placeholder="Enter fax number"
-              />
+              <div>
+                <label className="block text-sm font-light text-gray-700 mb-1">
+                  Contact Fax / 聯絡傳真
+                </label>
+                <div className="flex gap-2">
+                  <select
+                    value={formData.contactFaxCode || '+852'}
+                    onChange={(e) => handleInputChange('contactFaxCode', e.target.value)}
+                    className="w-28 px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+                  >
+                    {PHONE_CODE_OPTIONS.map((code) => (
+                      <option key={code} value={code}>
+                        {code}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    type="tel"
+                    value={formData.contactFax || ''}
+                    onChange={(e) => handleInputChange('contactFax', e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+                    placeholder="Enter fax number"
+                  />
+                </div>
+              </div>
             </div>
           </FormSection>
 

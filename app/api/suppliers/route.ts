@@ -102,6 +102,18 @@ const toPathList = (value: unknown) => {
   return single ? [single] : [];
 };
 
+const hasAnyPath = (value: unknown) => {
+  if (Array.isArray(value)) return toPathArray(value).length > 0;
+  return Boolean(toPath(value));
+};
+
+const toFax = (code: unknown, number: unknown) => {
+  const faxNumber = toText(number);
+  if (!faxNumber) return null;
+  const faxCode = toText(code);
+  return faxCode ? `${faxCode} ${faxNumber}` : faxNumber;
+};
+
 const getFileName = (path: string) => {
   const parts = path.split('/');
   return parts[parts.length - 1] || null;
@@ -131,6 +143,9 @@ const toFloat = (value: unknown) => {
 
 const hasAnyText = (...values: unknown[]) =>
   values.some((value) => typeof value === 'string' && value.trim().length > 0);
+
+const hasAnyList = (value: unknown) =>
+  Array.isArray(value) && value.some((item) => typeof item === 'string' && item.trim().length > 0);
 
 const requireUser = async (request: Request) => {
   const authHeader = request.headers.get('authorization') || '';
@@ -192,14 +207,19 @@ const saveProjectHighlights = async (
   projects: any[]
 ) => {
   const filtered = (projects || [])
-    .filter((project) =>
-      hasAnyText(
+    .filter((project) => {
+      const hasText = hasAnyText(
         project?.projectName,
         project?.year,
         project?.address,
-        project?.area
-      )
-    )
+        project?.area,
+        project?.renovationType
+      );
+      const hasTypes = hasAnyList(project?.projectTypes);
+      const hasPhotos = hasAnyPath(project?.photos);
+      const isHighlight = Boolean(project?.projectHighlight);
+      return hasText || hasTypes || hasPhotos || isHighlight;
+    })
     .map((project) => ({
       project,
       row: {
@@ -289,7 +309,16 @@ const saveProjectManagers = async (
   managerIds.forEach((row, index) => {
     const projects = managers[index]?.projects || [];
     projects.forEach((project: any) => {
-      if (!hasAnyText(project?.projectName, project?.clientName, project?.year)) return;
+      if (
+        !hasAnyText(
+          project?.projectName,
+          project?.clientName,
+          project?.year,
+          project?.buildingName,
+          project?.area
+        )
+      )
+        return;
       projectRows.push({
         supplier_id: supplierId,
         project_manager_id: row.id,
@@ -338,7 +367,17 @@ const saveDesigners = async (supplierId: string, designers: any[]) => {
   designerIds.forEach((row, index) => {
     const projects = designers[index]?.projects || [];
     projects.forEach((project: any) => {
-      if (!hasAnyText(project?.projectName, project?.year, project?.address)) return;
+      const hasText = hasAnyText(
+        project?.projectName,
+        project?.year,
+        project?.address,
+        project?.area,
+        project?.renovationType
+      );
+      const hasTypes = hasAnyList(project?.projectTypes);
+      const hasPhotos = hasAnyPath(project?.photos);
+      const isHighlight = Boolean(project?.projectHighlight);
+      if (!hasText && !hasTypes && !hasPhotos && !isHighlight) return;
       projectRows.push({
         supplier_id: supplierId,
         designer_id: row.id,
@@ -412,14 +451,15 @@ const saveCertifications = async (
   if (Array.isArray(otherCerts)) {
     otherCerts.forEach((cert) => {
       const name = toText(typeof cert === 'string' ? cert : cert?.name);
-      if (!name) return;
+      const filePath = toPath(typeof cert === 'object' ? cert?.file : null);
+      if (!name && !filePath) return;
       rows.push({
         supplier_id: supplierId,
         scope,
         cert_type: 'other',
         iso_code: null,
         name,
-        file_path: toPath(typeof cert === 'object' ? cert?.file : null),
+        file_path: filePath,
       });
     });
   }
@@ -434,7 +474,8 @@ const saveInsurances = async (
 ) => {
   const rows = (Array.isArray(insurances) ? insurances : [])
     .filter((insurance) =>
-      hasAnyText(insurance?.type, insurance?.provider, insurance?.expiryDate)
+      hasAnyText(insurance?.type, insurance?.provider, insurance?.expiryDate) ||
+      hasAnyPath(insurance?.file)
     )
     .map((insurance) => ({
       supplier_id: supplierId,
@@ -682,7 +723,7 @@ export async function POST(request: Request) {
       contact_phone_code: toText(payload.submitterPhoneCode),
       contact_phone: toText(payload.submitterPhone),
       contact_email: toText(payload.submitterEmail),
-      contact_fax: toText(payload.contactFax),
+      contact_fax: toFax(payload.contactFaxCode, payload.contactFax),
       submission_date: toText(payload.submissionDate),
     };
     ensureOk(

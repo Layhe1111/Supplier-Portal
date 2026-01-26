@@ -158,7 +158,11 @@ export default function FileUpload({
           htmlFor={name}
           className="cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-light text-gray-700 bg-white hover:bg-gray-50 focus:outline-none transition-colors"
         >
-          {uploading ? 'Uploading...' : 'Choose File / 選擇文件'}
+          {uploading
+            ? 'Uploading...'
+            : fileName
+              ? 'Change File / 修改文件'
+              : 'Choose File / 選擇文件'}
         </label>
         <span className="ml-3 text-sm text-gray-500 truncate">
           {fileName ? (

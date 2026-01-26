@@ -46,6 +46,19 @@ const toYesNo = (value: boolean | null) => {
 
 const toDateString = (value: unknown) => (typeof value === 'string' ? value : '');
 
+const splitFax = (value: unknown) => {
+  if (typeof value !== 'string') {
+    return { code: '+852', number: '' };
+  }
+  const trimmed = value.trim();
+  if (!trimmed) return { code: '+852', number: '' };
+  const match = trimmed.match(/^(\+\d+)\s*(.*)$/);
+  if (match) {
+    return { code: match[1], number: match[2].trim() };
+  }
+  return { code: '+852', number: trimmed };
+};
+
 export async function GET(request: Request) {
   try {
     const auth = await requireUser(request);
@@ -367,6 +380,7 @@ export async function GET(request: Request) {
 
     const submissionDate =
       toDateString(contact.submission_date) || new Date().toISOString().split('T')[0];
+    const fax = splitFax(contact.contact_fax);
 
     const baseCompanyName =
       toText(company.company_name_en) || toText(company.company_name_zh);
@@ -385,7 +399,8 @@ export async function GET(request: Request) {
       submitterPhoneCode: toText(contact.contact_phone_code) || '+852',
       submitterPhone: toText(contact.contact_phone),
       submitterEmail: toText(contact.contact_email),
-      contactFax: toText(contact.contact_fax),
+      contactFaxCode: fax.code,
+      contactFax: fax.number,
       submissionDate,
     });
 
@@ -402,7 +417,8 @@ export async function GET(request: Request) {
         submitterPhone: toText(contact.contact_phone),
         submitterPhoneCode: toText(contact.contact_phone_code) || '+852',
         submitterEmail: toText(contact.contact_email),
-        contactFax: toText(contact.contact_fax),
+        contactFaxCode: fax.code,
+        contactFax: fax.number,
         businessDescription: toText(company.business_description),
         companySupplementLink: toText(company.company_supplement_link),
         companyLogo: company.company_logo_path ?? null,

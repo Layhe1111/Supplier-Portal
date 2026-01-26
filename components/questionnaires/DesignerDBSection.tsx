@@ -83,10 +83,11 @@ export default function DesignerDBSection({
   const isChina = data.country === 'China';
   const [showAutofillDialog, setShowAutofillDialog] = React.useState(false);
   const [autofillSource, setAutofillSource] = React.useState<DesignerProject | null>(null);
-  const [autofillTarget, setAutofillTarget] = React.useState<{
-    pmIndex: number;
-    projectIndex: number;
-  } | null>(null);
+  const [autofillTarget, setAutofillTarget] = React.useState<
+    | { type: 'dbHighlight'; projectId: string }
+    | { type: 'dbPmProject'; pmIndex: number; projectIndex: number }
+    | null
+  >(null);
 
   const toggleDbIsoCertification = (isoValue: string) => {
     const current = data.dbIsocertifications || [];
@@ -188,34 +189,85 @@ export default function DesignerDBSection({
     );
   };
 
+  const findDesignerProjectByName = (projectName: string, excludeId?: string) => {
+    const trimmedName = projectName.trim().toLowerCase();
+    if (!trimmedName) return null;
+
+    const highlightMatch = (data.designHighlights || []).find(
+      (project) =>
+        project.id !== excludeId && project.projectName.trim().toLowerCase() === trimmedName
+    );
+    if (highlightMatch) return highlightMatch;
+
+    for (const designer of data.designers || []) {
+      const projectMatch = designer.projects.find(
+        (project) =>
+          project.id !== excludeId && project.projectName.trim().toLowerCase() === trimmedName
+      );
+      if (projectMatch) return projectMatch;
+    }
+
+    return null;
+  };
+
+  const handleDbHighlightNameBlur = (projectName: string, projectId: string) => {
+    if (!projectName || projectName.trim() === '') return;
+    const existingProject = findDesignerProjectByName(projectName, projectId);
+    if (!existingProject) return;
+    setAutofillSource(existingProject);
+    setAutofillTarget({ type: 'dbHighlight', projectId });
+    setShowAutofillDialog(true);
+  };
+
   const handleProjectNameBlur = (
     pmIndex: number,
     projectIndex: number,
     projectName: string
   ) => {
+    if (!projectName || projectName.trim() === '') return;
     const highlight = findDbHighlightByName(projectName);
-    if (!highlight) return;
-    setAutofillSource(highlight);
-    setAutofillTarget({ pmIndex, projectIndex });
+    const existingProject = highlight || findDesignerProjectByName(projectName);
+    if (!existingProject) return;
+    setAutofillSource(existingProject);
+    setAutofillTarget({ type: 'dbPmProject', pmIndex, projectIndex });
     setShowAutofillDialog(true);
   };
 
   const handleAutofillConfirm = () => {
     if (!autofillSource || !autofillTarget) return;
-    const updated = [...(data.dbProjectManagers || [])];
-    const manager = updated[autofillTarget.pmIndex];
-    if (!manager) return;
-    const updatedProjects = [...(manager.projects || [])];
-    const target = updatedProjects[autofillTarget.projectIndex];
-    if (!target) return;
-    updatedProjects[autofillTarget.projectIndex] = {
-      ...target,
-      year: autofillSource.year,
-      buildingName: autofillSource.address,
-      area: autofillSource.area,
-    };
-    updated[autofillTarget.pmIndex] = { ...manager, projects: updatedProjects };
-    onChange('dbProjectManagers', updated as ProjectManager[]);
+
+    if (autofillTarget.type === 'dbHighlight') {
+      const updatedHighlights = (data.dbProjectHighlights || []).map((project) =>
+        project.id === autofillTarget.projectId
+          ? {
+              ...project,
+              year: autofillSource.year,
+              address: autofillSource.address,
+              area: autofillSource.area,
+              renovationType: autofillSource.renovationType,
+              projectTypes: autofillSource.projectTypes,
+              photos: autofillSource.photos,
+            }
+          : project
+      );
+      onChange('dbProjectHighlights', updatedHighlights);
+    } else if (autofillTarget.type === 'dbPmProject') {
+      const updated = [...(data.dbProjectManagers || [])];
+      const manager = updated[autofillTarget.pmIndex];
+      if (!manager) return;
+      const updatedProjects = [...(manager.projects || [])];
+      const target = updatedProjects[autofillTarget.projectIndex];
+      if (!target) return;
+      updatedProjects[autofillTarget.projectIndex] = {
+        ...target,
+        year: autofillSource.year,
+        buildingName: autofillSource.address,
+        area: autofillSource.area,
+      };
+      updated[autofillTarget.pmIndex] = { ...manager, projects: updatedProjects };
+      onChange('dbProjectManagers', updated as ProjectManager[]);
+    }
+
     setShowAutofillDialog(false);
     setAutofillSource(null);
     setAutofillTarget(null);
@@ -456,6 +508,7 @@ export default function DesignerDBSection({
                       onChange={(v) =>
                         updateDbProjectHighlight(project.id, 'projectName', v)
                       }
+                      onBlur={(v) => handleDbHighlightNameBlur(v, project.id)}
                     />
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

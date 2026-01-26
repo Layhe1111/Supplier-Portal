@@ -368,18 +368,22 @@ export default function SignupPage() {
                 {/* Invitation Code */}
                 <div>
                   <label htmlFor="invitationCode" className="block text-sm font-light text-gray-700 mb-1">
-                    Invitation Code / 邀請碼（可選）
+                    Invitation Code (optional) / 邀請碼（可選）
                   </label>
                   <input
                     id="invitationCode"
                     name="invitationCode"
                     type="text"
                     className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 sm:text-sm"
-                    placeholder="Optional invitation code"
+                    placeholder="Optional invitation code (leave blank if none)"
                     value={formData.invitationCode}
                     onChange={(e) => setFormData({ ...formData, invitationCode: e.target.value })}
                   />
-                  <p className="mt-1 text-xs text-gray-500">如有邀請碼可填寫，沒有也可直接註冊。</p>
+                  <p className="mt-1 text-xs text-gray-500">
+                    If you have an invitation code, enter it here. Otherwise you can register directly.
+                    <br />
+                    如有邀請碼可填寫，沒有也可直接註冊。
+                  </p>
                 </div>
               </div>
 

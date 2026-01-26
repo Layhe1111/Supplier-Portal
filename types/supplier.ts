@@ -105,6 +105,7 @@ export interface CommonRequirements {
   submitterPhoneCode: string;
   submitterPhone: string;
   submitterEmail: string;
+  contactFaxCode?: string;
   contactFax?: string;
   submissionDate: string;
 }
@@ -272,6 +273,7 @@ export interface BasicSupplierFormData {
   submitterPhone: string;
   submitterPhoneCode: string;
   submitterEmail: string;
+  contactFaxCode?: string;
   contactFax?: string;
 
   // Optional fields
@@ -295,6 +297,7 @@ export interface SupplierDirectoryEntry {
   submitterPhone: string;
   submitterPhoneCode: string;
   submitterEmail: string;
+  contactFaxCode?: string;
   contactFax?: string;
   businessDescription?: string;
   companySupplementLink?: string;

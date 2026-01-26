@@ -80,6 +80,20 @@ export default function SupplierRegistrationPage() {
           changed = true;
         }
 
+        if (normalized.contactFaxCode == null) {
+          normalized.contactFaxCode = '+852';
+          changed = true;
+        }
+
+        if (typeof normalized.contactFax === 'string' && normalized.contactFax.trim()) {
+          const match = normalized.contactFax.trim().match(/^(\+\d+)\s*(.*)$/);
+          if (match) {
+            normalized.contactFaxCode = match[1];
+            normalized.contactFax = match[2].trim();
+            changed = true;
+          }
+        }
+
         if (typeof normalized.submissionDate === 'string' && normalized.submissionDate.includes('T')) {
           normalized.submissionDate = normalized.submissionDate.split('T')[0];
           changed = true;
@@ -132,23 +146,24 @@ export default function SupplierRegistrationPage() {
   // Initialize form data when supplier type is selected
   useEffect(() => {
     if (supplierType && !formData) {
-      const commonFields = {
-        businessRegistration: null,
-        companyPhotos: null,
-        hkBusinessRegistrationNumber: '',
-        cnBusinessRegistrationNumber: '',
-        cnUnifiedSocialCreditCode: '',
-        guaranteeInfoTrue: false,
-        acceptQualitySupervision: false,
-        agreeInfoSharing: false,
-        submitterName: '',
-        submitterPosition: '',
-        submitterPhoneCode: '+852',
-        submitterPhone: '',
-        submitterEmail: '',
-        contactFax: '',
-        submissionDate: new Date().toISOString().split('T')[0],
-      };
+        const commonFields = {
+          businessRegistration: null,
+          companyPhotos: null,
+          hkBusinessRegistrationNumber: '',
+          cnBusinessRegistrationNumber: '',
+          cnUnifiedSocialCreditCode: '',
+          guaranteeInfoTrue: false,
+          acceptQualitySupervision: false,
+          agreeInfoSharing: false,
+          submitterName: '',
+          submitterPosition: '',
+          submitterPhoneCode: '+852',
+          submitterPhone: '',
+          submitterEmail: '',
+          contactFaxCode: '+852',
+          contactFax: '',
+          submissionDate: new Date().toISOString().split('T')[0],
+        };
 
       if (supplierType === 'contractor') {
         const contractorData: ContractorFormData = {

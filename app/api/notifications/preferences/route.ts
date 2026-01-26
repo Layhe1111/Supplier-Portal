@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import { validateEmail } from '@/lib/emailValidation';
 
 const requireUser = async (request: Request) => {
   const authHeader = request.headers.get('authorization') || '';
@@ -40,7 +39,7 @@ export async function GET(request: Request) {
     return NextResponse.json({
       notifyEmail: result.data?.notify_email ?? true,
       notifySms: result.data?.notify_sms ?? false,
-      notifyEmailAddress: result.data?.notify_email_address ?? null,
+      notifyEmailAddress: null,
     });
   } catch (error) {
     return NextResponse.json(
@@ -57,23 +56,13 @@ export async function POST(request: Request) {
     const payload = await request.json().catch(() => ({}));
     const notifyEmail = Boolean(payload.notifyEmail);
     const notifySms = Boolean(payload.notifySms);
-    const notifyEmailAddress =
-      typeof payload.notifyEmailAddress === 'string' ? payload.notifyEmailAddress.trim() : '';
-
-    if (notifyEmailAddress) {
-      const check = validateEmail(notifyEmailAddress, 'Email');
-      if (!check.ok) {
-        return NextResponse.json({ error: check.error || 'Invalid email' }, { status: 400 });
-      }
-    }
-
     const result = await supabaseAdmin
       .from('profiles')
       .upsert({
         user_id: auth.user.id,
         notify_email: notifyEmail,
         notify_sms: notifySms,
-        notify_email_address: notifyEmailAddress || null,
+        notify_email_address: null,
       })
       .select('notify_email, notify_sms, notify_email_address')
       .single();
@@ -88,7 +77,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       notifyEmail: result.data.notify_email,
       notifySms: result.data.notify_sms,
-      notifyEmailAddress: result.data.notify_email_address ?? null,
+      notifyEmailAddress: null,
     });
   } catch (error) {
     return NextResponse.json(

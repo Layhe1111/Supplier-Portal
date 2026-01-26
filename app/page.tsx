@@ -32,6 +32,11 @@ export default function LoginPage() {
       const { data } = await supabase.auth.getSession();
       const user = data.session?.user;
       if (!user) return;
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError || !userData.user) {
+        await supabase.auth.signOut({ scope: 'local' });
+        return;
+      }
       const { data: suppliers } = await supabase
         .from('suppliers')
         .select('id')

@@ -48,6 +48,7 @@ type AdminNotification = {
   body: string;
   audience: string;
   targetUserId?: string | null;
+  targetLabel?: string | null;
   createdAt: string;
   createdBy?: string | null;
   readCount?: number;
@@ -104,6 +105,8 @@ export default function AdminTicketsPage() {
   const [notificationAudience, setNotificationAudience] = useState<'all' | 'user'>('all');
   const [notificationTargetEmail, setNotificationTargetEmail] = useState('');
   const [notificationTargetPhone, setNotificationTargetPhone] = useState('');
+  const [notificationChannel, setNotificationChannel] = useState<'both' | 'email' | 'sms'>('both');
+  const [notificationSubmitting, setNotificationSubmitting] = useState(false);
 
   const infoSupplier = infoPayload?.supplier || null;
   const infoStatus = infoPayload?.status || '';
@@ -244,6 +247,13 @@ export default function AdminTicketsPage() {
         <div className="border border-gray-100">{rows}</div>
       </section>
     );
+  };
+
+  const formatFax = (code?: string, number?: string) => {
+    const trimmedNumber = typeof number === 'string' ? number.trim() : '';
+    if (!trimmedNumber) return '';
+    const trimmedCode = typeof code === 'string' ? code.trim() : '';
+    return trimmedCode ? `${trimmedCode} ${trimmedNumber}` : trimmedNumber;
   };
 
   const renderItemFields = (fields: Array<[string, unknown]>) => (
@@ -533,27 +543,47 @@ export default function AdminTicketsPage() {
     }
     const token = await getToken();
     if (!token) return;
+    setNotificationSubmitting(true);
     const res = await fetch('/api/admin/notifications', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({
         title: notificationTitle.trim(),
-        body: notificationBody.trim(),
-        audience: notificationAudience,
-        targetEmail: notificationAudience === 'user' ? notificationTargetEmail.trim() : null,
-        targetPhone: notificationAudience === 'user' ? notificationTargetPhone.trim() : null,
+          body: notificationBody.trim(),
+          audience: notificationAudience,
+          targetEmail: notificationAudience === 'user' ? notificationTargetEmail.trim() : null,
+          targetPhone: notificationAudience === 'user' ? notificationTargetPhone.trim() : null,
+          channel: notificationChannel,
       }),
     });
     const body = await res.json().catch(() => ({}));
     if (!res.ok) {
       setError(body.error || 'Failed to create notification');
+      setNotificationSubmitting(false);
       return;
+    }
+    if (
+      notificationChannel !== 'email' &&
+      body?.delivery &&
+      typeof body.delivery.smsSent === 'number' &&
+      body.delivery.smsSent === 0
+    ) {
+      const skipped = typeof body.delivery.smsSkippedNoPhone === 'number'
+        ? body.delivery.smsSkippedNoPhone
+        : 0;
+      setError(
+        skipped > 0
+          ? 'SMS not sent: target user has no phone bound.'
+          : 'SMS not sent: no eligible recipients.'
+      );
     }
     await loadNotifications();
     setNotificationTitle('');
     setNotificationBody('');
     setNotificationTargetEmail('');
     setNotificationTargetPhone('');
+    setNotificationChannel('both');
+    setNotificationSubmitting(false);
   };
 
   useEffect(() => {
@@ -868,7 +898,7 @@ export default function AdminTicketsPage() {
                                   .join(' '),
                               ],
                               ['Submitter Email', infoSupplier.submitterEmail],
-                              ['Contact Fax', infoSupplier.contactFax],
+                          ['Contact Fax', formatFax(infoSupplier.contactFaxCode, infoSupplier.contactFax)],
                               ['Business Description', infoSupplier.businessDescription],
                               ['Company Supplement Link', infoSupplier.companySupplementLink],
                               ['Company Logo', infoSupplier.companyLogo],
@@ -907,7 +937,7 @@ export default function AdminTicketsPage() {
                                   .join(' '),
                               ],
                               ['Submitter Email', infoSupplier.submitterEmail],
-                              ['Contact Fax', infoSupplier.contactFax],
+                              ['Contact Fax', formatFax(infoSupplier.contactFaxCode, infoSupplier.contactFax)],
                               ['Submission Date', infoSupplier.submissionDate],
                             ])}
 
@@ -1265,6 +1295,7 @@ export default function AdminTicketsPage() {
                 onChange={(e) => setNotificationTitle(e.target.value)}
                 className="border border-gray-300 px-3 py-2 text-sm"
                 placeholder="Notification title"
+                disabled={notificationSubmitting}
               />
               <textarea
                 value={notificationBody}
@@ -1272,12 +1303,14 @@ export default function AdminTicketsPage() {
                 className="border border-gray-300 px-3 py-2 text-sm"
                 rows={3}
                 placeholder="Notification message"
+                disabled={notificationSubmitting}
               />
               <div className="flex flex-col md:flex-row md:items-center gap-3">
                 <select
                   value={notificationAudience}
                   onChange={(e) => setNotificationAudience(e.target.value as 'all' | 'user')}
                   className="border border-gray-300 px-3 py-2 text-sm"
+                  disabled={notificationSubmitting}
                 >
                   <option value="all">All users / 全部</option>
                   <option value="user">Specific user / 指定用戶</option>
@@ -1289,21 +1322,36 @@ export default function AdminTicketsPage() {
                       onChange={(e) => setNotificationTargetEmail(e.target.value)}
                       className="border border-gray-300 px-3 py-2 text-sm flex-1"
                       placeholder="Target user email"
+                      disabled={notificationSubmitting}
                     />
                     <input
                       value={notificationTargetPhone}
                       onChange={(e) => setNotificationTargetPhone(e.target.value)}
                       className="border border-gray-300 px-3 py-2 text-sm flex-1"
                       placeholder="Target user phone"
+                      disabled={notificationSubmitting}
                     />
                   </div>
                 )}
+                <select
+                  value={notificationChannel}
+                  onChange={(e) =>
+                    setNotificationChannel(e.target.value as 'both' | 'email' | 'sms')
+                  }
+                  className="border border-gray-300 px-3 py-2 text-sm"
+                  disabled={notificationSubmitting}
+                >
+                  <option value="both">Email + SMS</option>
+                  <option value="email">Email only</option>
+                  <option value="sms">SMS only</option>
+                </select>
                 <button
                   type="button"
                   onClick={createNotification}
                   className="px-4 py-2 text-sm bg-gray-900 text-white"
+                  disabled={notificationSubmitting}
                 >
-                  Send Notification
+                  {notificationSubmitting ? 'Sending...' : 'Send Notification'}
                 </button>
               </div>
             </div>
@@ -1320,7 +1368,9 @@ export default function AdminTicketsPage() {
                         <p className="text-xs text-gray-600 mt-1">{item.body}</p>
                         <p className="text-[11px] text-gray-400 mt-1">
                           {new Date(item.createdAt).toLocaleString()} ·{' '}
-                          {item.audience === 'all' ? 'All' : 'User'}
+                          {item.audience === 'all'
+                            ? 'All'
+                            : item.targetLabel || 'User'}
                         </p>
                       </div>
                       <div className="text-xs text-gray-500">

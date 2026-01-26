@@ -140,13 +140,32 @@ export default function CommonRequirements({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormInput
-            label="Contact Fax / 聯絡傳真"
-            name="contactFax"
-            value={data.contactFax || ''}
-            onChange={(v) => onChange('contactFax', v)}
-            placeholder="Enter fax number"
-          />
+          <div>
+            <label className="block text-sm font-light text-gray-700 mb-1">
+              Contact Fax / 聯絡傳真
+            </label>
+            <div className="flex gap-2">
+              <select
+                value={data.contactFaxCode || '+852'}
+                onChange={(e) => onChange('contactFaxCode', e.target.value)}
+                className="w-28 px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+              >
+                {phoneCodeOptions.map((code) => (
+                  <option key={code} value={code}>
+                    {code}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="tel"
+                name="contactFax"
+                value={data.contactFax || ''}
+                onChange={(e) => onChange('contactFax', e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-300 text-sm font-light focus:outline-none focus:ring-1 focus:ring-gray-400"
+                placeholder="Enter fax number"
+              />
+            </div>
+          </div>
         </div>
       </FormSection>
 

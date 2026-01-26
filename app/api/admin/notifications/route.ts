@@ -51,6 +51,23 @@ const toText = (value: unknown) => {
   return trimmed ? trimmed : null;
 };
 
+const normalizePhone = (value: string | null) => {
+  if (!value) return '';
+  return value.replace(/\D/g, '');
+};
+
+const isSamePhone = (a: string | null, b: string | null) => {
+  const aNorm = normalizePhone(a);
+  const bNorm = normalizePhone(b);
+  if (!aNorm || !bNorm) return false;
+  if (aNorm === bNorm) return true;
+  const shortLength = 8;
+  if (aNorm.length >= shortLength && bNorm.length >= shortLength) {
+    return aNorm.slice(-shortLength) === bNorm.slice(-shortLength);
+  }
+  return false;
+};
+
 const sendEmail = async (email: string, title: string, body: string) => {
   if (!RESEND_API_KEY || !FROM_EMAIL) return;
   await fetch('https://api.resend.com/emails', {
@@ -69,8 +86,12 @@ const sendEmail = async (email: string, title: string, body: string) => {
 };
 
 const sendSms = async (phone: string, body: string) => {
-  if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) return;
-  if (!TWILIO_FROM_NUMBER && !TWILIO_MESSAGING_SERVICE_SID) return;
+  if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) {
+    throw new Error('Twilio credentials missing');
+  }
+  if (!TWILIO_FROM_NUMBER && !TWILIO_MESSAGING_SERVICE_SID) {
+    throw new Error('Twilio sender not configured');
+  }
   const auth = Buffer.from(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`).toString('base64');
   const params = new URLSearchParams();
   params.set('To', phone);
@@ -80,7 +101,7 @@ const sendSms = async (phone: string, body: string) => {
   } else if (TWILIO_FROM_NUMBER) {
     params.set('From', TWILIO_FROM_NUMBER);
   }
-  await fetch(
+  const res = await fetch(
     `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`,
     {
       method: 'POST',
@@ -91,6 +112,36 @@ const sendSms = async (phone: string, body: string) => {
       body: params,
     }
   );
+  if (!res.ok) {
+    const detail = await res.text().catch(() => '');
+    throw new Error(`Twilio SMS failed (${res.status}): ${detail}`);
+  }
+};
+
+const findUserByTarget = async (
+  users: { id: string; email?: string | null; phone?: string | null }[],
+  targetUserId: string | null,
+  targetEmail: string | null,
+  targetPhone: string | null
+) => {
+  if (targetUserId) {
+    const matched = users.find((user) => user.id === targetUserId);
+    if (matched) return matched;
+  }
+
+  if (targetEmail) {
+    const matched = users.find(
+      (user) => user.email?.toLowerCase() === targetEmail.toLowerCase()
+    );
+    if (matched) return matched;
+  }
+
+  if (targetPhone) {
+    const matched = users.find((user) => isSamePhone(user.phone || null, targetPhone));
+    if (matched) return matched;
+  }
+
+  return null;
 };
 
 const resolveUsersByAudience = async (
@@ -101,12 +152,7 @@ const resolveUsersByAudience = async (
 ) => {
   const users = (await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 })).data?.users || [];
   if (audience === 'user') {
-    const matched = users.find(
-      (user) =>
-        (targetUserId && user.id === targetUserId) ||
-        (targetEmail && user.email?.toLowerCase() === targetEmail.toLowerCase()) ||
-        (targetPhone && user.phone === targetPhone)
-    );
+    const matched = await findUserByTarget(users, targetUserId, targetEmail, targetPhone);
     return matched ? [matched] : [];
   }
   return users;
@@ -162,16 +208,39 @@ export async function GET(request: Request) {
       readCount.set(row.notification_id, current + 1);
     });
 
-    const notifications = (result.data || []).map((row) => ({
-      id: row.id,
-      title: row.title,
-      body: row.body,
-      audience: row.audience,
-      targetUserId: row.target_user_id,
-      createdAt: row.created_at,
-      createdBy: row.created_by,
-      readCount: readCount.get(row.id) || 0,
-    }));
+    const rows = result.data || [];
+    const targetIds = rows
+      .map((row) => row.target_user_id)
+      .filter((id: string | null) => Boolean(id)) as string[];
+
+    const usersResult = targetIds.length
+      ? await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 })
+      : { data: { users: [] as { id: string; email?: string | null; phone?: string | null }[] } };
+
+    const userMap = new Map(
+      (usersResult.data?.users || []).map((user) => [
+        user.id,
+        { email: user.email || null, phone: user.phone || null },
+      ])
+    );
+
+    const notifications = rows.map((row) => {
+      const user = row.target_user_id ? userMap.get(row.target_user_id) : null;
+      const labels = [user?.email, user?.phone]
+        .filter((item) => item && String(item).trim().length > 0) as string[];
+      const targetLabel = labels.length > 0 ? labels.join(' / ') : null;
+      return {
+        id: row.id,
+        title: row.title,
+        body: row.body,
+        audience: row.audience,
+        targetUserId: row.target_user_id,
+        targetLabel,
+        createdAt: row.created_at,
+        createdBy: row.created_by,
+        readCount: readCount.get(row.id) || 0,
+      };
+    });
 
     return NextResponse.json({ notifications });
   } catch (error) {
@@ -193,6 +262,10 @@ export async function POST(request: Request) {
     const targetUserId = toText(payload.targetUserId);
     const targetEmail = toText(payload.targetEmail);
     const targetPhone = toText(payload.targetPhone);
+    const channel =
+      payload.channel === 'email' || payload.channel === 'sms' || payload.channel === 'both'
+        ? payload.channel
+        : 'both';
 
     if (!title || !body) {
       return NextResponse.json({ error: 'Missing title or body' }, { status: 400 });
@@ -201,10 +274,12 @@ export async function POST(request: Request) {
     let resolvedTargetUserId = targetUserId;
     if (audience === 'user' && !resolvedTargetUserId && (targetEmail || targetPhone)) {
       const { data } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 });
-      const matched = (data?.users || []).find(
-        (user) =>
-          (targetEmail && user.email?.toLowerCase() === targetEmail.toLowerCase()) ||
-          (targetPhone && user.phone === targetPhone)
+      const users = data?.users || [];
+      const matched = await findUserByTarget(
+        users,
+        null,
+        targetEmail,
+        targetPhone
       );
       resolvedTargetUserId = matched?.id || null;
     }
@@ -214,6 +289,17 @@ export async function POST(request: Request) {
         { error: 'Missing target user' },
         { status: 400 }
       );
+    }
+
+    const smsRequested = channel !== 'email';
+    const emailRequested = channel !== 'sms';
+    if (smsRequested) {
+      if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) {
+        return NextResponse.json({ error: 'Twilio credentials missing' }, { status: 500 });
+      }
+      if (!TWILIO_FROM_NUMBER && !TWILIO_MESSAGING_SERVICE_SID) {
+        return NextResponse.json({ error: 'Twilio sender not configured' }, { status: 500 });
+      }
     }
 
     const insert = await supabaseAdmin
@@ -242,6 +328,10 @@ export async function POST(request: Request) {
       targetPhone
     );
     const prefs = await loadPreferences(targetUsers.map((user) => user.id));
+    let smsSent = 0;
+    let smsSkippedNoPhone = 0;
+    let emailSent = 0;
+
     for (const user of targetUsers) {
       const pref = prefs.get(user.id) || {
         notify_email: true,
@@ -249,10 +339,17 @@ export async function POST(request: Request) {
         notify_email_address: null,
       };
       const emailTarget = user.email || pref.notify_email_address;
-      if (pref.notify_email && emailTarget) {
+      if (emailRequested && pref.notify_email && emailTarget) {
         await sendEmail(emailTarget, title, body);
+        emailSent += 1;
       }
-      // SMS sending is disabled for now; prompt users to add email instead.
+      const allowSms = channel === 'sms' ? true : pref.notify_sms;
+      if (smsRequested && allowSms && user.phone) {
+        await sendSms(user.phone, `${title}\n${body}`);
+        smsSent += 1;
+      } else if (smsRequested && allowSms && !user.phone) {
+        smsSkippedNoPhone += 1;
+      }
     }
 
     return NextResponse.json({
@@ -263,6 +360,11 @@ export async function POST(request: Request) {
         audience: insert.data.audience,
         targetUserId: insert.data.target_user_id,
         createdAt: insert.data.created_at,
+      },
+      delivery: {
+        emailSent,
+        smsSent,
+        smsSkippedNoPhone,
       },
     });
   } catch (error) {
