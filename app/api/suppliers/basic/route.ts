@@ -233,7 +233,7 @@ export async function GET(request: Request) {
 
     const logoUrlMap = new Map<string, string>();
     const bucket = process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET || 'supplier-files';
-    for (const path of logoPathsToSign) {
+    for (const path of Array.from(logoPathsToSign)) {
       try {
         const { data } = await supabaseAdmin.storage
           .from(bucket)
