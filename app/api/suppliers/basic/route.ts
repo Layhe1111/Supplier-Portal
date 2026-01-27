@@ -194,6 +194,29 @@ export async function GET(request: Request) {
     const contactMap = new Map<string, any>();
     (contactsResult.data || []).forEach((row) => contactMap.set(row.supplier_id, row));
 
+    // Generate signed URLs for logos
+    const logoPathsToSign = new Set<string>();
+    (companiesResult.data || []).forEach((row) => {
+      if (row.company_logo_path) {
+        logoPathsToSign.add(row.company_logo_path);
+      }
+    });
+
+    const logoUrlMap = new Map<string, string>();
+    const bucket = process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET || 'supplier-files';
+    for (const path of logoPathsToSign) {
+      try {
+        const { data } = await supabaseAdmin.storage
+          .from(bucket)
+          .createSignedUrl(path, 3600); // 1 hour expiry
+        if (data?.signedUrl) {
+          logoUrlMap.set(path, data.signedUrl);
+        }
+      } catch (err) {
+        console.error('Failed to sign logo URL:', path, err);
+      }
+    }
+
     const suppliersWithMeta = supplierRows.map((row) => {
       const supplierId = row.id;
       const supplierType = row.supplier_type || 'basic';
@@ -205,6 +228,8 @@ export async function GET(request: Request) {
         company?.business_type || BUSINESS_TYPE_LABELS[supplierType] || '';
       const submissionSortKey = contact?.submission_date || row.submitted_at || '';
       const sortName = (companyName || company?.company_name_zh || '').trim().toLowerCase();
+      const logoPath = company?.company_logo_path;
+      const logoUrl = logoPath ? logoUrlMap.get(logoPath) || null : null;
       return {
         entry: {
           supplierType,
@@ -215,7 +240,7 @@ export async function GET(request: Request) {
           businessType,
           businessDescription: company?.business_description ?? '',
           companySupplementLink: company?.company_supplement_link ?? '',
-          companyLogo: company?.company_logo_path ?? null,
+          companyLogo: logoUrl,
           submitterName: contact?.contact_name ?? '',
           submitterPosition: contact?.contact_position ?? '',
           submitterPhone: contact?.contact_phone ?? '',

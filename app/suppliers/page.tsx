@@ -310,16 +310,31 @@ export default function SuppliersDirectoryPage() {
                 return (
                   <div
                     key={`${supplier.companyName}-${index}`}
-                    className="border border-gray-200 p-6 hover:shadow-md transition-shadow"
+                    className="border border-gray-200 p-6 hover:shadow-md transition-shadow relative"
                   >
-                    <h4 className="text-base font-medium text-gray-900 mb-1">
-                      {highlightMatches(supplier.companyName, nameTerms)}
-                    </h4>
-                    {supplier.companyNameChinese && (
-                      <p className="text-sm text-gray-700 mb-3">
-                        {highlightMatches(supplier.companyNameChinese, nameTerms)}
-                      </p>
+                    {supplier.companyLogo && (
+                      <div className="absolute top-4 right-4 w-16 h-16 flex items-center justify-center bg-gray-50 rounded">
+                        <img
+                          src={supplier.companyLogo as string}
+                          alt={`${supplier.companyName} logo`}
+                          className="max-w-full max-h-full object-contain"
+                          onError={(e) => {
+                            console.error('Failed to load logo:', supplier.companyLogo);
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      </div>
                     )}
+                    <div className={supplier.companyLogo ? 'pr-20' : ''}>
+                      <h4 className="text-base font-medium text-gray-900 mb-1">
+                        {highlightMatches(supplier.companyName, nameTerms)}
+                      </h4>
+                      {supplier.companyNameChinese && (
+                        <p className="text-sm text-gray-700 mb-3">
+                          {highlightMatches(supplier.companyNameChinese, nameTerms)}
+                        </p>
+                      )}
+                    </div>
 
                     <p className="text-sm text-gray-600 mb-3">
                       {supplier.officeAddress || '-'}
