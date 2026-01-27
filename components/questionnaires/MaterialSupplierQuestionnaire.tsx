@@ -11,6 +11,7 @@ import {
   parseRegisteredCapital,
   REGISTERED_CAPITAL_CURRENCIES,
 } from '@/lib/registeredCapital';
+import { parseProductImportFile } from '@/lib/productImport';
 
 interface MaterialSupplierQuestionnaireProps {
   data: MaterialSupplierFormData;
@@ -141,6 +142,38 @@ export default function MaterialSupplierQuestionnaire({
   const removeProduct = (id: string) => {
     const updatedProducts = data.products.filter((p) => p.id !== id);
     onChange('products', updatedProducts);
+  };
+
+  const handleProductImport = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const { products, errors } = await parseProductImportFile(file);
+      if (products.length > 0) {
+        onChange('products', [...data.products, ...products]);
+      }
+
+      if (products.length === 0 && errors.length === 0) {
+        alert('未读取到任何产品数据，请检查模板。');
+        return;
+      }
+
+      const messages: string[] = [];
+      if (products.length > 0) {
+        messages.push(`已导入 ${products.length} 个产品。`);
+      }
+      if (errors.length > 0) {
+        messages.push(`以下行有问题，已跳过：\n${errors.join('\n')}`);
+      }
+      alert(messages.join('\n\n'));
+    } catch (error) {
+      alert(error instanceof Error ? error.message : '导入失败，请检查文件格式。');
+    } finally {
+      event.target.value = '';
+    }
   };
 
   const isHongKong = data.country === 'Hong Kong';
@@ -516,6 +549,29 @@ export default function MaterialSupplierQuestionnaire({
             <p>【Product Category / 產品類別】：_____________</p>
             <p>【Product Brand / 產品品牌】：_____________</p>
             <p>【Product Series / 產品系列】：_____________</p>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <p className="text-xs text-gray-500">
+              批量导入请先下载模板，填写后上传 / Download template and upload Excel to import
+            </p>
+            <div className="flex flex-wrap items-center gap-3">
+              <a
+                href="/api/products/template"
+                className="px-3 py-1.5 border border-gray-300 text-xs font-light text-gray-700 hover:bg-gray-50 transition-colors"
+                download
+              >
+                Download Template / 下載模板
+              </a>
+              <label className="px-3 py-1.5 bg-gray-900 text-white text-xs font-light hover:bg-gray-800 transition-colors cursor-pointer">
+                Import Excel / 上傳Excel
+                <input
+                  type="file"
+                  accept=".xlsx,.xls"
+                  onChange={handleProductImport}
+                  className="hidden"
+                />
+              </label>
+            </div>
           </div>
         </div>
 

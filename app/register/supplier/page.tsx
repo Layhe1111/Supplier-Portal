@@ -305,7 +305,7 @@ export default function SupplierRegistrationPage() {
           hkWorkEligibleEmployees: '',
           companyType: [],
           representedBrands: [''],
-          warehouses: [{ address: '', capacity: '' }],
+          warehouses: [],
           companySupplementFile: null,
           companySupplementLink: '',
           products: [],

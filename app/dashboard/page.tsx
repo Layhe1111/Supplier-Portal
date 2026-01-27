@@ -6,6 +6,7 @@ import { SupplierFormData, Product } from '@/types/supplier';
 import ProductModal from '@/components/ProductModal';
 import { supabase } from '@/lib/supabaseClient';
 import { validateOptionalUrl } from '@/lib/urlValidation';
+import { parseProductImportFile } from '@/lib/productImport';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -20,6 +21,8 @@ export default function DashboardPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [error, setError] = useState('');
   const [supplierStatus, setSupplierStatus] = useState<'draft' | 'submitted' | null>(null);
+  const [pageSize, setPageSize] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const syncProducts = async (nextProducts: Product[]) => {
     const { data: sessionData } = await supabase.auth.getSession();
@@ -149,6 +152,44 @@ export default function DashboardPage() {
     }
   };
 
+  const handleImportProducts = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (!userData || userData.supplierType !== 'material') return;
+
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const { products: imported, errors } = await parseProductImportFile(file);
+      if (imported.length === 0 && errors.length === 0) {
+        alert('未读取到任何产品数据，请检查模板。');
+        return;
+      }
+
+      if (imported.length > 0) {
+        const nextProducts = [...products, ...imported];
+        await syncProducts(nextProducts);
+        setProducts(nextProducts);
+      }
+
+      const messages: string[] = [];
+      if (imported.length > 0) {
+        messages.push(`已导入 ${imported.length} 个产品。`);
+      }
+      if (errors.length > 0) {
+        messages.push(`以下行有问题，已跳过：\n${errors.join('\n')}`);
+      }
+      if (messages.length > 0) {
+        alert(messages.join('\n\n'));
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '导入失败，请检查文件格式。');
+    } finally {
+      event.target.value = '';
+    }
+  };
+
   // Get unique categories
   const categories = products.length > 0
     ? ['all', ...Array.from(new Set(products.map(p => p.category)))]
@@ -166,6 +207,17 @@ export default function DashboardPage() {
 
     return matchesSearch && matchesCategory;
   });
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedCategory, pageSize]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / pageSize));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedProducts = filteredProducts.slice(
+    (safePage - 1) * pageSize,
+    safePage * pageSize
+  );
 
   if (isLoading) {
     return (
@@ -293,10 +345,28 @@ export default function DashboardPage() {
         {/* Product Management - Only show for material suppliers */}
         {userData?.supplierType === 'material' && (
           <div className="bg-white border border-gray-200 p-8">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-3">
               <h3 className="text-lg font-light text-gray-900">
                 Product Catalog / 產品目錄
               </h3>
+              <div className="flex flex-wrap items-center gap-3">
+                <a
+                  href="/api/products/template"
+                  className="px-3 py-1.5 border border-gray-300 text-xs font-light text-gray-700 hover:bg-gray-50 transition-colors"
+                  download
+                >
+                  Download Template / 下載模板
+                </a>
+                <label className="px-3 py-1.5 bg-gray-900 text-white text-xs font-light hover:bg-gray-800 transition-colors cursor-pointer">
+                  Import Excel / 上傳Excel
+                  <input
+                    type="file"
+                    accept=".xlsx,.xls"
+                    onChange={handleImportProducts}
+                    className="hidden"
+                  />
+                </label>
+              </div>
             </div>
 
             {/* Search and Filter */}
@@ -321,6 +391,25 @@ export default function DashboardPage() {
                       {cat === 'all' ? 'All Categories / 所有類別' : cat}
                     </option>
                   ))}
+                </select>
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+              <p className="text-xs text-gray-500">
+                Showing {filteredProducts.length} of {products.length} products
+                <br />
+                顯示 {filteredProducts.length} / {products.length} 個產品
+              </p>
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-gray-600">每页显示</label>
+                <select
+                  value={pageSize}
+                  onChange={(e) => setPageSize(Number(e.target.value))}
+                  className="px-2 py-1 border border-gray-300 text-xs bg-white focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
+                >
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={50}>50</option>
                 </select>
               </div>
             </div>
@@ -383,7 +472,9 @@ export default function DashboardPage() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredProducts.map((product, index) => (
+                    {paginatedProducts.map((product, index) => {
+                      const displayIndex = (safePage - 1) * pageSize + index;
+                      return (
                       <tr key={product.id} className="hover:bg-gray-50">
                         <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                           {product.sku}
@@ -414,7 +505,7 @@ export default function DashboardPage() {
                         <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                           <div className="flex gap-2">
                             <button
-                              onClick={() => handleEditProduct(product, index)}
+                              onClick={() => handleEditProduct(product, displayIndex)}
                               className="text-blue-600 hover:text-blue-800 font-light"
                             >
                               Edit / 編輯
@@ -428,16 +519,35 @@ export default function DashboardPage() {
                           </div>
                         </td>
                       </tr>
-                    ))}
+                      );
+                    })}
                   </tbody>
                 </table>
-              </div>
-            )}
-
-            {filteredProducts.length > 0 && (
-              <div className="mt-4 text-sm text-gray-600">
-                Showing {filteredProducts.length} of {products.length} products
-                / 顯示 {filteredProducts.length} / {products.length} 個產品
+                <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3 text-xs text-gray-600">
+                  <span>
+                    Page {safePage} / {totalPages}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                      disabled={safePage <= 1}
+                      className="px-3 py-1 border border-gray-300 text-xs disabled:opacity-50"
+                    >
+                      Prev / 上一頁
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                      }
+                      disabled={safePage >= totalPages}
+                      className="px-3 py-1 border border-gray-300 text-xs disabled:opacity-50"
+                    >
+                      Next / 下一頁
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
           </div>

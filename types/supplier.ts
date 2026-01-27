@@ -303,6 +303,7 @@ export interface SupplierDirectoryEntry {
   companySupplementLink?: string;
   companyLogo?: UploadValue | null;
   submissionDate: string;
+  representedBrands?: string[];
 }
 
 // Union type for all supplier form data

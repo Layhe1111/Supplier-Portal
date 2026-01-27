@@ -121,6 +121,27 @@ const fetchContactRows = async (supplierIds: string[]) => {
   return { error: null, data: rows };
 };
 
+const fetchBrandsRows = async (supplierIds: string[]) => {
+  const chunks = chunkArray(supplierIds, SUPPLIER_ID_CHUNK_SIZE);
+  const rows: any[] = [];
+  for (let i = 0; i < chunks.length; i += 1) {
+    const chunk = chunks[i];
+    const result = await supabaseAdmin
+      .from('material_represented_brands')
+      .select('supplier_id, brand_name')
+      .in('supplier_id', chunk)
+      .order('created_at', { ascending: true });
+    if (result.error) {
+      return {
+        error: { message: `Fetch material_represented_brands chunk ${i + 1}/${chunks.length}: ${result.error.message}` },
+        data: null,
+      };
+    }
+    rows.push(...(result.data || []));
+  }
+  return { error: null, data: rows };
+};
+
 export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
@@ -176,14 +197,15 @@ export async function GET(request: Request) {
       });
     }
 
-    const [companiesResult, contactsResult] = await Promise.all([
+    const [companiesResult, contactsResult, brandsResult] = await Promise.all([
       fetchCompanyRows(supplierIds),
       fetchContactRows(supplierIds),
+      fetchBrandsRows(supplierIds),
     ]);
 
-    if (companiesResult.error || contactsResult.error) {
+    if (companiesResult.error || contactsResult.error || brandsResult.error) {
       return NextResponse.json(
-        { error: companiesResult.error?.message || contactsResult.error?.message || 'Failed to load data' },
+        { error: companiesResult.error?.message || contactsResult.error?.message || brandsResult.error?.message || 'Failed to load data' },
         { status: 500 }
       );
     }
@@ -193,6 +215,13 @@ export async function GET(request: Request) {
 
     const contactMap = new Map<string, any>();
     (contactsResult.data || []).forEach((row) => contactMap.set(row.supplier_id, row));
+
+    const brandsMap = new Map<string, string[]>();
+    (brandsResult.data || []).forEach((row) => {
+      const brands = brandsMap.get(row.supplier_id) || [];
+      brands.push(row.brand_name);
+      brandsMap.set(row.supplier_id, brands);
+    });
 
     // Generate signed URLs for logos
     const logoPathsToSign = new Set<string>();
@@ -230,6 +259,7 @@ export async function GET(request: Request) {
       const sortName = (companyName || company?.company_name_zh || '').trim().toLowerCase();
       const logoPath = company?.company_logo_path;
       const logoUrl = logoPath ? logoUrlMap.get(logoPath) || null : null;
+      const brands = brandsMap.get(supplierId) || [];
       return {
         entry: {
           supplierType,
@@ -248,6 +278,7 @@ export async function GET(request: Request) {
           submitterEmail: contact?.contact_email ?? '',
           contactFax: contact?.contact_fax ?? '',
           submissionDate: contact?.submission_date ?? '',
+          representedBrands: brands,
         },
         businessTypeZh: company?.business_type_zh ?? '',
         sortName,

@@ -379,6 +379,16 @@ export default function SuppliersDirectoryPage() {
                       </span>
                     </div>
 
+                    {supplier.supplierType === 'material' && supplier.representedBrands && supplier.representedBrands.length > 0 && (
+                      <div className="mt-3 flex items-start text-sm">
+                        <span className="text-blue-600 mr-2">▶</span>
+                        <div className="text-gray-700">
+                          <span className="font-medium">Represented Brands / 代理品牌: </span>
+                          <span>{supplier.representedBrands.join(', ')}</span>
+                        </div>
+                      </div>
+                    )}
+
                     {supplier.businessDescription && (
                       <p className="mt-3 text-sm text-gray-600 italic">
                         {supplier.businessDescription}

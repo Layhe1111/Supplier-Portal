@@ -866,7 +866,7 @@ export async function GET(request: Request) {
         hkWorkEligibleEmployees: toText(company.hk_work_eligible_employees),
         companyType: companyTypes,
         representedBrands: representedBrands.length > 0 ? representedBrands : [''],
-        warehouses: warehouses.length > 0 ? warehouses : [{ address: '', capacity: '' }],
+        warehouses,
         companySupplementFile: supplementFiles.length > 0 ? supplementFiles : null,
         companySupplementLink: toText(company.company_supplement_link),
         products,
