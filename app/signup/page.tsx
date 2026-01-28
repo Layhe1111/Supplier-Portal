@@ -446,6 +446,16 @@ export default function SignupPage() {
                       : 'Verify & Create / 驗證並創建'}
                 </button>
               </div>
+
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => router.push('/')}
+                  className="text-sm text-gray-600 hover:text-gray-900"
+                >
+                  Already have an account? Sign in / 已有帳戶？登入
+                </button>
+              </div>
             </form>
           </div>
         </div>

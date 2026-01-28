@@ -2,12 +2,12 @@ import * as XLSX from 'xlsx';
 import type { Product } from '@/types/supplier';
 
 export const PRODUCT_TEMPLATE_HEADERS = [
-  'Category / 類別',
-  'Brand / 品牌',
-  'Series / 系列',
+  'Product Category / 產品類別',
+  'Product Brand / 產品品牌',
+  'Product Series / 產品系列',
   'SKU / SKU編碼',
   'Product Name / 產品名稱',
-  'Spec / 規格',
+  'Size / 規格',
   'Material / 材質',
   'Unit Price (HKD) / 單價（港幣）',
   'MOQ / 最小起訂量',
