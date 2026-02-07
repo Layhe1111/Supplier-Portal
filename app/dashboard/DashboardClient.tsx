@@ -7,6 +7,7 @@ import ProductModal from '@/components/ProductModal';
 import { supabase } from '@/lib/supabaseClient';
 import { validateOptionalUrl } from '@/lib/urlValidation';
 import { parseProductImportFile } from '@/lib/productImport';
+import { useToast } from '@/components/ToastProvider';
 
 const STORAGE_BUCKET = process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET || 'supplier-files';
 const STORAGE_PATH_REGEX = /^[^/]+\/\d{13}-/;
@@ -755,6 +756,7 @@ const buildBilingualPayload = (supplier: any, status: string | null) => {
 
 export default function DashboardClient() {
   const router = useRouter();
+  const toast = useToast();
   const searchParams = useSearchParams();
   const isTestMode = searchParams.get('test') !== null;
   const didLoadRef = useRef(false);
@@ -768,9 +770,15 @@ export default function DashboardClient() {
   const [products, setProducts] = useState<Product[]>([]);
   const [error, setError] = useState('');
   const [supplierStatus, setSupplierStatus] = useState<'draft' | 'submitted' | null>(null);
+  const [isGeneratingPpt, setIsGeneratingPpt] = useState(false);
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-  const [showCopyNotice, setShowCopyNotice] = useState(false);
+
+  useEffect(() => {
+    if (!error) return;
+    toast.error(error);
+    setError('');
+  }, [error, toast]);
 
   const syncProducts = async (nextProducts: Product[]) => {
     const { data: sessionData } = await supabase.auth.getSession();
@@ -911,7 +919,7 @@ export default function DashboardClient() {
     try {
       const { products: imported, errors } = await parseProductImportFile(file);
       if (imported.length === 0 && errors.length === 0) {
-        alert('未读取到任何产品数据，请检查模板。');
+        toast.error('未读取到任何产品数据，请检查模板。');
         return;
       }
 
@@ -929,7 +937,11 @@ export default function DashboardClient() {
         messages.push(`以下行有问题，已跳过：\n${errors.join('\n')}`);
       }
       if (messages.length > 0) {
-        alert(messages.join('\n\n'));
+        if (errors.length > 0) {
+          toast.error(messages.join('\n\n'));
+        } else {
+          toast.success(messages.join('\n\n'));
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : '导入失败，请检查文件格式。');
@@ -938,11 +950,13 @@ export default function DashboardClient() {
     }
   };
 
-  const handleCopyFormData = async () => {
+  const handleGeneratePpt = async () => {
     if (!userData) return;
     if (userData.supplierType === 'basic') return;
+    if (isGeneratingPpt) return;
 
     try {
+      setIsGeneratingPpt(true);
       const paths = new Set<string>();
       collectStoragePaths(userData, paths);
 
@@ -964,13 +978,58 @@ export default function DashboardClient() {
 
       const labeledPayload = buildBilingualPayload(payload, supplierStatus);
       const prunedPayload = pruneEmpty(labeledPayload) || {};
-      const jsonData = JSON.stringify(prunedPayload, null, 2);
-      await navigator.clipboard.writeText(jsonData);
-      setShowCopyNotice(true);
-      setTimeout(() => setShowCopyNotice(false), 2000);
+
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) {
+        throw new Error('Please sign in first / 請先登入');
+      }
+
+      const controller = new AbortController();
+      const timeoutHandle = setTimeout(() => controller.abort(), 600_000);
+      let res: Response;
+      try {
+        res = await fetch('/api/ppt/generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ data: prunedPayload }),
+          signal: controller.signal,
+        });
+      } finally {
+        clearTimeout(timeoutHandle);
+      }
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || 'Failed to generate PPT');
+      }
+
+      const blob = await res.blob();
+      const contentDisposition = res.headers.get('content-disposition') || '';
+      const match = contentDisposition.match(/filename="?([^";]+)"?/i);
+      const filename = match?.[1] || 'supplier-report.pptx';
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = objectUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(objectUrl);
+
+      toast.success('PPT 已生成並開始下載');
     } catch (err) {
-      console.error('Failed to copy:', err);
-      setError('Failed to copy form data / 複製表單數據失敗');
+      if (err instanceof Error && err.name === 'AbortError') {
+        setError('生成超时，请重试 / Request timed out, please retry');
+        return;
+      }
+      console.error('Failed to generate PPT:', err);
+      setError(err instanceof Error ? err.message : 'Failed to generate PPT / 生成PPT失敗');
+    } finally {
+      setIsGeneratingPpt(false);
     }
   };
 
@@ -1013,27 +1072,8 @@ export default function DashboardClient() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Copy Notice */}
-      <div
-        className={`fixed top-4 right-4 z-50 transform transition-all duration-300 ease-out ${
-          showCopyNotice
-            ? 'translate-x-0 opacity-100'
-            : 'translate-x-full opacity-0 pointer-events-none'
-        }`}
-        aria-live="polite"
-      >
-        <div className="bg-blue-600 text-white text-sm font-light px-4 py-3 shadow-lg">
-          已複製到剪貼板 / Copied to clipboard
-        </div>
-      </div>
-
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {error && (
-          <div className="mb-4 rounded border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {error}
-          </div>
-        )}
         {supplierStatus === 'draft' && userData && (
           <div className="mb-4 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
             Draft saved. Please complete your registration / 草稿已保存，請繼續完成註冊。
@@ -1061,13 +1101,17 @@ export default function DashboardClient() {
              supplierStatus === 'submitted' && (
               <button
                 type="button"
-                onClick={handleCopyFormData}
-                className="px-4 py-2 bg-blue-600 text-white text-sm font-light hover:bg-blue-700 transition-colors"
+                onClick={handleGeneratePpt}
+                disabled={isGeneratingPpt}
+                className="px-4 py-2 bg-blue-600 text-white text-sm font-light hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 transition-colors"
               >
-               Copy Data
+                {isGeneratingPpt ? '生成中...' : '生成PPT'}
               </button>
             )}
           </div>
+          <p className="mb-4 text-sm text-gray-600">
+            AI制作公司手册功能即将上线 / AI Company Brochure feature coming soon.
+          </p>
           {userData && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>

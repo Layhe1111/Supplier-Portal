@@ -67,25 +67,43 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const typeParam = url.searchParams.get('type');
     const userIdParam = url.searchParams.get('userId');
+    const supplierIdParam = url.searchParams.get('supplierId');
     let targetUserId = auth.user.id;
+    let requesterRole: 'user' | 'admin' | null = null;
 
-    if (userIdParam && userIdParam !== auth.user.id) {
-      const role = await getUserRole(auth.user.id);
-      if (role !== 'admin') {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    const ensureAdmin = async () => {
+      if (requesterRole === 'admin') return true;
+      if (requesterRole == null) {
+        requesterRole = await getUserRole(auth.user.id);
       }
-      targetUserId = userIdParam;
-    }
+      return requesterRole === 'admin';
+    };
 
     let supplierQuery = supabaseAdmin
       .from('suppliers')
-      .select('id, supplier_type, status, submitted_at, updated_at')
-      .eq('user_id', targetUserId);
+      .select('id, supplier_type, status, submitted_at, updated_at');
 
-    if (typeParam) {
-      supplierQuery = supplierQuery.eq('supplier_type', typeParam);
+    if (supplierIdParam) {
+      const isAdmin = await ensureAdmin();
+      if (!isAdmin) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
+      supplierQuery = supplierQuery.eq('id', supplierIdParam);
     } else {
-      supplierQuery = supplierQuery.order('updated_at', { ascending: false }).limit(1);
+      if (userIdParam && userIdParam !== auth.user.id) {
+        const isAdmin = await ensureAdmin();
+        if (!isAdmin) {
+          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
+        targetUserId = userIdParam;
+      }
+
+      supplierQuery = supplierQuery.eq('user_id', targetUserId);
+      if (typeParam) {
+        supplierQuery = supplierQuery.eq('supplier_type', typeParam);
+      } else {
+        supplierQuery = supplierQuery.order('updated_at', { ascending: false }).limit(1);
+      }
     }
 
     const supplierResult = await supplierQuery.maybeSingle();

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import { validateLocalPhone } from '@/lib/phoneValidation';
 import { validateEmail } from '@/lib/emailValidation';
+import { useToast } from '@/components/ToastProvider';
 
 type LoginMethod = 'email' | 'phone';
 
@@ -15,7 +16,9 @@ const COUNTRY_CODES = [
 
 export default function LoginPage() {
   const router = useRouter();
+  const toast = useToast();
   const didBootstrapRef = useRef(false);
+  const [isHydrated, setIsHydrated] = useState(false);
   const [loginMethod, setLoginMethod] = useState<LoginMethod>('email');
   const [formData, setFormData] = useState({
     email: '',
@@ -25,6 +28,17 @@ export default function LoginPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!error) return;
+    toast.error(error);
+    setError('');
+  }, [error, toast]);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
   useEffect(() => {
     const bootstrap = async () => {
       if (didBootstrapRef.current) return;
@@ -184,7 +198,11 @@ export default function LoginPage() {
 
           {/* Login Form */}
           <div className="flex justify-center">
-            <form className="w-[432px] space-y-6 bg-white p-6 rounded-lg border border-gray-200" onSubmit={handleSubmit}>
+            <form
+              className="w-[432px] space-y-6 bg-white p-6 rounded-lg border border-gray-200"
+              method="post"
+              onSubmit={handleSubmit}
+            >
             <div className="space-y-4">
               {loginMethod === 'email' ? (
                 // Email Input
@@ -256,18 +274,12 @@ export default function LoginPage() {
             <div>
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !isHydrated}
                 className="w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-light bg-gray-900 text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? 'Signing in...' : 'Sign In / 登入'}
               </button>
             </div>
-
-            {error && (
-              <p className="text-center text-sm text-red-600">
-                {error}
-              </p>
-            )}
 
             <div className="text-center">
               <button

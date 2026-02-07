@@ -262,6 +262,7 @@ export async function GET(request: Request) {
       const brands = brandsMap.get(supplierId) || [];
       return {
         entry: {
+          supplierId,
           supplierType,
           companyName,
           companyNameChinese: company?.company_name_zh ?? '',

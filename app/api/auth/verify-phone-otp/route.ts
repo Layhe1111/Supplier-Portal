@@ -1,36 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { checkTwilioVerification } from '@/lib/twilioVerify';
-
-const validateInviteCode = async (code: string) => {
-  const trimmed = code.trim();
-  if (!trimmed) return null;
-  const { data, error } = await supabaseAdmin
-    .from('invite_codes')
-    .select('*')
-    .eq('code', trimmed)
-    .maybeSingle();
-  if (error || !data) {
-    throw new Error('Invalid invitation code');
-  }
-  if (data.status !== 'active') {
-    throw new Error('Invitation code inactive');
-  }
-  if (data.expires_at && new Date(data.expires_at).getTime() < Date.now()) {
-    throw new Error('Invitation code expired');
-  }
-  if (typeof data.max_uses === 'number' && data.used_count >= data.max_uses) {
-    throw new Error('Invitation code exhausted');
-  }
-  const { error: updateError } = await supabaseAdmin
-    .from('invite_codes')
-    .update({ used_count: (data.used_count || 0) + 1 })
-    .eq('id', data.id);
-  if (updateError) {
-    throw new Error('Failed to redeem invitation code');
-  }
-  return data.id as number;
-};
+import { consumeInviteCode } from '@/lib/inviteCodes';
 
 export async function POST(request: Request) {
   try {
@@ -58,7 +29,7 @@ export async function POST(request: Request) {
 
     const inviteCodeId =
       typeof invitationCode === 'string' && invitationCode.trim()
-        ? await validateInviteCode(invitationCode)
+        ? await consumeInviteCode(invitationCode)
         : null;
 
     const { data, error } = await supabaseAdmin.auth.admin.createUser({

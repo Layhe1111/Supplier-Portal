@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import { useToast } from '@/components/ToastProvider';
 
 type TicketMessage = {
   id: string;
@@ -53,6 +54,7 @@ export default function SupportTicketPanel({
   isOpen: boolean;
   onClose: () => void;
 }) {
+  const toast = useToast();
   const [subject, setSubject] = useState('');
   const [category, setCategory] = useState('account');
   const [description, setDescription] = useState('');
@@ -75,6 +77,12 @@ export default function SupportTicketPanel({
     setError('');
     void loadTickets();
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!error) return;
+    toast.error(error);
+    setError('');
+  }, [error, toast]);
 
   useEffect(() => {
     if (!listRef.current) return;
@@ -423,11 +431,6 @@ export default function SupportTicketPanel({
                     placeholder="Tell us what happened, steps to reproduce, and screenshots if any."
                   />
                 </div>
-                {error && (
-                  <p className="text-sm text-red-600">
-                    {error}
-                  </p>
-                )}
                 <button
                   type="button"
                   onClick={handleCreateTicket}

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { uploadFileToStorage } from '@/lib/storageUpload';
 import { extractOriginalFilename } from '@/lib/sanitizeFilename';
+import { useToast } from '@/components/ToastProvider';
 
 interface FileUploadProps {
   label: string;
@@ -35,6 +36,7 @@ export default function FileUpload({
   value,
   className = '',
 }: FileUploadProps) {
+  const toast = useToast();
   const [fileName, setFileName] = useState<string>('');
   const [filePath, setFilePath] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -66,6 +68,12 @@ export default function FileUpload({
       }
     };
   }, [previewIsObjectUrl, previewUrl]);
+
+  useEffect(() => {
+    if (!error) return;
+    toast.error(error);
+    setError('');
+  }, [error, toast]);
 
   const isLikelyImage = (path: string | null, file?: File | null) => {
     if (file?.type?.startsWith('image/')) return true;
@@ -197,10 +205,6 @@ export default function FileUpload({
           Accepted formats: {formattedAccept} / 支援格式：{formattedAccept}
         </p>
       )}
-      {error && (
-        <p className="text-xs text-red-600 mt-1">{error}</p>
-      )}
-
       {previewUrl && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"

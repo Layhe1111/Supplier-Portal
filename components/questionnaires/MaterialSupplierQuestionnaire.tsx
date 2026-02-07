@@ -12,6 +12,7 @@ import {
   REGISTERED_CAPITAL_CURRENCIES,
 } from '@/lib/registeredCapital';
 import { parseProductImportFile } from '@/lib/productImport';
+import { useToast } from '@/components/ToastProvider';
 
 interface MaterialSupplierQuestionnaireProps {
   data: MaterialSupplierFormData;
@@ -25,6 +26,7 @@ export default function MaterialSupplierQuestionnaire({
   data,
   onChange,
 }: MaterialSupplierQuestionnaireProps) {
+  const toast = useToast();
   const countryOptions = [
     { value: 'Hong Kong', label: 'Hong Kong 香港' },
     { value: 'China', label: 'China 中國' },
@@ -157,7 +159,7 @@ export default function MaterialSupplierQuestionnaire({
       }
 
       if (products.length === 0 && errors.length === 0) {
-        alert('未读取到任何产品数据，请检查模板。');
+        toast.error('未读取到任何产品数据，请检查模板。');
         return;
       }
 
@@ -168,9 +170,13 @@ export default function MaterialSupplierQuestionnaire({
       if (errors.length > 0) {
         messages.push(`以下行有问题，已跳过：\n${errors.join('\n')}`);
       }
-      alert(messages.join('\n\n'));
+      if (errors.length > 0) {
+        toast.error(messages.join('\n\n'));
+      } else {
+        toast.success(messages.join('\n\n'));
+      }
     } catch (error) {
-      alert(error instanceof Error ? error.message : '导入失败，请检查文件格式。');
+      toast.error(error instanceof Error ? error.message : '导入失败，请检查文件格式。');
     } finally {
       event.target.value = '';
     }

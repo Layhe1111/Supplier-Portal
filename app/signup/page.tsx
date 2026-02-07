@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import { validateLocalPhone } from '@/lib/phoneValidation';
 import { validateEmail } from '@/lib/emailValidation';
+import { useToast } from '@/components/ToastProvider';
 
 type SignupMethod = 'email' | 'phone';
 type Step = 'input' | 'enter_code';
@@ -16,6 +17,8 @@ const COUNTRY_CODES = [
 
 export default function SignupPage() {
   const router = useRouter();
+  const toast = useToast();
+  const [isHydrated, setIsHydrated] = useState(false);
   const [signupMethod, setSignupMethod] = useState<SignupMethod>('email');
   const [step, setStep] = useState<Step>('input');
   const [formData, setFormData] = useState({
@@ -30,6 +33,16 @@ export default function SignupPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [resendSecondsLeft, setResendSecondsLeft] = useState(0);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!error) return;
+    toast.error(error);
+    setError('');
+  }, [error, toast]);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   const handleMethodChange = (method: SignupMethod) => {
     setSignupMethod(method);
@@ -279,6 +292,7 @@ export default function SignupPage() {
           <div className="flex justify-center">
             <form
               className="w-[432px] space-y-6 bg-white p-6 rounded-lg border border-gray-200"
+              method="post"
               onSubmit={step === 'input' ? handleSendOtp : handleVerifyOtp}
             >
               <div className="space-y-4">
@@ -427,16 +441,10 @@ export default function SignupPage() {
                 </div>
               )}
 
-              {error && (
-                <p className="text-sm text-red-600">
-                  {error}
-                </p>
-              )}
-
               <div>
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !isHydrated}
                   className="w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-light bg-gray-900 text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {isSubmitting

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { uploadFileToStorage } from '@/lib/storageUpload';
 import { extractOriginalFilename } from '@/lib/sanitizeFilename';
+import { useToast } from '@/components/ToastProvider';
 
 interface MultiImageUploadProps {
   label: string;
@@ -28,6 +29,7 @@ export default function MultiImageUpload({
   value,
   className = '',
 }: MultiImageUploadProps) {
+  const toast = useToast();
   const [files, setFiles] = useState<{ name: string; path: string }[]>([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
@@ -44,6 +46,12 @@ export default function MultiImageUpload({
       .map((path) => ({ name: getDisplayName(path), path }));
     setFiles(nextFiles);
   }, [value]);
+
+  useEffect(() => {
+    if (!error) return;
+    toast.error(error);
+    setError('');
+  }, [error, toast]);
 
   const handlePreview = async (path: string) => {
     if (!path || uploading) return;
@@ -172,10 +180,6 @@ export default function MultiImageUpload({
         <p className="text-sm text-gray-500 mt-2">
           No images selected / 未選擇圖片
         </p>
-      )}
-
-      {error && (
-        <p className="text-xs text-red-600 mt-2">{error}</p>
       )}
 
       {previewUrl && (

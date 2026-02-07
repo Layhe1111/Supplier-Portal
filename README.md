@@ -54,6 +54,14 @@ RESEND_FROM_EMAIL=
 TWILIO_ACCOUNT_SID=
 TWILIO_AUTH_TOKEN=
 TWILIO_VERIFY_SERVICE_SID=
+PPTGEN_USERNAME=
+PPTGEN_PASSWORD=
+PPTGEN_KEY=
+PPTGEN_TEMPLATE_URL=
+# optional, if you want to upload a local template file instead of URL
+PPTGEN_TEMPLATE_FILE=
+# optional, default 4; used when input JSON has no explicit presentation.slides
+PPTGEN_SYNTH_SLIDES=4
 ```
 
 ### Database & Storage

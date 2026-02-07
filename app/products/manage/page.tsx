@@ -6,9 +6,11 @@ import { MaterialSupplierFormData, Product } from '@/types/supplier';
 import ProductModal from '@/components/ProductModal';
 import { supabase } from '@/lib/supabaseClient';
 import { useUnsavedChanges } from '@/components/UnsavedChangesProvider';
+import { useToast } from '@/components/ToastProvider';
 
 export default function ProductManagePage() {
   const router = useRouter();
+  const toast = useToast();
   const didLoadRef = useRef(false);
   const changeCounterRef = useRef(0);
   const { setDirty, registerSaveHandler } = useUnsavedChanges();
@@ -19,6 +21,12 @@ export default function ProductManagePage() {
   const [editingIndex, setEditingIndex] = useState<number | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!error) return;
+    toast.error(error);
+    setError('');
+  }, [error, toast]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -128,7 +136,7 @@ export default function ProductManagePage() {
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        alert(body.error || 'Failed to save products');
+        toast.error(body.error || 'Failed to save products');
         return false;
       }
 
@@ -137,14 +145,15 @@ export default function ProductManagePage() {
       }
 
       if (navigateOnSuccess) {
+        toast.success('Products saved');
         router.push('/dashboard');
       }
       return true;
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to save products');
+      toast.error(err instanceof Error ? err.message : 'Failed to save products');
       return false;
     }
-  }, [products, router, setDirty, userData]);
+  }, [products, router, setDirty, toast, userData]);
 
   const handleSaveAll = async () => {
     await saveProducts(true);

@@ -12,6 +12,7 @@ import { validateLocalPhone } from '@/lib/phoneValidation';
 import { validateOptionalUrl } from '@/lib/urlValidation';
 import { validateEmail } from '@/lib/emailValidation';
 import { useUnsavedChanges } from '@/components/UnsavedChangesProvider';
+import { useToast } from '@/components/ToastProvider';
 
 const PHONE_CODE_OPTIONS = [
   '+852',
@@ -53,6 +54,7 @@ const COUNTRY_OPTIONS = [
 
 export default function BasicSupplierRegistrationPage() {
   const router = useRouter();
+  const toast = useToast();
   const didBootstrapRef = useRef(false);
   const changeCounterRef = useRef(0);
   const { setDirty, registerSaveHandler } = useUnsavedChanges();
@@ -77,6 +79,12 @@ export default function BasicSupplierRegistrationPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!error) return;
+    toast.error(error);
+    setError('');
+  }, [error, toast]);
 
   // Check if user is logged in (Supabase auth) and load any existing local draft
   useEffect(() => {
@@ -632,11 +640,6 @@ export default function BasicSupplierRegistrationPage() {
             </button>
           </div>
 
-          {error && (
-            <p className="text-sm text-red-600 text-right">
-              {error}
-            </p>
-          )}
         </form>
       </div>
     </div>

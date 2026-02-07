@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { uploadFileToStorage } from '@/lib/storageUpload';
 import { extractOriginalFilename } from '@/lib/sanitizeFilename';
+import { useToast } from '@/components/ToastProvider';
 
 interface MultiFileUploadProps {
   label: string;
@@ -30,6 +31,7 @@ export default function MultiFileUpload({
   value,
   className = '',
 }: MultiFileUploadProps) {
+  const toast = useToast();
   const [files, setFiles] = useState<{ name: string; path: string }[]>([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
@@ -51,6 +53,12 @@ export default function MultiFileUpload({
       .map((path) => ({ name: getDisplayName(path), path }));
     setFiles(nextFiles);
   }, [value]);
+
+  useEffect(() => {
+    if (!error) return;
+    toast.error(error);
+    setError('');
+  }, [error, toast]);
 
   const handlePreview = async (path: string) => {
     if (!path || uploading) return;
@@ -163,9 +171,6 @@ export default function MultiFileUpload({
         </div>
       )}
 
-      {error && (
-        <p className="text-xs text-red-600 mt-2">{error}</p>
-      )}
     </div>
   );
 }

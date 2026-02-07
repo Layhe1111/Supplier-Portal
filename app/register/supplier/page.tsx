@@ -18,6 +18,7 @@ import DesignerQuestionnaire from '@/components/questionnaires/DesignerQuestionn
 import MaterialSupplierQuestionnaire from '@/components/questionnaires/MaterialSupplierQuestionnaire';
 import CommonRequirements from '@/components/questionnaires/CommonRequirements';
 import { useUnsavedChanges } from '@/components/UnsavedChangesProvider';
+import { useToast } from '@/components/ToastProvider';
 
 type NonBasicSupplierFormData =
   | ContractorFormData
@@ -26,6 +27,7 @@ type NonBasicSupplierFormData =
 
 export default function SupplierRegistrationPage() {
   const router = useRouter();
+  const toast = useToast();
   const [supplierType, setSupplierType] = useState<
     'contractor' | 'designer' | 'material' | null
   >(null);
@@ -36,11 +38,7 @@ export default function SupplierRegistrationPage() {
   const [isClearingType, setIsClearingType] = useState(false);
   const [error, setError] = useState('');
   const [supplierId, setSupplierId] = useState<string | null>(null);
-  const [showAutoSaveNotice, setShowAutoSaveNotice] = useState(false);
-  const [showSaveNotice, setShowSaveNotice] = useState(false);
   const autoSaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const autoSaveNoticeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const saveNoticeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const saveRedirectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasUserInteractedRef = useRef(false);
   const isSubmittingRef = useRef(false);
@@ -48,6 +46,12 @@ export default function SupplierRegistrationPage() {
   const didBootstrapRef = useRef(false);
   const changeCounterRef = useRef(0);
   const { setDirty, registerSaveHandler } = useUnsavedChanges();
+
+  useEffect(() => {
+    if (!error) return;
+    toast.error(error);
+    setError('');
+  }, [error, toast]);
 
   // Initialize form data based on supplier type
   const [formData, setFormData] = useState<NonBasicSupplierFormData | null>(null);
@@ -457,7 +461,7 @@ export default function SupplierRegistrationPage() {
       if (changeCounterRef.current === saveVersion) {
         setDirty(false);
       }
-      setShowSaveNotice(true);
+      toast.success('Saved / 已保存');
       if (saveRedirectTimeoutRef.current) {
         clearTimeout(saveRedirectTimeoutRef.current);
       }
@@ -481,7 +485,7 @@ export default function SupplierRegistrationPage() {
     setIsAutoSaving(true);
     try {
       await upsertSupplier('draft');
-      setShowAutoSaveNotice(true);
+      toast.success('Auto-saved / 已自动保存');
       if (changeCounterRef.current === saveVersion) {
         setDirty(false);
       }
@@ -589,38 +593,6 @@ export default function SupplierRegistrationPage() {
   }, [formData]);
 
   useEffect(() => {
-    if (!showAutoSaveNotice) return;
-    if (autoSaveNoticeTimeoutRef.current) {
-      clearTimeout(autoSaveNoticeTimeoutRef.current);
-    }
-    autoSaveNoticeTimeoutRef.current = setTimeout(() => {
-      setShowAutoSaveNotice(false);
-    }, 3000);
-
-    return () => {
-      if (autoSaveNoticeTimeoutRef.current) {
-        clearTimeout(autoSaveNoticeTimeoutRef.current);
-      }
-    };
-  }, [showAutoSaveNotice]);
-
-  useEffect(() => {
-    if (!showSaveNotice) return;
-    if (saveNoticeTimeoutRef.current) {
-      clearTimeout(saveNoticeTimeoutRef.current);
-    }
-    saveNoticeTimeoutRef.current = setTimeout(() => {
-      setShowSaveNotice(false);
-    }, 1000);
-
-    return () => {
-      if (saveNoticeTimeoutRef.current) {
-        clearTimeout(saveNoticeTimeoutRef.current);
-      }
-    };
-  }, [showSaveNotice]);
-
-  useEffect(() => {
     return () => {
       if (saveRedirectTimeoutRef.current) {
         clearTimeout(saveRedirectTimeoutRef.current);
@@ -654,12 +626,6 @@ export default function SupplierRegistrationPage() {
           {isClearingType && (
             <p className="mb-4 text-sm text-gray-600">
               Clearing data... / 正在清除資料...
-            </p>
-          )}
-
-          {error && (
-            <p className="mb-4 text-sm text-red-600">
-              {error}
             </p>
           )}
 
@@ -742,30 +708,6 @@ export default function SupplierRegistrationPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div
-        className={`fixed top-4 right-4 z-50 transform transition-all duration-300 ease-out ${
-          showSaveNotice
-            ? 'translate-x-0 opacity-100'
-            : 'translate-x-full opacity-0 pointer-events-none'
-        }`}
-        aria-live="polite"
-      >
-        <div className="bg-gray-900 text-white text-sm font-light px-4 py-3 shadow-lg">
-          Saved / 已保存
-        </div>
-      </div>
-      <div
-        className={`fixed top-16 right-4 z-50 transform transition-all duration-300 ease-out ${
-          showAutoSaveNotice
-            ? 'translate-x-0 opacity-100'
-            : 'translate-x-full opacity-0 pointer-events-none'
-        }`}
-        aria-live="polite"
-      >
-        <div className="bg-gray-900 text-white text-sm font-light px-4 py-3 shadow-lg">
-          Auto-saved / 已自动保存
-        </div>
-      </div>
       <div className="max-w-5xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-light text-gray-900">
@@ -852,11 +794,6 @@ export default function SupplierRegistrationPage() {
             </div>
           </div>
 
-          {error && (
-            <p className="text-sm text-red-600 mt-4">
-              {error}
-            </p>
-          )}
         </form>
       </div>
     </div>

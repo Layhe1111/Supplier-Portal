@@ -88,13 +88,17 @@ export async function GET(request: Request) {
 
     const filtered = users.filter((user) => {
       if (!q) return true;
-      return (user.email || '').toLowerCase().includes(q);
+      return (
+        (user.email || '').toLowerCase().includes(q) ||
+        (user.phone || '').toLowerCase().includes(q)
+      );
     });
 
     return NextResponse.json({
       users: filtered.map((user) => ({
         id: user.id,
         email: user.email,
+        phone: user.phone,
         createdAt: user.created_at,
         lastSignInAt: user.last_sign_in_at,
         role: rolesMap.get(user.id)?.role || 'user',

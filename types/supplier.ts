@@ -286,6 +286,7 @@ export interface BasicSupplierFormData {
 }
 
 export interface SupplierDirectoryEntry {
+  supplierId?: string;
   supplierType: 'basic' | 'contractor' | 'designer' | 'material';
   companyName: string;
   companyNameChinese?: string;
