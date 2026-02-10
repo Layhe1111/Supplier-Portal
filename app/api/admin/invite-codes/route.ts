@@ -5,6 +5,12 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin';
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || process.env.EMAIL_FROM;
 const PUBLIC_PORTAL_SIGNUP_URL = 'https://www.supplierportal.net/signup';
+const PORTAL_URL = process.env.PUBLIC_PORTAL_URL || new URL(PUBLIC_PORTAL_SIGNUP_URL).origin;
+const SUPPORT_EMAIL_ADDRESS =
+  process.env.SUPPORT_EMAIL_ADDRESS || process.env.SUPPORT_EMAIL || FROM_EMAIL || 'info@engineeringstewards.com';
+const PROCUREMENT_CONTACT_EMAIL =
+  process.env.PROCUREMENT_CONTACT_EMAIL || process.env.BUSINESS_CONTACT_EMAIL || SUPPORT_EMAIL_ADDRESS;
+const COMPANY_NAME = process.env.COMPANY_NAME || 'Engineering Stewards Limited';
 
 const requireUser = async (request: Request) => {
   const authHeader = request.headers.get('authorization') || '';
@@ -88,18 +94,102 @@ const sendInviteCodeEmail = async (params: {
   }
 
   const expiresText = params.expiresAt
-    ? `\nThis code expires at: ${new Date(params.expiresAt).toLocaleString()}.`
+    ? `\nInvitation code expiry: ${new Date(params.expiresAt).toLocaleString()}.\n邀請碼失效時間：${new Date(params.expiresAt).toLocaleString()}。`
+    : '';
+  const expiresHtml = params.expiresAt
+    ? `<br/>Invitation code expiry: ${new Date(params.expiresAt).toLocaleString()}.<br/>邀請碼失效時間：${new Date(params.expiresAt).toLocaleString()}。`
     : '';
 
-  const subject = 'Your invitation code / 邀請碼';
-  const text = `You are invited to Supplier Portal.
+  const subject = 'Invitation to Join Supplier Portal / 供應商平台邀請函';
+  const text = `Subject: ${subject}
+
+Dear Valued Supplier,
+
+You are receiving this invitation to join our new Supplier Portal, developed by Engineering Stewards Limited, a partner of the Hong Kong Science and Technology Parks (HKSTP).
+
+This portal is designed to optimize our partnership and provide you with additional benefits:
+- Streamlined Interface: Manage your interactions, documents, and communications with our organization efficiently.
+- Profile Enhancement: We can assist in converting your provided information into a professional digital company brochure hosted on your portal profile.
+- Promotional Support: Approved supplier profiles may be featured and recommended to our platform's active user base to increase your business opportunities.
+
+Action Required:
+To activate your account and access these features, please complete your registration via the link below.
 
 Invitation code: ${params.code}${expiresText}
-Sign up here: ${params.signupUrl}
+Supplier Portal Registration Link: ${params.signupUrl}
+Portal URL: ${PORTAL_URL}
 
-您已被邀請加入 Supplier Portal。
-邀請碼：${params.code}${expiresText ? `\n失效時間：${new Date(params.expiresAt as string).toLocaleString()}` : ''}
-註冊入口：${params.signupUrl}`;
+For technical support: ${SUPPORT_EMAIL_ADDRESS}
+
+This is an automated message. Please do not reply directly to this email. For any non-technical inquiries regarding this invitation, please contact ${PROCUREMENT_CONTACT_EMAIL}.
+
+We look forward to your registration.
+
+Sincerely,
+The Supplier Portal System
+${COMPANY_NAME}
+
+尊敬的供應商夥伴，您好：
+
+您收到此郵件，是因為我們誠邀您加入全新 Supplier Portal（供應商平台）。此平台由 Engineering Stewards Limited 開發，並與香港科技園公司（HKSTP）生態合作。
+
+此平台旨在優化我們的合作流程，並為您提供更多商機與價值：
+- 流程更高效：可集中管理與我們的互動、文件與溝通記錄。
+- 企業形象升級：我們可協助將您提供的資料轉換為專業數碼公司手冊，展示於您的平台檔案頁面。
+- 推廣支持：通過審核的供應商檔案，將有機會被推薦給平台活躍用戶，提升曝光與業務機會。
+
+請您完成以下操作：
+為啟用帳戶並使用上述功能，請透過以下連結完成註冊。
+
+邀請碼：${params.code}${expiresText}
+供應商平台註冊連結：${params.signupUrl}
+平台網址：${PORTAL_URL}
+
+技術支援：${SUPPORT_EMAIL_ADDRESS}
+
+此郵件為系統自動發送，請勿直接回覆。如有非技術相關問題，請聯絡：${PROCUREMENT_CONTACT_EMAIL}。
+
+期待您的註冊。
+
+此致
+供應商平台系統
+${COMPANY_NAME}`;
+
+  const html = `Subject: ${subject}<br/><br/>
+Dear Valued Supplier,<br/><br/>
+You are receiving this invitation to join our new Supplier Portal, developed by Engineering Stewards Limited, a partner of the Hong Kong Science and Technology Parks (HKSTP).<br/><br/>
+This portal is designed to optimize our partnership and provide you with additional benefits:<br/>
+Streamlined Interface: Manage your interactions, documents, and communications with our organization efficiently.<br/>
+Profile Enhancement: We can assist in converting your provided information into a professional digital company brochure hosted on your portal profile.<br/>
+Promotional Support: Approved supplier profiles may be featured and recommended to our platform's active user base to increase your business opportunities.<br/><br/>
+Action Required:<br/>
+To activate your account and access these features, please complete your registration via the link below.<br/><br/>
+Invitation code: ${params.code}${expiresHtml}<br/>
+Supplier Portal Registration Link: <a href="${params.signupUrl}">${params.signupUrl}</a><br/>
+Portal URL: <a href="${PORTAL_URL}">${PORTAL_URL}</a><br/><br/>
+For technical support: <a href="mailto:${SUPPORT_EMAIL_ADDRESS}">${SUPPORT_EMAIL_ADDRESS}</a><br/><br/>
+This is an automated message. Please do not reply directly to this email. For any non-technical inquiries regarding this invitation, please contact <a href="mailto:${PROCUREMENT_CONTACT_EMAIL}">${PROCUREMENT_CONTACT_EMAIL}</a>.<br/><br/>
+We look forward to your registration.<br/><br/>
+Sincerely,<br/>
+The Supplier Portal System<br/>
+${COMPANY_NAME}<br/><br/>
+尊敬的供應商夥伴，您好：<br/><br/>
+您收到此郵件，是因為我們誠邀您加入全新 Supplier Portal（供應商平台）。此平台由 Engineering Stewards Limited 開發，並與香港科技園公司（HKSTP）生態合作。<br/><br/>
+此平台旨在優化我們的合作流程，並為您提供更多商機與價值：<br/>
+流程更高效：可集中管理與我們的互動、文件與溝通記錄。<br/>
+企業形象升級：我們可協助將您提供的資料轉換為專業數碼公司手冊，展示於您的平台檔案頁面。<br/>
+推廣支持：通過審核的供應商檔案，將有機會被推薦給平台活躍用戶，提升曝光與業務機會。<br/><br/>
+請您完成以下操作：<br/>
+為啟用帳戶並使用上述功能，請透過以下連結完成註冊。<br/><br/>
+邀請碼：${params.code}${expiresHtml}<br/>
+供應商平台註冊連結：<a href="${params.signupUrl}">${params.signupUrl}</a><br/>
+平台網址：<a href="${PORTAL_URL}">${PORTAL_URL}</a><br/><br/>
+技術支援：<a href="mailto:${SUPPORT_EMAIL_ADDRESS}">${SUPPORT_EMAIL_ADDRESS}</a><br/><br/>
+此郵件為系統自動發送，請勿直接回覆。如有非技術相關問題，請聯絡 <a href="mailto:${PROCUREMENT_CONTACT_EMAIL}">${PROCUREMENT_CONTACT_EMAIL}</a>。<br/><br/>
+期待您的註冊。<br/><br/>
+此致<br/>
+供應商平台系統<br/>
+${COMPANY_NAME}`;
 
   const emailRes = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -112,6 +202,7 @@ Sign up here: ${params.signupUrl}
       to: params.to,
       subject,
       text,
+      html,
     }),
   });
 
