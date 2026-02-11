@@ -1,0 +1,125 @@
+{
+  "presentationTitle": "Design Firm Capability Deck",
+  "styleHint": "consulting minimal",
+  "slides": [
+    {
+      "type": "title",
+      "title": "Northstar Design & Build",
+      "keyMessage": "Integrated design and delivery partner for complex workplace programs.",
+      "subtitle": "Data-backed capability overview",
+      "density": "low",
+      "tone": "consulting",
+      "emphasis": {
+        "phrases": ["Integrated design and delivery"],
+        "numbers": []
+      },
+      "visual": {
+        "layoutHint": "full-bleed-image",
+        "imageUrl": "https://httpbin.org/image/jpeg"
+      }
+    },
+    {
+      "type": "bullets",
+      "title": "Our Services",
+      "keyMessage": "Deliver end-to-end outcomes through a unified design-build workflow.",
+      "bullets": [
+        "Align workplace strategy with business growth priorities.",
+        "Design concept options for phased implementation.",
+        "Standardize design language across regional offices.",
+        "Optimize cost and timeline through early constructability checks.",
+        "Coordinate consultants and authority submissions.",
+        "Execute fit-out works with integrated PM controls."
+      ],
+      "density": "medium",
+      "tone": "consulting",
+      "emphasis": {
+        "phrases": ["end-to-end outcomes", "unified design-build workflow"],
+        "numbers": []
+      },
+      "visual": {
+        "layoutHint": "cards"
+      },
+      "constraints": {
+        "maxBulletsPerSlide": 6,
+        "maxCharsPerBullet": 110
+      }
+    },
+    {
+      "type": "bullets",
+      "title": "Selected Projects",
+      "keyMessage": "Project delivery quality is sustained across multi-market engagements.",
+      "bullets": [
+        "Deliver flagship workplace upgrades in Singapore, Tokyo, and Hong Kong.",
+        "Coordinate tenant standards and local compliance in parallel schedules.",
+        "Maintain design consistency while adapting to market-specific requirements.",
+        "Close construction and handover milestones with transparent governance."
+      ],
+      "density": "medium",
+      "tone": "report",
+      "emphasis": {
+        "phrases": ["multi-market engagements"],
+        "numbers": []
+      },
+      "visual": {
+        "layoutHint": "image-right",
+        "imageUrl": "https://httpbin.org/image/png"
+      },
+      "constraints": {
+        "maxBulletsPerSlide": 6,
+        "maxCharsPerBullet": 110
+      }
+    },
+    {
+      "type": "bigNumber",
+      "title": "Design & Build Capability",
+      "keyMessage": "Scaled delivery capacity supports high-volume annual programs.",
+      "number": "120,000 sqm",
+      "caption": "Annual cumulative delivery area across active design-build projects.",
+      "bullets": [
+        "Sustain delivery quality through standardized QA and governance controls.",
+        "Deploy parallel teams across project waves with shared PMO oversight."
+      ],
+      "density": "low",
+      "tone": "report",
+      "emphasis": {
+        "phrases": ["delivery capacity"],
+        "numbers": ["120,000 sqm"]
+      },
+      "visual": {
+        "layoutHint": "text"
+      }
+    },
+    {
+      "type": "bullets",
+      "title": "Compliance & Quality",
+      "keyMessage": "Compliance risk is controlled through process discipline and transparent checks.",
+      "bullets": [
+        "Establish safety governance and permit tracking from day one.",
+        "Implement standardized quality checklists across all work packages.",
+        "Run weekly risk reviews with owners, actions, and deadlines.",
+        "Document incident prevention controls and close-out evidence.",
+        "Maintain insurance and contractual compliance records centrally.",
+        "Coordinate authority approvals and inspection readiness planning.",
+        "Track non-conformance trends and corrective action performance.",
+        "Publish client-facing progress updates for decision transparency.",
+        "Align subcontractor quality plans with project acceptance criteria.",
+        "Audit handover packages before practical completion sign-off.",
+        "Embed lessons learned into next-project quality baselines.",
+        "Continuously improve governance standards using delivery data."
+      ],
+      "density": "high",
+      "tone": "report",
+      "emphasis": {
+        "phrases": ["risk is controlled", "process discipline"],
+        "numbers": []
+      },
+      "visual": {
+        "layoutHint": "text"
+      },
+      "constraints": {
+        "maxBulletsPerSlide": 6,
+        "maxCharsPerBullet": 90
+      }
+    }
+  ]
+}

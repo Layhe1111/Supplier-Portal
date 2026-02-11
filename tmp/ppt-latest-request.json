@@ -1,0 +1,911 @@
+{
+  "generated_at": "2026-02-10T07:15:04.356Z",
+  "source_payload": {
+    "Section 1: Design Company Overview / 設計公司概況": {
+      "Company English Name / 公司英文名": "SL&A Hong Kong Limited",
+      "Year of Incorporation / 成立年份": "2015",
+      "Registered Capital Amount / 註冊資本數額": "2000000 HKD",
+      "Country / 國家和地區": "Hong Kong 香港",
+      "Office Address / 辦公地址": "7/F, Sea Bird House, 22-28 Wyndham Street, Central, Hong Kong",
+      "Business Description / 公司或業務簡介": "SLA is an Asia-focused international design firm specializing in creating inspiring spaces. They offer a comprehensive range of services including Interior Design, Design & Build, Hospitality Design, Architectural Design, Sustainable Design, and Workspace Strategy.\n\nA core strength is their extensive portfolio of work for major global corporations. Their key clients and featured projects span across prominent cities in Asia, such as Adobe in Tokyo, NVIDIA in Beijing, ByteDance (TikTok) and Microsoft in Kuala Lumpur, and Hotel Indigo in Taiwan's Alishan.\n\nThe company emphasizes a user-centric and practical approach, aiming to create environments that enhance productivity, comfort, and brand expression. A cornerstone of their promise is to deliver projects that are on time, within budget, practical, and beautiful.",
+      "Business Registration Number / 商業登記號": "2849140242038459",
+      "Business Registration / 商業登記證": "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769394818997-Thomas_Student_HONG_-_R_J.CLOZE_HANDOUT.ACT_III__orig__VGhvbWFzIChTdHVkZW50KSBIT05HIC0gUiZKLkNMT1pFX0hBTkRPVVQuQUNUX0lJSS5wZGY.pdf?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NDgxODk5Ny1UaG9tYXNfU3R1ZGVudF9IT05HXy1fUl9KLkNMT1pFX0hBTkRPVVQuQUNUX0lJSV9fb3JpZ19fVkdodmJXRnpJQ2hUZEhWa1pXNTBLU0JJVDA1SElDMGdVaVpLTGtOTVQxcEZYMGhCVGtSUFZWUXVRVU5VWDBsSlNTNXdaR1kucGRmIiwiaWF0IjoxNzcwNzA3NjczLCJleHAiOjE3NzA3MTEyNzN9.RQkQncl4EdvgLbGGD8rcDxkNR_mLgVK-ciubzNP5sJc",
+      "Company Photos / 公司形象照片": "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769394866934-2c6cd2afdce82d1b7379667ef8e6f246__orig__MmM2Y2QyYWZkY2U4MmQxYjczNzk2NjdlZjhlNmYyNDYuanBlZw.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NDg2NjkzNC0yYzZjZDJhZmRjZTgyZDFiNzM3OTY2N2VmOGU2ZjI0Nl9fb3JpZ19fTW1NMlkyUXlZV1prWTJVNE1tUXhZamN6TnprMk5qZGxaamhsTm1ZeU5EWXVhbkJsWncuanBlZyIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.uRn3EExI-wLz0eeoomdrGawbKpQ8b-CoZDJiLKFp-B0",
+      "Design Awards / 設計獎項": [
+        {
+          "Year / 年份": "2022",
+          "Award / 獎項": "Muse Design Awards",
+          "Placement / 名次": "Gold",
+          "Project / 項目": "Pfizer Inc."
+        },
+        {
+          "Year / 年份": "2023",
+          "Award / 獎項": "Muse Design Awards - Interior Design Office Category",
+          "Placement / 名次": "Gold",
+          "Project / 項目": "Agoda"
+        }
+      ],
+      "Design Team Size / 設計團隊規模": "250",
+      "Prefered Fee Structure / 設計收費模式": [
+        "By Area 按面積"
+      ],
+      "Design Highlights / 经典案例": [
+        {
+          "Project Name / 項目名稱": "NVIDIA Beijing",
+          "Year / 年份": "2021",
+          "Area (sqft) / 面積（平方呎）": "28000",
+          "Building Name / 大廈名稱": "Citic Tower",
+          "Project Scope / 是否重新裝修？": "New Fitout 全新装修",
+          "Property Types / 主要項目類型": [
+            "Office 辦公"
+          ],
+          "Project Photos / 項目照片": [
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395313258-1459a66d6c4d33d9e054db2294440d19__orig__MTQ1OWE2NmQ2YzRkMzNkOWUwNTRkYjIyOTQ0NDBkMTkud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMzI1OC0xNDU5YTY2ZDZjNGQzM2Q5ZTA1NGRiMjI5NDQ0MGQxOV9fb3JpZ19fTVRRMU9XRTJObVEyWXpSa016TmtPV1V3TlRSa1lqSXlPVFEwTkRCa01Ua3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.kFEFlacsRxTSt6E28mpQqmUgqRGfVI7gMKxv3exHCcs",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395313699-0fdd7003aa32acd8f078ad35a9181558__orig__MGZkZDcwMDNhYTMyYWNkOGYwNzhhZDM1YTkxODE1NTgud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMzY5OS0wZmRkNzAwM2FhMzJhY2Q4ZjA3OGFkMzVhOTE4MTU1OF9fb3JpZ19fTUdaa1pEY3dNRE5oWVRNeVlXTmtPR1l3TnpoaFpETTFZVGt4T0RFMU5UZ3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.jANzSl0isfRJb8vaOzOpSRV9PR9JBAQwGen0tqWiWnw",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395245386-95158108227ccd2803797639068380f2__orig__OTUxNTgxMDgyMjdjY2QyODAzNzk3NjM5MDY4MzgwZjIud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTI0NTM4Ni05NTE1ODEwODIyN2NjZDI4MDM3OTc2MzkwNjgzODBmMl9fb3JpZ19fT1RVeE5UZ3hNRGd5TWpkalkyUXlPREF6TnprM05qTTVNRFk0TXpnd1pqSXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.hU0Iy6dUx_PsUgCi1Mc2B_2OO0bHz6Mcf02vrEFjJU8",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395309797-e1c3cba97428d0c805c36e05feadd070__orig__ZTFjM2NiYTk3NDI4ZDBjODA1YzM2ZTA1ZmVhZGQwNzAud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMwOTc5Ny1lMWMzY2JhOTc0MjhkMGM4MDVjMzZlMDVmZWFkZDA3MF9fb3JpZ19fWlRGak0yTmlZVGszTkRJNFpEQmpPREExWXpNMlpUQTFabVZoWkdRd056QXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.kb9osvHje-JyYM_xcYqvpGsm-lC4kZoc4R8ll1nBGPs",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395311006-ca7b884eac280e162c7f2662c5f5ac76__orig__Y2E3Yjg4NGVhYzI4MGUxNjJjN2YyNjYyYzVmNWFjNzYud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMTAwNi1jYTdiODg0ZWFjMjgwZTE2MmM3ZjI2NjJjNWY1YWM3Nl9fb3JpZ19fWTJFM1lqZzROR1ZoWXpJNE1HVXhOakpqTjJZeU5qWXlZelZtTldGak56WXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.s56LvLXuIiX_AQ6u5ObYljgolzwse9D90HG01hEReSY",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395311770-9877aef10de6eefe268f034820983f05__orig__OTg3N2FlZjEwZGU2ZWVmZTI2OGYwMzQ4MjA5ODNmMDUud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMTc3MC05ODc3YWVmMTBkZTZlZWZlMjY4ZjAzNDgyMDk4M2YwNV9fb3JpZ19fT1RnM04yRmxaakV3WkdVMlpXVm1aVEkyT0dZd016UTRNakE1T0RObU1EVXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.T-4znaJWSDOlTgvNBwUxHxZ_WcIW-9Gd-1B8LcgUk5o",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395312213-49ba48c88f3fa1b7131646b5c127999a__orig__NDliYTQ4Yzg4ZjNmYTFiNzEzMTY0NmI1YzEyNzk5OWEud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMjIxMy00OWJhNDhjODhmM2ZhMWI3MTMxNjQ2YjVjMTI3OTk5YV9fb3JpZ19fTkRsaVlUUTRZemc0WmpObVlURmlOekV6TVRZME5tSTFZekV5TnprNU9XRXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.FAiIvvIk5dhrJUqgcciDZoPEMzkHiETeCkXWrCskSyY",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395312636-aef9260e8e95781f74ead4af1059fd38__orig__YWVmOTI2MGU4ZTk1NzgxZjc0ZWFkNGFmMTA1OWZkMzgud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMjYzNi1hZWY5MjYwZThlOTU3ODFmNzRlYWQ0YWYxMDU5ZmQzOF9fb3JpZ19fWVdWbU9USTJNR1U0WlRrMU56Z3haamMwWldGa05HRm1NVEExT1daa016Z3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.FfZIRI4R9yevCe-x_333VIGdxUiExi4jIc6_teEmRl4",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395312952-8a680cf9518dbf1e219994e805a28528__orig__OGE2ODBjZjk1MThkYmYxZTIxOTk5NGU4MDVhMjg1Mjgud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMjk1Mi04YTY4MGNmOTUxOGRiZjFlMjE5OTk0ZTgwNWEyODUyOF9fb3JpZ19fT0dFMk9EQmpaamsxTVRoa1ltWXhaVEl4T1RrNU5HVTRNRFZoTWpnMU1qZ3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.X3EvIx8XqELpf1D_5BHKsuCJN3XGJvO5sd1drhrQEfQ"
+          ]
+        }
+      ],
+      "Or enter company website / 或輸入公司網站": "https://www.sla-group.com/"
+    },
+    "Section 2: Design Specialization / 設計專業": {
+      "Property Types / 主要項目類型": [
+        "Hotel 酒店",
+        "Medical 醫療"
+      ],
+      "Design Styles / 擅長風格": [
+        "現代簡約風 / Modern Minimalist",
+        "現代輕奢風 / Modern Light Luxury Style"
+      ],
+      "BIM Capability / BIM能力": "No 否",
+      "Main Software / 主要軟件": [
+        "SketchUp",
+        "AutoCAD"
+      ]
+    },
+    "Section 3: Personnel Information / 人員信息": {
+      "Organization Chart / 組織架構圖": "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395776325-Screenshot_2026-01-26_10.49.25_AM__orig__U2NyZWVuc2hvdCAyMDI2LTAxLTI2IDEwLjQ5LjI1IEFNLnBuZw.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTc3NjMyNS1TY3JlZW5zaG90XzIwMjYtMDEtMjZfMTAuNDkuMjVfQU1fX29yaWdfX1UyTnlaV1Z1YzJodmRDQXlNREkyTFRBeExUSTJJREV3TGpRNUxqSTFJRUZOTG5CdVp3LnBuZyIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.8vhvOBDH7ZtZnFC07p8ffOnl8X0ntn0QqRaG0vooUTM",
+      "Design Personnel / 設計人員": [
+        {
+          "Designer Name / 設計師姓名": "Louis Lau",
+          "Years of Experience / 年資": "20",
+          "CV / 簡歷": "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493186218-Screenshot_2026-01-26_10.51.27_AM__orig__U2NyZWVuc2hvdCAyMDI2LTAxLTI2IDEwLjUxLjI3IEFNLnBuZw.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzE4NjIxOC1TY3JlZW5zaG90XzIwMjYtMDEtMjZfMTAuNTEuMjdfQU1fX29yaWdfX1UyTnlaV1Z1YzJodmRDQXlNREkyTFRBeExUSTJJREV3TGpVeExqSTNJRUZOTG5CdVp3LnBuZyIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.gaXzxcfiFSc3MTmMGxdbDyAbeweZcsPEpah0sC9224k",
+          "Projects / 項目經歷": [
+            {
+              "Project Name / 項目名稱": "Pfizer Inc.",
+              "Year / 年份": "2022",
+              "Area (sqft) / 面積（平方呎）": "15004",
+              "Building Name / 大廈名稱": "Kerry Centre",
+              "Project Scope / 是否重新裝修？": "New Fitout 全新装修",
+              "Property Types / 主要項目類型": [
+                "Office 辦公"
+              ],
+              "Project Photos / 項目照片": [
+                "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493531396-6ebc2b6c69aafb9f3dea56e3f24024a9_1__orig__NmViYzJiNmM2OWFhZmI5ZjNkZWE1NmUzZjI0MDI0YTkgKDEpLndlYnA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzUzMTM5Ni02ZWJjMmI2YzY5YWFmYjlmM2RlYTU2ZTNmMjQwMjRhOV8xX19vcmlnX19ObVZpWXpKaU5tTTJPV0ZoWm1JNVpqTmtaV0UxTm1VelpqSTBNREkwWVRrZ0tERXBMbmRsWW5BLndlYnAiLCJpYXQiOjE3NzA3MDc2NzMsImV4cCI6MTc3MDcxMTI3M30.0QGYBs4TW1RfLOWzxLM5f1RQHACHxyhxr_kDomukj30",
+                "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493539131-05c53d17bddc5b71c3c6e3fd42369704__orig__MDVjNTNkMTdiZGRjNWI3MWMzYzZlM2ZkNDIzNjk3MDQud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzUzOTEzMS0wNWM1M2QxN2JkZGM1YjcxYzNjNmUzZmQ0MjM2OTcwNF9fb3JpZ19fTURWak5UTmtNVGRpWkdSak5XSTNNV016WXpabE0yWmtOREl6TmprM01EUXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.rMEhT8lse6mCRc9vDVq3QsoCuDkfzrMwlroKeBO_DVA",
+                "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493539647-562c115b25a78732500dc0a22db25c85__orig__NTYyYzExNWIyNWE3ODczMjUwMGRjMGEyMmRiMjVjODUud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzUzOTY0Ny01NjJjMTE1YjI1YTc4NzMyNTAwZGMwYTIyZGIyNWM4NV9fb3JpZ19fTlRZeVl6RXhOV0l5TldFM09EY3pNalV3TUdSak1HRXlNbVJpTWpWak9EVXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.TgSVp0G7ZrapmDV2xvnTFW-3kmIXi8sscUXQ5so5CTs",
+                "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493539897-d05ffed4e6b5bcd0f96209721982a365_1__orig__ZDA1ZmZlZDRlNmI1YmNkMGY5NjIwOTcyMTk4MmEzNjUgKDEpLndlYnA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzUzOTg5Ny1kMDVmZmVkNGU2YjViY2QwZjk2MjA5NzIxOTgyYTM2NV8xX19vcmlnX19aREExWm1abFpEUmxObUkxWW1Oa01HWTVOakl3T1RjeU1UazRNbUV6TmpVZ0tERXBMbmRsWW5BLndlYnAiLCJpYXQiOjE3NzA3MDc2NzMsImV4cCI6MTc3MDcxMTI3M30.9cN4NGVJTOGhXgNecYUNlLSmdw9b-bJDvke39LLh7r4",
+                "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493540144-c64d1863eb111bc4f3bba16d6e9ccc7e_1__orig__YzY0ZDE4NjNlYjExMWJjNGYzYmJhMTZkNmU5Y2NjN2UgKDEpLndlYnA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzU0MDE0NC1jNjRkMTg2M2ViMTExYmM0ZjNiYmExNmQ2ZTljY2M3ZV8xX19vcmlnX19ZelkwWkRFNE5qTmxZakV4TVdKak5HWXpZbUpoTVRaa05tVTVZMk5qTjJVZ0tERXBMbmRsWW5BLndlYnAiLCJpYXQiOjE3NzA3MDc2NzMsImV4cCI6MTc3MDcxMTI3M30.OQJx-ctswD1tKWSCF-Qt6QTlVL2V0duHxQGOXuA-9KI"
+              ]
+            }
+          ]
+        },
+        {
+          "Designer Name / 設計師姓名": "Jason Wang",
+          "Years of Experience / 年資": "20",
+          "CV / 簡歷": "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493713985-Screenshot_2026-01-27_2.01.45_PM__orig__U2NyZWVuc2hvdCAyMDI2LTAxLTI3IDIuMDEuNDUgUE0ucG5n.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzcxMzk4NS1TY3JlZW5zaG90XzIwMjYtMDEtMjdfMi4wMS40NV9QTV9fb3JpZ19fVTJOeVpXVnVjMmh2ZENBeU1ESTJMVEF4TFRJM0lESXVNREV1TkRVZ1VFMHVjRzVuLnBuZyIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.PvnutbGjuJjilCvP3xYzJ686vdUfSBX5RiUwPcj7zho",
+          "Projects / 項目經歷": [
+            {
+              "Project Name / 項目名稱": "Green Q Hotel Shanghai",
+              "Year / 年份": "2019",
+              "Area (sqft) / 面積（平方呎）": "86100",
+              "Building Name / 大廈名稱": "Green Q Hotel Shanghai",
+              "Project Scope / 是否重新裝修？": "New Fitout 全新装修",
+              "Property Types / 主要項目類型": [
+                "Hotel 酒店"
+              ],
+              "Project Photos / 項目照片": [
+                "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493924031-8853d6e6ce4920798ba7dddd4e218acd__orig__ODg1M2Q2ZTZjZTQ5MjA3OThiYTdkZGRkNGUyMThhY2Qud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzkyNDAzMS04ODUzZDZlNmNlNDkyMDc5OGJhN2RkZGQ0ZTIxOGFjZF9fb3JpZ19fT0RnMU0yUTJaVFpqWlRRNU1qQTNPVGhpWVRka1pHUmtOR1V5TVRoaFkyUXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.Y_dy8I_EaFADZbOc0XkUcQRwRHPkf_veR9fcoj0loyg",
+                "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493924595-de23e1b12380bfbedbaae1f8e5c57207__orig__ZGUyM2UxYjEyMzgwYmZiZWRiYWFlMWY4ZTVjNTcyMDcud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzkyNDU5NS1kZTIzZTFiMTIzODBiZmJlZGJhYWUxZjhlNWM1NzIwN19fb3JpZ19fWkdVeU0yVXhZakV5TXpnd1ltWmlaV1JpWVdGbE1XWTRaVFZqTlRjeU1EY3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.8Zh_A9UnEvY6cTWj32SX2ixHP5KJ0Jf_6HxnD1ujjIE",
+                "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493925190-b11907af5fb532684082b939521aaec1__orig__YjExOTA3YWY1ZmI1MzI2ODQwODJiOTM5NTIxYWFlYzEud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzkyNTE5MC1iMTE5MDdhZjVmYjUzMjY4NDA4MmI5Mzk1MjFhYWVjMV9fb3JpZ19fWWpFeE9UQTNZV1kxWm1JMU16STJPRFF3T0RKaU9UTTVOVEl4WVdGbFl6RXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.0EQgI8lpd-FRoI34jczVQ5xayBlqefgN6XvWqAficYg",
+                "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493925575-8ee686e27361ab3d7a2427ec20d404cc__orig__OGVlNjg2ZTI3MzYxYWIzZDdhMjQyN2VjMjBkNDA0Y2Mud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzkyNTU3NS04ZWU2ODZlMjczNjFhYjNkN2EyNDI3ZWMyMGQ0MDRjY19fb3JpZ19fT0dWbE5qZzJaVEkzTXpZeFlXSXpaRGRoTWpReU4yVmpNakJrTkRBMFkyTXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.cT6vxWAcfwpnh3PmAKv1sX_0lqfdZRJX1VuWYtT9eUQ",
+                "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493925834-4ea527a0c763b1978a6cda60791d99df__orig__NGVhNTI3YTBjNzYzYjE5NzhhNmNkYTYwNzkxZDk5ZGYud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzkyNTgzNC00ZWE1MjdhMGM3NjNiMTk3OGE2Y2RhNjA3OTFkOTlkZl9fb3JpZ19fTkdWaE5USTNZVEJqTnpZellqRTVOemhoTm1Oa1lUWXdOemt4WkRrNVpHWXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.Oosq7HAnnTfujNsR5A8X5LdP3Laq2Zi3a--TH6anZxw",
+                "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493926113-dadb4de3cea6126d7893fd4d17173a3c__orig__ZGFkYjRkZTNjZWE2MTI2ZDc4OTNmZDRkMTcxNzNhM2Mud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzkyNjExMy1kYWRiNGRlM2NlYTYxMjZkNzg5M2ZkNGQxNzE3M2EzY19fb3JpZ19fWkdGa1lqUmtaVE5qWldFMk1USTJaRGM0T1RObVpEUmtNVGN4TnpOaE0yTXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.H3C1Z_5JpiNiTUTGIcIYsCwmc-a74yT2n7ISn8QmgCY"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "Section 4: Design & Build Capability / D&B能力": {
+      "Can you provide Design & Build services? / 是否能提供D&B服務？": "Yes 是",
+      "Section 2: Certifications / 資質與認證": {
+        "Do you have RGBC certificate / 是否有RGBC牌": "No",
+        "Other Certifications / 其他認證": [
+          {
+            "Certification Name / 認證名稱": "fjaa",
+            "Certificate Upload / 證書上傳": "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769494055540-Screenshot_2026-01-26_4.43.17_PM__orig__U2NyZWVuc2hvdCAyMDI2LTAxLTI2IDQuNDMuMTcgUE0ucG5n.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5NDA1NTU0MC1TY3JlZW5zaG90XzIwMjYtMDEtMjZfNC40My4xN19QTV9fb3JpZ19fVTJOeVpXVnVjMmh2ZENBeU1ESTJMVEF4TFRJMklEUXVORE11TVRjZ1VFMHVjRzVuLnBuZyIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.ahEkWOcGWhPto5NYb06s75cBxmcXWQdSbxWEGyJDXoM"
+          }
+        ]
+      },
+      "Section 3: Construction Capability / 施工能力": {
+        "Property Types / 主要項目類型": [
+          "Office 辦公",
+          "Hotel 酒店"
+        ],
+        "Project Highlights / 亮點項目": [
+          {
+            "Project Name / 項目名稱": "NVIDIA Beijing",
+            "Year / 年份": "2021",
+            "Area (sqft) / 面積（平方呎）": "28000",
+            "Building Name / 大廈名稱": "Citic Tower",
+            "Project Scope / 是否重新裝修？": "New Fitout 全新装修",
+            "Property Types / 主要項目類型": [
+              "Office 辦公"
+            ],
+            "Project Photos / 項目照片": [
+              "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395312213-49ba48c88f3fa1b7131646b5c127999a__orig__NDliYTQ4Yzg4ZjNmYTFiNzEzMTY0NmI1YzEyNzk5OWEud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMjIxMy00OWJhNDhjODhmM2ZhMWI3MTMxNjQ2YjVjMTI3OTk5YV9fb3JpZ19fTkRsaVlUUTRZemc0WmpObVlURmlOekV6TVRZME5tSTFZekV5TnprNU9XRXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.FAiIvvIk5dhrJUqgcciDZoPEMzkHiETeCkXWrCskSyY",
+              "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395312636-aef9260e8e95781f74ead4af1059fd38__orig__YWVmOTI2MGU4ZTk1NzgxZjc0ZWFkNGFmMTA1OWZkMzgud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMjYzNi1hZWY5MjYwZThlOTU3ODFmNzRlYWQ0YWYxMDU5ZmQzOF9fb3JpZ19fWVdWbU9USTJNR1U0WlRrMU56Z3haamMwWldGa05HRm1NVEExT1daa016Z3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.FfZIRI4R9yevCe-x_333VIGdxUiExi4jIc6_teEmRl4",
+              "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395312952-8a680cf9518dbf1e219994e805a28528__orig__OGE2ODBjZjk1MThkYmYxZTIxOTk5NGU4MDVhMjg1Mjgud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMjk1Mi04YTY4MGNmOTUxOGRiZjFlMjE5OTk0ZTgwNWEyODUyOF9fb3JpZ19fT0dFMk9EQmpaamsxTVRoa1ltWXhaVEl4T1RrNU5HVTRNRFZoTWpnMU1qZ3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.X3EvIx8XqELpf1D_5BHKsuCJN3XGJvO5sd1drhrQEfQ",
+              "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395313258-1459a66d6c4d33d9e054db2294440d19__orig__MTQ1OWE2NmQ2YzRkMzNkOWUwNTRkYjIyOTQ0NDBkMTkud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMzI1OC0xNDU5YTY2ZDZjNGQzM2Q5ZTA1NGRiMjI5NDQ0MGQxOV9fb3JpZ19fTVRRMU9XRTJObVEyWXpSa016TmtPV1V3TlRSa1lqSXlPVFEwTkRCa01Ua3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.kFEFlacsRxTSt6E28mpQqmUgqRGfVI7gMKxv3exHCcs",
+              "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395313699-0fdd7003aa32acd8f078ad35a9181558__orig__MGZkZDcwMDNhYTMyYWNkOGYwNzhhZDM1YTkxODE1NTgud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMzY5OS0wZmRkNzAwM2FhMzJhY2Q4ZjA3OGFkMzVhOTE4MTU1OF9fb3JpZ19fTUdaa1pEY3dNRE5oWVRNeVlXTmtPR1l3TnpoaFpETTFZVGt4T0RFMU5UZ3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.jANzSl0isfRJb8vaOzOpSRV9PR9JBAQwGen0tqWiWnw",
+              "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395245386-95158108227ccd2803797639068380f2__orig__OTUxNTgxMDgyMjdjY2QyODAzNzk3NjM5MDY4MzgwZjIud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTI0NTM4Ni05NTE1ODEwODIyN2NjZDI4MDM3OTc2MzkwNjgzODBmMl9fb3JpZ19fT1RVeE5UZ3hNRGd5TWpkalkyUXlPREF6TnprM05qTTVNRFk0TXpnd1pqSXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.hU0Iy6dUx_PsUgCi1Mc2B_2OO0bHz6Mcf02vrEFjJU8",
+              "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395309797-e1c3cba97428d0c805c36e05feadd070__orig__ZTFjM2NiYTk3NDI4ZDBjODA1YzM2ZTA1ZmVhZGQwNzAud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMwOTc5Ny1lMWMzY2JhOTc0MjhkMGM4MDVjMzZlMDVmZWFkZDA3MF9fb3JpZ19fWlRGak0yTmlZVGszTkRJNFpEQmpPREExWXpNMlpUQTFabVZoWkdRd056QXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.kb9osvHje-JyYM_xcYqvpGsm-lC4kZoc4R8ll1nBGPs",
+              "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395311006-ca7b884eac280e162c7f2662c5f5ac76__orig__Y2E3Yjg4NGVhYzI4MGUxNjJjN2YyNjYyYzVmNWFjNzYud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMTAwNi1jYTdiODg0ZWFjMjgwZTE2MmM3ZjI2NjJjNWY1YWM3Nl9fb3JpZ19fWTJFM1lqZzROR1ZoWXpJNE1HVXhOakpqTjJZeU5qWXlZelZtTldGak56WXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.s56LvLXuIiX_AQ6u5ObYljgolzwse9D90HG01hEReSY",
+              "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395311770-9877aef10de6eefe268f034820983f05__orig__OTg3N2FlZjEwZGU2ZWVmZTI2OGYwMzQ4MjA5ODNmMDUud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMTc3MC05ODc3YWVmMTBkZTZlZWZlMjY4ZjAzNDgyMDk4M2YwNV9fb3JpZ19fT1RnM04yRmxaakV3WkdVMlpXVm1aVEkyT0dZd016UTRNakE1T0RObU1EVXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.T-4znaJWSDOlTgvNBwUxHxZ_WcIW-9Gd-1B8LcgUk5o"
+            ]
+          }
+        ],
+        "Accumulated Project Area per Year (sqft) / 年施工面積（平方呎）": "100000",
+        "Maximum Number of Projects in Parallel / 最多能同時承接的項目數": "4",
+        "Average Project Value (HKD) / 平均項目金額（港幣）": "20000000"
+      },
+      "Section 5: Personnel / 人員": {
+        "Contractor Organization Chart / 施工人员組織架構圖": "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769494265145-Screenshot_2026-01-26_10.49.25_AM__orig__U2NyZWVuc2hvdCAyMDI2LTAxLTI2IDEwLjQ5LjI1IEFNLnBuZw.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5NDI2NTE0NS1TY3JlZW5zaG90XzIwMjYtMDEtMjZfMTAuNDkuMjVfQU1fX29yaWdfX1UyTnlaV1Z1YzJodmRDQXlNREkyTFRBeExUSTJJREV3TGpRNUxqSTFJRUZOTG5CdVp3LnBuZyIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.IHqAAGgMXrJ2WsSTm7hx6hTG7ZMHK5N2vUmwB4BICP0",
+        "Project Managers / 項目經理": [
+          {
+            "Name / 姓名": "Jason Wang",
+            "Year of Experience / 年資": "20",
+            "Languages / 語言": "Mandarin",
+            "Projects / 項目經歷": [
+              {
+                "Project Name / 項目名稱": "Pfizer Inc.",
+                "Client Name / 客戶名稱": "Pfizer Hong Kong",
+                "Year / 年份": "2022",
+                "Building Name / 大廈名稱": "Kerry Centre",
+                "Area (sqft) / 面積（平方呎）": "15004"
+              }
+            ],
+            "Project Manager CV / 項目經理簡歷": "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769494319975-Own_Production_handout__orig__T3duIFByb2R1Y3Rpb24gaGFuZG91dC5kb2N4.docx?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5NDMxOTk3NS1Pd25fUHJvZHVjdGlvbl9oYW5kb3V0X19vcmlnX19UM2R1SUZCeWIyUjFZM1JwYjI0Z2FHRnVaRzkxZEM1a2IyTjQuZG9jeCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.zl5sqXERZ2fysQg_naEBIIucnlqYBL7tlUw3VRm_m7o"
+          }
+        ],
+        "Do you have Safety Officer(s)? / 是否有安全主任？": "Yes 有",
+        "Number of Safety Officers / 安全主任人數": "5",
+        "Do you have Construction Manager(s)? / 是否有施工經理？": "Yes 有",
+        "Number of Construction Managers / 施工經理人數": "8",
+        "Do you have MEP Lead(s)? / 是否有機電負責人？": "No 無"
+      },
+      "Section 6: Compliance and Governance / 合規與治理": {
+        "If taking projects in Hong Kong, we commit to hiring workers who can legally work in Hong Kong and hold valid HKID and Construction Safety Certificate / 如在香港承接項目，保證聘請可在香港合法工作的工人且持有有效香港身份證與建造業安全證明書（平安咭）": false,
+        "Insurance / 保險 (At least one required / 至少需要一個)": [
+          {
+            "Insurance Type / 保險類型": "General Liability insurance 第三者責任保險",
+            "Insurance Provider / 保險公司": "AIA",
+            "Expiry Date / 到期日期": "2029-07-23"
+          }
+        ],
+        "Do you have Environmental Health and Safety policy? / 是否有環境健康安全政策？": "Yes 有",
+        "Environmental Health and Safety Document / 環境健康安全文件": "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769494429106-doubleframe_table_product_sheet__orig__ZG91YmxlZnJhbWVfdGFibGVfcHJvZHVjdF9zaGVldC5wZGY.pdf?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5NDQyOTEwNi1kb3VibGVmcmFtZV90YWJsZV9wcm9kdWN0X3NoZWV0X19vcmlnX19aRzkxWW14bFpuSmhiV1ZmZEdGaWJHVmZjSEp2WkhWamRGOXphR1ZsZEM1d1pHWS5wZGYiLCJpYXQiOjE3NzA3MDc2NzMsImV4cCI6MTc3MDcxMTI3M30.UvtxbMp2uu3WV-8BAWq8OijRBFq-dafhpZjWlGzFk-g",
+        "Any incidents in the past 3 years? / 過去3年是否有任何事故？": "No 無",
+        "Any litigation in the past 3 years? / 過去3年是否有任何訴訟？": "No 無"
+      }
+    },
+    "Quality Commitment / 質量承諾": {
+      "Guarantee all information provided is true and valid / 保證提供資料真實有效": true,
+      "Accept platform quality supervision / 接受平台質量監督": true,
+      "Agree to information sharing terms / 同意信息共享條款": true
+    },
+    "Contact Information / 聯絡人資料": {
+      "Contact Person / 聯絡人": "Louis Lau",
+      "Position / 職位": "Project Director",
+      "Contact Number / 聯繫電話": "+852 9482 7655",
+      "Email / 電郵": "louis.lau@sla-group.com",
+      "Submission Date / 提交日期": "2026-01-26",
+      "Contact Fax / 聯絡傳真": "+852 2347 7677"
+    }
+  },
+  "pre_rewrite_request_payload": {
+    "font_name": "黑体",
+    "language": "en-US",
+    "color": "蓝色",
+    "user_name": "Louis Lau",
+    "ai_picture": false,
+    "report": false,
+    "custom_data": {
+      "title": "SL&A Hong Kong Limited - Design Firm Brochure Deck",
+      "sub_title": "Company Profile & Capability Overview",
+      "author": "Louis Lau",
+      "catalogs": [
+        {
+          "catalog": "Agenda",
+          "sub_catalog": [
+            "Complete Table of Contents"
+          ]
+        },
+        {
+          "catalog": "Company Overview",
+          "sub_catalog": [
+            "Company Background, Timeline, Positioning & Scale"
+          ]
+        },
+        {
+          "catalog": "Our Services",
+          "sub_catalog": [
+            "Integrated Design + Design & Build Service Scope"
+          ]
+        },
+        {
+          "catalog": "Design Expertise",
+          "sub_catalog": [
+            "Project Types, Design Styles & Technical Capability"
+          ]
+        },
+        {
+          "catalog": "Regional Experience & Clients",
+          "sub_catalog": [
+            "Regional Footprint and Representative Clients"
+          ]
+        },
+        {
+          "catalog": "Selected Projects",
+          "sub_catalog": [
+            "Featured Project References"
+          ]
+        },
+        {
+          "catalog": "Awards & Recognition",
+          "sub_catalog": [
+            "International Awards and Industry Recognition"
+          ]
+        },
+        {
+          "catalog": "Team & Leadership",
+          "sub_catalog": [
+            "Core Design and Project Leadership Team"
+          ]
+        },
+        {
+          "catalog": "Design & Build Capability",
+          "sub_catalog": [
+            "Project Scale, Delivery Capability, Parallel Capacity"
+          ]
+        },
+        {
+          "catalog": "Compliance & Quality",
+          "sub_catalog": [
+            "Safety, Insurance, Quality and Compliance Commitments"
+          ]
+        },
+        {
+          "catalog": "Contact",
+          "sub_catalog": [
+            "Primary Contact and Company Address"
+          ]
+        }
+      ],
+      "contents": [
+        {
+          "catalog_index": 0,
+          "sub_catalog_index": 0,
+          "content": [
+            "1. Company Overview",
+            "2. Our Services",
+            "3. Design Expertise",
+            "4. Regional Experience & Clients",
+            "5. Selected Projects",
+            "6. Awards & Recognition",
+            "7. Team & Leadership",
+            "8. Design & Build Capability"
+          ]
+        },
+        {
+          "catalog_index": 1,
+          "sub_catalog_index": 0,
+          "content": [
+            "Established in 2015 and headquartered in Hong Kong.",
+            "Registered capital of HKD 2, 000, 000 with a team of 250 professionals.",
+            "An Asia-focused international design firm specializing in Interior Design, Design & Build, Hospitality Design, Architectural Design, Sustainable Design, and Workspace Strategy.",
+            "F, Sea Bird House, 22-28 Wyndham Street, Central, Hong Kong."
+          ],
+          "picture": [
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769394866934-2c6cd2afdce82d1b7379667ef8e6f246__orig__MmM2Y2QyYWZkY2U4MmQxYjczNzk2NjdlZjhlNmYyNDYuanBlZw.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NDg2NjkzNC0yYzZjZDJhZmRjZTgyZDFiNzM3OTY2N2VmOGU2ZjI0Nl9fb3JpZ19fTW1NMlkyUXlZV1prWTJVNE1tUXhZamN6TnprMk5qZGxaamhsTm1ZeU5EWXVhbkJsWncuanBlZyIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.uRn3EExI-wLz0eeoomdrGawbKpQ8b-CoZDJiLKFp-B0",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395313258-1459a66d6c4d33d9e054db2294440d19__orig__MTQ1OWE2NmQ2YzRkMzNkOWUwNTRkYjIyOTQ0NDBkMTkud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMzI1OC0xNDU5YTY2ZDZjNGQzM2Q5ZTA1NGRiMjI5NDQ0MGQxOV9fb3JpZ19fTVRRMU9XRTJObVEyWXpSa016TmtPV1V3TlRSa1lqSXlPVFEwTkRCa01Ua3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.kFEFlacsRxTSt6E28mpQqmUgqRGfVI7gMKxv3exHCcs",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395313699-0fdd7003aa32acd8f078ad35a9181558__orig__MGZkZDcwMDNhYTMyYWNkOGYwNzhhZDM1YTkxODE1NTgud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMzY5OS0wZmRkNzAwM2FhMzJhY2Q4ZjA3OGFkMzVhOTE4MTU1OF9fb3JpZ19fTUdaa1pEY3dNRE5oWVRNeVlXTmtPR1l3TnpoaFpETTFZVGt4T0RFMU5UZ3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.jANzSl0isfRJb8vaOzOpSRV9PR9JBAQwGen0tqWiWnw"
+          ]
+        },
+        {
+          "catalog_index": 2,
+          "sub_catalog_index": 0,
+          "content": [
+            "Comprehensive service scope confirmed from submitted data.",
+            "Design & Build services are available.",
+            "Project delivery language is refined for presentation while preserving original facts."
+          ],
+          "picture": [
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769494055540-Screenshot_2026-01-26_4.43.17_PM__orig__U2NyZWVuc2hvdCAyMDI2LTAxLTI2IDQuNDMuMTcgUE0ucG5n.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5NDA1NTU0MC1TY3JlZW5zaG90XzIwMjYtMDEtMjZfNC40My4xN19QTV9fb3JpZ19fVTJOeVpXVnVjMmh2ZENBeU1ESTJMVEF4TFRJMklEUXVORE11TVRjZ1VFMHVjRzVuLnBuZyIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.ahEkWOcGWhPto5NYb06s75cBxmcXWQdSbxWEGyJDXoM",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395312213-49ba48c88f3fa1b7131646b5c127999a__orig__NDliYTQ4Yzg4ZjNmYTFiNzEzMTY0NmI1YzEyNzk5OWEud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMjIxMy00OWJhNDhjODhmM2ZhMWI3MTMxNjQ2YjVjMTI3OTk5YV9fb3JpZ19fTkRsaVlUUTRZemc0WmpObVlURmlOekV6TVRZME5tSTFZekV5TnprNU9XRXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.FAiIvvIk5dhrJUqgcciDZoPEMzkHiETeCkXWrCskSyY",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395312636-aef9260e8e95781f74ead4af1059fd38__orig__YWVmOTI2MGU4ZTk1NzgxZjc0ZWFkNGFmMTA1OWZkMzgud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMjYzNi1hZWY5MjYwZThlOTU3ODFmNzRlYWQ0YWYxMDU5ZmQzOF9fb3JpZ19fWVdWbU9USTJNR1U0WlRrMU56Z3haamMwWldGa05HRm1NVEExT1daa016Z3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.FfZIRI4R9yevCe-x_333VIGdxUiExi4jIc6_teEmRl4"
+          ]
+        },
+        {
+          "catalog_index": 3,
+          "sub_catalog_index": 0,
+          "content": [
+            "Primary project types include Office, Hotel, and Medical.",
+            "Design styles include Modern Minimalist and Modern Light Luxury Style.",
+            "Main software stack includes SketchUp and AutoCAD.",
+            "BIM capability is not available."
+          ],
+          "picture": [
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395245386-95158108227ccd2803797639068380f2__orig__OTUxNTgxMDgyMjdjY2QyODAzNzk3NjM5MDY4MzgwZjIud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTI0NTM4Ni05NTE1ODEwODIyN2NjZDI4MDM3OTc2MzkwNjgzODBmMl9fb3JpZ19fT1RVeE5UZ3hNRGd5TWpkalkyUXlPREF6TnprM05qTTVNRFk0TXpnd1pqSXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.hU0Iy6dUx_PsUgCi1Mc2B_2OO0bHz6Mcf02vrEFjJU8",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395309797-e1c3cba97428d0c805c36e05feadd070__orig__ZTFjM2NiYTk3NDI4ZDBjODA1YzM2ZTA1ZmVhZGQwNzAud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMwOTc5Ny1lMWMzY2JhOTc0MjhkMGM4MDVjMzZlMDVmZWFkZDA3MF9fb3JpZ19fWlRGak0yTmlZVGszTkRJNFpEQmpPREExWXpNMlpUQTFabVZoWkdRd056QXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.kb9osvHje-JyYM_xcYqvpGsm-lC4kZoc4R8ll1nBGPs",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395311006-ca7b884eac280e162c7f2662c5f5ac76__orig__Y2E3Yjg4NGVhYzI4MGUxNjJjN2YyNjYyYzVmNWFjNzYud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMTAwNi1jYTdiODg0ZWFjMjgwZTE2MmM3ZjI2NjJjNWY1YWM3Nl9fb3JpZ19fWTJFM1lqZzROR1ZoWXpJNE1HVXhOakpqTjJZeU5qWXlZelZtTldGak56WXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.s56LvLXuIiX_AQ6u5ObYljgolzwse9D90HG01hEReSY"
+          ]
+        },
+        {
+          "catalog_index": 4,
+          "sub_catalog_index": 0,
+          "content": [
+            "Regional footprint is focused in Hong Kong.",
+            "Representative client includes Pfizer Hong Kong.",
+            "These references are sourced from submitted supplier records."
+          ],
+          "picture": [
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395311770-9877aef10de6eefe268f034820983f05__orig__OTg3N2FlZjEwZGU2ZWVmZTI2OGYwMzQ4MjA5ODNmMDUud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMTc3MC05ODc3YWVmMTBkZTZlZWZlMjY4ZjAzNDgyMDk4M2YwNV9fb3JpZ19fT1RnM04yRmxaakV3WkdVMlpXVm1aVEkyT0dZd016UTRNakE1T0RObU1EVXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.T-4znaJWSDOlTgvNBwUxHxZ_WcIW-9Gd-1B8LcgUk5o",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395312952-8a680cf9518dbf1e219994e805a28528__orig__OGE2ODBjZjk1MThkYmYxZTIxOTk5NGU4MDVhMjg1Mjgud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMjk1Mi04YTY4MGNmOTUxOGRiZjFlMjE5OTk0ZTgwNWEyODUyOF9fb3JpZ19fT0dFMk9EQmpaamsxTVRoa1ltWXhaVEl4T1RrNU5HVTRNRFZoTWpnMU1qZ3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.X3EvIx8XqELpf1D_5BHKsuCJN3XGJvO5sd1drhrQEfQ",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395776325-Screenshot_2026-01-26_10.49.25_AM__orig__U2NyZWVuc2hvdCAyMDI2LTAxLTI2IDEwLjQ5LjI1IEFNLnBuZw.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTc3NjMyNS1TY3JlZW5zaG90XzIwMjYtMDEtMjZfMTAuNDkuMjVfQU1fX29yaWdfX1UyTnlaV1Z1YzJodmRDQXlNREkyTFRBeExUSTJJREV3TGpRNUxqSTFJRUZOTG5CdVp3LnBuZyIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.8vhvOBDH7ZtZnFC07p8ffOnl8X0ntn0QqRaG0vooUTM"
+          ]
+        },
+        {
+          "catalog_index": 5,
+          "sub_catalog_index": 0,
+          "content": [
+            "Featured project: Pfizer Inc.",
+            "Project year: 2022, area: 15, 004 sqft.",
+            "Project type: Office."
+          ],
+          "picture": [
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493186218-Screenshot_2026-01-26_10.51.27_AM__orig__U2NyZWVuc2hvdCAyMDI2LTAxLTI2IDEwLjUxLjI3IEFNLnBuZw.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzE4NjIxOC1TY3JlZW5zaG90XzIwMjYtMDEtMjZfMTAuNTEuMjdfQU1fX29yaWdfX1UyTnlaV1Z1YzJodmRDQXlNREkyTFRBeExUSTJJREV3TGpVeExqSTNJRUZOTG5CdVp3LnBuZyIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.gaXzxcfiFSc3MTmMGxdbDyAbeweZcsPEpah0sC9224k",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493531396-6ebc2b6c69aafb9f3dea56e3f24024a9_1__orig__NmViYzJiNmM2OWFhZmI5ZjNkZWE1NmUzZjI0MDI0YTkgKDEpLndlYnA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzUzMTM5Ni02ZWJjMmI2YzY5YWFmYjlmM2RlYTU2ZTNmMjQwMjRhOV8xX19vcmlnX19ObVZpWXpKaU5tTTJPV0ZoWm1JNVpqTmtaV0UxTm1VelpqSTBNREkwWVRrZ0tERXBMbmRsWW5BLndlYnAiLCJpYXQiOjE3NzA3MDc2NzMsImV4cCI6MTc3MDcxMTI3M30.0QGYBs4TW1RfLOWzxLM5f1RQHACHxyhxr_kDomukj30",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493539131-05c53d17bddc5b71c3c6e3fd42369704__orig__MDVjNTNkMTdiZGRjNWI3MWMzYzZlM2ZkNDIzNjk3MDQud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzUzOTEzMS0wNWM1M2QxN2JkZGM1YjcxYzNjNmUzZmQ0MjM2OTcwNF9fb3JpZ19fTURWak5UTmtNVGRpWkdSak5XSTNNV016WXpabE0yWmtOREl6TmprM01EUXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.rMEhT8lse6mCRc9vDVq3QsoCuDkfzrMwlroKeBO_DVA"
+          ]
+        },
+        {
+          "catalog_index": 6,
+          "sub_catalog_index": 0,
+          "content": [
+            "Award: Muse Design Awards, Gold placement.",
+            "All recognition statements are based on supplier-submitted award data."
+          ],
+          "picture": [
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493539647-562c115b25a78732500dc0a22db25c85__orig__NTYyYzExNWIyNWE3ODczMjUwMGRjMGEyMmRiMjVjODUud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzUzOTY0Ny01NjJjMTE1YjI1YTc4NzMyNTAwZGMwYTIyZGIyNWM4NV9fb3JpZ19fTlRZeVl6RXhOV0l5TldFM09EY3pNalV3TUdSak1HRXlNbVJpTWpWak9EVXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.TgSVp0G7ZrapmDV2xvnTFW-3kmIXi8sscUXQ5so5CTs",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493539897-d05ffed4e6b5bcd0f96209721982a365_1__orig__ZDA1ZmZlZDRlNmI1YmNkMGY5NjIwOTcyMTk4MmEzNjUgKDEpLndlYnA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzUzOTg5Ny1kMDVmZmVkNGU2YjViY2QwZjk2MjA5NzIxOTgyYTM2NV8xX19vcmlnX19aREExWm1abFpEUmxObUkxWW1Oa01HWTVOakl3T1RjeU1UazRNbUV6TmpVZ0tERXBMbmRsWW5BLndlYnAiLCJpYXQiOjE3NzA3MDc2NzMsImV4cCI6MTc3MDcxMTI3M30.9cN4NGVJTOGhXgNecYUNlLSmdw9b-bJDvke39LLh7r4",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493540144-c64d1863eb111bc4f3bba16d6e9ccc7e_1__orig__YzY0ZDE4NjNlYjExMWJjNGYzYmJhMTZkNmU5Y2NjN2UgKDEpLndlYnA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzU0MDE0NC1jNjRkMTg2M2ViMTExYmM0ZjNiYmExNmQ2ZTljY2M3ZV8xX19vcmlnX19ZelkwWkRFNE5qTmxZakV4TVdKak5HWXpZbUpoTVRaa05tVTVZMk5qTjJVZ0tERXBMbmRsWW5BLndlYnAiLCJpYXQiOjE3NzA3MDc2NzMsImV4cCI6MTc3MDcxMTI3M30.OQJx-ctswD1tKWSCF-Qt6QTlVL2V0duHxQGOXuA-9KI"
+          ]
+        },
+        {
+          "catalog_index": 7,
+          "sub_catalog_index": 0,
+          "content": [
+            "Primary leadership includes Jason Wang.",
+            "Declared team scale is 250 professionals.",
+            "Team and leadership wording is polished while preserving submitted personnel facts."
+          ],
+          "picture": [
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493713985-Screenshot_2026-01-27_2.01.45_PM__orig__U2NyZWVuc2hvdCAyMDI2LTAxLTI3IDIuMDEuNDUgUE0ucG5n.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzcxMzk4NS1TY3JlZW5zaG90XzIwMjYtMDEtMjdfMi4wMS40NV9QTV9fb3JpZ19fVTJOeVpXVnVjMmh2ZENBeU1ESTJMVEF4TFRJM0lESXVNREV1TkRVZ1VFMHVjRzVuLnBuZyIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.PvnutbGjuJjilCvP3xYzJ686vdUfSBX5RiUwPcj7zho",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493924031-8853d6e6ce4920798ba7dddd4e218acd__orig__ODg1M2Q2ZTZjZTQ5MjA3OThiYTdkZGRkNGUyMThhY2Qud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzkyNDAzMS04ODUzZDZlNmNlNDkyMDc5OGJhN2RkZGQ0ZTIxOGFjZF9fb3JpZ19fT0RnMU0yUTJaVFpqWlRRNU1qQTNPVGhpWVRka1pHUmtOR1V5TVRoaFkyUXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.Y_dy8I_EaFADZbOc0XkUcQRwRHPkf_veR9fcoj0loyg",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493924595-de23e1b12380bfbedbaae1f8e5c57207__orig__ZGUyM2UxYjEyMzgwYmZiZWRiYWFlMWY4ZTVjNTcyMDcud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzkyNDU5NS1kZTIzZTFiMTIzODBiZmJlZGJhYWUxZjhlNWM1NzIwN19fb3JpZ19fWkdVeU0yVXhZakV5TXpnd1ltWmlaV1JpWVdGbE1XWTRaVFZqTlRjeU1EY3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.8Zh_A9UnEvY6cTWj32SX2ixHP5KJ0Jf_6HxnD1ujjIE"
+          ]
+        },
+        {
+          "catalog_index": 8,
+          "sub_catalog_index": 0,
+          "content": [
+            "Parallel project capacity: 4 projects.",
+            "Annual delivered area: 100, 000 sqft.",
+            "Average project value: HKD 20, 000, 000."
+          ],
+          "picture": [
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769494265145-Screenshot_2026-01-26_10.49.25_AM__orig__U2NyZWVuc2hvdCAyMDI2LTAxLTI2IDEwLjQ5LjI1IEFNLnBuZw.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5NDI2NTE0NS1TY3JlZW5zaG90XzIwMjYtMDEtMjZfMTAuNDkuMjVfQU1fX29yaWdfX1UyTnlaV1Z1YzJodmRDQXlNREkyTFRBeExUSTJJREV3TGpRNUxqSTFJRUZOTG5CdVp3LnBuZyIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.IHqAAGgMXrJ2WsSTm7hx6hTG7ZMHK5N2vUmwB4BICP0"
+          ]
+        },
+        {
+          "catalog_index": 9,
+          "sub_catalog_index": 0,
+          "content": [
+            "Safety status: false.",
+            "Insurance: General Liability insurance, provider: AIA.",
+            "Compliance and quality statement: true."
+          ]
+        },
+        {
+          "catalog_index": 10,
+          "sub_catalog_index": 0,
+          "content": [
+            "Primary contact: Louis Lau.",
+            "Contact details: +852 9482 7655; louis.lau@sla-group.com.",
+            "F, Sea Bird House, 22-28 Wyndham Street, Central, Hong Kong.",
+            "Website: www.sla-group.com."
+          ]
+        }
+      ]
+    }
+  },
+  "request_payload": {
+    "font_name": "黑体",
+    "language": "en-US",
+    "color": "蓝色",
+    "user_name": "Louis Lau",
+    "ai_picture": false,
+    "report": false,
+    "custom_data": {
+      "title": "SL&A Hong Kong Limited - Design Firm Brochure Deck",
+      "sub_title": "Company Profile & Capability Overview",
+      "author": "Louis Lau",
+      "catalogs": [
+        {
+          "catalog": "Agenda",
+          "sub_catalog": [
+            "Complete Table of Contents"
+          ]
+        },
+        {
+          "catalog": "Company Overview",
+          "sub_catalog": [
+            "Company Background, Timeline, Positioning & Scale"
+          ]
+        },
+        {
+          "catalog": "Our Services",
+          "sub_catalog": [
+            "Integrated Design + Design & Build Service Scope"
+          ]
+        },
+        {
+          "catalog": "Design Expertise",
+          "sub_catalog": [
+            "Project Types, Design Styles & Technical Capability"
+          ]
+        },
+        {
+          "catalog": "Regional Experience & Clients",
+          "sub_catalog": [
+            "Regional Footprint and Representative Clients"
+          ]
+        },
+        {
+          "catalog": "Selected Projects",
+          "sub_catalog": [
+            "Featured Project References"
+          ]
+        },
+        {
+          "catalog": "Awards & Recognition",
+          "sub_catalog": [
+            "International Awards and Industry Recognition"
+          ]
+        },
+        {
+          "catalog": "Team & Leadership",
+          "sub_catalog": [
+            "Core Design and Project Leadership Team"
+          ]
+        },
+        {
+          "catalog": "Design & Build Capability",
+          "sub_catalog": [
+            "Project Scale, Delivery Capability, Parallel Capacity"
+          ]
+        },
+        {
+          "catalog": "Compliance & Quality",
+          "sub_catalog": [
+            "Safety, Insurance, Quality and Compliance Commitments"
+          ]
+        },
+        {
+          "catalog": "Contact",
+          "sub_catalog": [
+            "Primary Contact and Company Address"
+          ]
+        }
+      ],
+      "contents": [
+        {
+          "catalog_index": 0,
+          "sub_catalog_index": 0,
+          "content": [
+            "1. Company Overview",
+            "2. Our Services",
+            "3. Design Expertise",
+            "4. Regional Experience & Clients",
+            "5. Selected Projects",
+            "6. Awards & Recognition",
+            "7. Team & Leadership",
+            "8. Design & Build Capability"
+          ]
+        },
+        {
+          "catalog_index": 1,
+          "sub_catalog_index": 0,
+          "content": [
+            "Established in 2015 and headquartered in Hong Kong.",
+            "Registered capital of HKD 2, 000, 000 with a team of 250 professionals.",
+            "An Asia-focused international design firm specializing in Interior Design, Design & Build, Hospitality Design, Architectural Design, Sustainable Design, and Workspace Strategy.",
+            "F, Sea Bird House, 22-28 Wyndham Street, Central, Hong Kong."
+          ],
+          "picture": [
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769394866934-2c6cd2afdce82d1b7379667ef8e6f246__orig__MmM2Y2QyYWZkY2U4MmQxYjczNzk2NjdlZjhlNmYyNDYuanBlZw.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NDg2NjkzNC0yYzZjZDJhZmRjZTgyZDFiNzM3OTY2N2VmOGU2ZjI0Nl9fb3JpZ19fTW1NMlkyUXlZV1prWTJVNE1tUXhZamN6TnprMk5qZGxaamhsTm1ZeU5EWXVhbkJsWncuanBlZyIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.uRn3EExI-wLz0eeoomdrGawbKpQ8b-CoZDJiLKFp-B0",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395313258-1459a66d6c4d33d9e054db2294440d19__orig__MTQ1OWE2NmQ2YzRkMzNkOWUwNTRkYjIyOTQ0NDBkMTkud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMzI1OC0xNDU5YTY2ZDZjNGQzM2Q5ZTA1NGRiMjI5NDQ0MGQxOV9fb3JpZ19fTVRRMU9XRTJObVEyWXpSa016TmtPV1V3TlRSa1lqSXlPVFEwTkRCa01Ua3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.kFEFlacsRxTSt6E28mpQqmUgqRGfVI7gMKxv3exHCcs",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395313699-0fdd7003aa32acd8f078ad35a9181558__orig__MGZkZDcwMDNhYTMyYWNkOGYwNzhhZDM1YTkxODE1NTgud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMzY5OS0wZmRkNzAwM2FhMzJhY2Q4ZjA3OGFkMzVhOTE4MTU1OF9fb3JpZ19fTUdaa1pEY3dNRE5oWVRNeVlXTmtPR1l3TnpoaFpETTFZVGt4T0RFMU5UZ3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.jANzSl0isfRJb8vaOzOpSRV9PR9JBAQwGen0tqWiWnw"
+          ]
+        },
+        {
+          "catalog_index": 2,
+          "sub_catalog_index": 0,
+          "content": [
+            "Comprehensive service scope confirmed from submitted data.",
+            "Design & Build services are available.",
+            "Project delivery language is refined for presentation while preserving original facts."
+          ],
+          "picture": [
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769494055540-Screenshot_2026-01-26_4.43.17_PM__orig__U2NyZWVuc2hvdCAyMDI2LTAxLTI2IDQuNDMuMTcgUE0ucG5n.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5NDA1NTU0MC1TY3JlZW5zaG90XzIwMjYtMDEtMjZfNC40My4xN19QTV9fb3JpZ19fVTJOeVpXVnVjMmh2ZENBeU1ESTJMVEF4TFRJMklEUXVORE11TVRjZ1VFMHVjRzVuLnBuZyIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.ahEkWOcGWhPto5NYb06s75cBxmcXWQdSbxWEGyJDXoM",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395312213-49ba48c88f3fa1b7131646b5c127999a__orig__NDliYTQ4Yzg4ZjNmYTFiNzEzMTY0NmI1YzEyNzk5OWEud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMjIxMy00OWJhNDhjODhmM2ZhMWI3MTMxNjQ2YjVjMTI3OTk5YV9fb3JpZ19fTkRsaVlUUTRZemc0WmpObVlURmlOekV6TVRZME5tSTFZekV5TnprNU9XRXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.FAiIvvIk5dhrJUqgcciDZoPEMzkHiETeCkXWrCskSyY",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395312636-aef9260e8e95781f74ead4af1059fd38__orig__YWVmOTI2MGU4ZTk1NzgxZjc0ZWFkNGFmMTA1OWZkMzgud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMjYzNi1hZWY5MjYwZThlOTU3ODFmNzRlYWQ0YWYxMDU5ZmQzOF9fb3JpZ19fWVdWbU9USTJNR1U0WlRrMU56Z3haamMwWldGa05HRm1NVEExT1daa016Z3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.FfZIRI4R9yevCe-x_333VIGdxUiExi4jIc6_teEmRl4"
+          ]
+        },
+        {
+          "catalog_index": 3,
+          "sub_catalog_index": 0,
+          "content": [
+            "Primary project types include Office, Hotel, and Medical.",
+            "Design styles include Modern Minimalist and Modern Light Luxury Style.",
+            "Main software stack includes SketchUp and AutoCAD.",
+            "BIM capability is not available."
+          ],
+          "picture": [
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395245386-95158108227ccd2803797639068380f2__orig__OTUxNTgxMDgyMjdjY2QyODAzNzk3NjM5MDY4MzgwZjIud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTI0NTM4Ni05NTE1ODEwODIyN2NjZDI4MDM3OTc2MzkwNjgzODBmMl9fb3JpZ19fT1RVeE5UZ3hNRGd5TWpkalkyUXlPREF6TnprM05qTTVNRFk0TXpnd1pqSXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.hU0Iy6dUx_PsUgCi1Mc2B_2OO0bHz6Mcf02vrEFjJU8",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395309797-e1c3cba97428d0c805c36e05feadd070__orig__ZTFjM2NiYTk3NDI4ZDBjODA1YzM2ZTA1ZmVhZGQwNzAud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMwOTc5Ny1lMWMzY2JhOTc0MjhkMGM4MDVjMzZlMDVmZWFkZDA3MF9fb3JpZ19fWlRGak0yTmlZVGszTkRJNFpEQmpPREExWXpNMlpUQTFabVZoWkdRd056QXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.kb9osvHje-JyYM_xcYqvpGsm-lC4kZoc4R8ll1nBGPs",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395311006-ca7b884eac280e162c7f2662c5f5ac76__orig__Y2E3Yjg4NGVhYzI4MGUxNjJjN2YyNjYyYzVmNWFjNzYud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMTAwNi1jYTdiODg0ZWFjMjgwZTE2MmM3ZjI2NjJjNWY1YWM3Nl9fb3JpZ19fWTJFM1lqZzROR1ZoWXpJNE1HVXhOakpqTjJZeU5qWXlZelZtTldGak56WXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.s56LvLXuIiX_AQ6u5ObYljgolzwse9D90HG01hEReSY"
+          ]
+        },
+        {
+          "catalog_index": 4,
+          "sub_catalog_index": 0,
+          "content": [
+            "Regional footprint is focused in Hong Kong.",
+            "Representative client includes Pfizer Hong Kong.",
+            "These references are sourced from submitted supplier records."
+          ],
+          "picture": [
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395311770-9877aef10de6eefe268f034820983f05__orig__OTg3N2FlZjEwZGU2ZWVmZTI2OGYwMzQ4MjA5ODNmMDUud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMTc3MC05ODc3YWVmMTBkZTZlZWZlMjY4ZjAzNDgyMDk4M2YwNV9fb3JpZ19fT1RnM04yRmxaakV3WkdVMlpXVm1aVEkyT0dZd016UTRNakE1T0RObU1EVXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.T-4znaJWSDOlTgvNBwUxHxZ_WcIW-9Gd-1B8LcgUk5o",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395312952-8a680cf9518dbf1e219994e805a28528__orig__OGE2ODBjZjk1MThkYmYxZTIxOTk5NGU4MDVhMjg1Mjgud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMjk1Mi04YTY4MGNmOTUxOGRiZjFlMjE5OTk0ZTgwNWEyODUyOF9fb3JpZ19fT0dFMk9EQmpaamsxTVRoa1ltWXhaVEl4T1RrNU5HVTRNRFZoTWpnMU1qZ3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.X3EvIx8XqELpf1D_5BHKsuCJN3XGJvO5sd1drhrQEfQ",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395776325-Screenshot_2026-01-26_10.49.25_AM__orig__U2NyZWVuc2hvdCAyMDI2LTAxLTI2IDEwLjQ5LjI1IEFNLnBuZw.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTc3NjMyNS1TY3JlZW5zaG90XzIwMjYtMDEtMjZfMTAuNDkuMjVfQU1fX29yaWdfX1UyTnlaV1Z1YzJodmRDQXlNREkyTFRBeExUSTJJREV3TGpRNUxqSTFJRUZOTG5CdVp3LnBuZyIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.8vhvOBDH7ZtZnFC07p8ffOnl8X0ntn0QqRaG0vooUTM"
+          ]
+        },
+        {
+          "catalog_index": 5,
+          "sub_catalog_index": 0,
+          "content": [
+            "Featured project: Pfizer Inc.",
+            "Project year: 2022, area: 15, 004 sqft.",
+            "Project type: Office."
+          ],
+          "picture": [
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493186218-Screenshot_2026-01-26_10.51.27_AM__orig__U2NyZWVuc2hvdCAyMDI2LTAxLTI2IDEwLjUxLjI3IEFNLnBuZw.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzE4NjIxOC1TY3JlZW5zaG90XzIwMjYtMDEtMjZfMTAuNTEuMjdfQU1fX29yaWdfX1UyTnlaV1Z1YzJodmRDQXlNREkyTFRBeExUSTJJREV3TGpVeExqSTNJRUZOTG5CdVp3LnBuZyIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.gaXzxcfiFSc3MTmMGxdbDyAbeweZcsPEpah0sC9224k",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493531396-6ebc2b6c69aafb9f3dea56e3f24024a9_1__orig__NmViYzJiNmM2OWFhZmI5ZjNkZWE1NmUzZjI0MDI0YTkgKDEpLndlYnA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzUzMTM5Ni02ZWJjMmI2YzY5YWFmYjlmM2RlYTU2ZTNmMjQwMjRhOV8xX19vcmlnX19ObVZpWXpKaU5tTTJPV0ZoWm1JNVpqTmtaV0UxTm1VelpqSTBNREkwWVRrZ0tERXBMbmRsWW5BLndlYnAiLCJpYXQiOjE3NzA3MDc2NzMsImV4cCI6MTc3MDcxMTI3M30.0QGYBs4TW1RfLOWzxLM5f1RQHACHxyhxr_kDomukj30",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493539131-05c53d17bddc5b71c3c6e3fd42369704__orig__MDVjNTNkMTdiZGRjNWI3MWMzYzZlM2ZkNDIzNjk3MDQud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzUzOTEzMS0wNWM1M2QxN2JkZGM1YjcxYzNjNmUzZmQ0MjM2OTcwNF9fb3JpZ19fTURWak5UTmtNVGRpWkdSak5XSTNNV016WXpabE0yWmtOREl6TmprM01EUXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.rMEhT8lse6mCRc9vDVq3QsoCuDkfzrMwlroKeBO_DVA"
+          ]
+        },
+        {
+          "catalog_index": 6,
+          "sub_catalog_index": 0,
+          "content": [
+            "Award: Muse Design Awards, Gold placement.",
+            "All recognition statements are based on supplier-submitted award data."
+          ],
+          "picture": [
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493539647-562c115b25a78732500dc0a22db25c85__orig__NTYyYzExNWIyNWE3ODczMjUwMGRjMGEyMmRiMjVjODUud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzUzOTY0Ny01NjJjMTE1YjI1YTc4NzMyNTAwZGMwYTIyZGIyNWM4NV9fb3JpZ19fTlRZeVl6RXhOV0l5TldFM09EY3pNalV3TUdSak1HRXlNbVJpTWpWak9EVXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.TgSVp0G7ZrapmDV2xvnTFW-3kmIXi8sscUXQ5so5CTs",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493539897-d05ffed4e6b5bcd0f96209721982a365_1__orig__ZDA1ZmZlZDRlNmI1YmNkMGY5NjIwOTcyMTk4MmEzNjUgKDEpLndlYnA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzUzOTg5Ny1kMDVmZmVkNGU2YjViY2QwZjk2MjA5NzIxOTgyYTM2NV8xX19vcmlnX19aREExWm1abFpEUmxObUkxWW1Oa01HWTVOakl3T1RjeU1UazRNbUV6TmpVZ0tERXBMbmRsWW5BLndlYnAiLCJpYXQiOjE3NzA3MDc2NzMsImV4cCI6MTc3MDcxMTI3M30.9cN4NGVJTOGhXgNecYUNlLSmdw9b-bJDvke39LLh7r4",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493540144-c64d1863eb111bc4f3bba16d6e9ccc7e_1__orig__YzY0ZDE4NjNlYjExMWJjNGYzYmJhMTZkNmU5Y2NjN2UgKDEpLndlYnA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzU0MDE0NC1jNjRkMTg2M2ViMTExYmM0ZjNiYmExNmQ2ZTljY2M3ZV8xX19vcmlnX19ZelkwWkRFNE5qTmxZakV4TVdKak5HWXpZbUpoTVRaa05tVTVZMk5qTjJVZ0tERXBMbmRsWW5BLndlYnAiLCJpYXQiOjE3NzA3MDc2NzMsImV4cCI6MTc3MDcxMTI3M30.OQJx-ctswD1tKWSCF-Qt6QTlVL2V0duHxQGOXuA-9KI"
+          ]
+        },
+        {
+          "catalog_index": 7,
+          "sub_catalog_index": 0,
+          "content": [
+            "Primary leadership includes Jason Wang.",
+            "Declared team scale is 250 professionals.",
+            "Team and leadership wording is polished while preserving submitted personnel facts."
+          ],
+          "picture": [
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493713985-Screenshot_2026-01-27_2.01.45_PM__orig__U2NyZWVuc2hvdCAyMDI2LTAxLTI3IDIuMDEuNDUgUE0ucG5n.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzcxMzk4NS1TY3JlZW5zaG90XzIwMjYtMDEtMjdfMi4wMS40NV9QTV9fb3JpZ19fVTJOeVpXVnVjMmh2ZENBeU1ESTJMVEF4TFRJM0lESXVNREV1TkRVZ1VFMHVjRzVuLnBuZyIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.PvnutbGjuJjilCvP3xYzJ686vdUfSBX5RiUwPcj7zho",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493924031-8853d6e6ce4920798ba7dddd4e218acd__orig__ODg1M2Q2ZTZjZTQ5MjA3OThiYTdkZGRkNGUyMThhY2Qud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzkyNDAzMS04ODUzZDZlNmNlNDkyMDc5OGJhN2RkZGQ0ZTIxOGFjZF9fb3JpZ19fT0RnMU0yUTJaVFpqWlRRNU1qQTNPVGhpWVRka1pHUmtOR1V5TVRoaFkyUXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.Y_dy8I_EaFADZbOc0XkUcQRwRHPkf_veR9fcoj0loyg",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493924595-de23e1b12380bfbedbaae1f8e5c57207__orig__ZGUyM2UxYjEyMzgwYmZiZWRiYWFlMWY4ZTVjNTcyMDcud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzkyNDU5NS1kZTIzZTFiMTIzODBiZmJlZGJhYWUxZjhlNWM1NzIwN19fb3JpZ19fWkdVeU0yVXhZakV5TXpnd1ltWmlaV1JpWVdGbE1XWTRaVFZqTlRjeU1EY3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.8Zh_A9UnEvY6cTWj32SX2ixHP5KJ0Jf_6HxnD1ujjIE"
+          ]
+        },
+        {
+          "catalog_index": 8,
+          "sub_catalog_index": 0,
+          "content": [
+            "Parallel project capacity: 4 projects.",
+            "Annual delivered area: 100, 000 sqft.",
+            "Average project value: HKD 20, 000, 000."
+          ],
+          "picture": [
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769494265145-Screenshot_2026-01-26_10.49.25_AM__orig__U2NyZWVuc2hvdCAyMDI2LTAxLTI2IDEwLjQ5LjI1IEFNLnBuZw.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5NDI2NTE0NS1TY3JlZW5zaG90XzIwMjYtMDEtMjZfMTAuNDkuMjVfQU1fX29yaWdfX1UyTnlaV1Z1YzJodmRDQXlNREkyTFRBeExUSTJJREV3TGpRNUxqSTFJRUZOTG5CdVp3LnBuZyIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.IHqAAGgMXrJ2WsSTm7hx6hTG7ZMHK5N2vUmwB4BICP0"
+          ]
+        },
+        {
+          "catalog_index": 9,
+          "sub_catalog_index": 0,
+          "content": [
+            "Safety status: false.",
+            "Insurance: General Liability insurance, provider: AIA.",
+            "Compliance and quality statement: true."
+          ]
+        },
+        {
+          "catalog_index": 10,
+          "sub_catalog_index": 0,
+          "content": [
+            "Primary contact: Louis Lau.",
+            "Contact details: +852 9482 7655; louis.lau@sla-group.com.",
+            "F, Sea Bird House, 22-28 Wyndham Street, Central, Hong Kong.",
+            "Website: www.sla-group.com."
+          ]
+        }
+      ]
+    }
+  },
+  "consistency_check": {
+    "ok": true,
+    "mismatches": []
+  },
+  "fallback_used": false,
+  "api_request_payload": {
+    "font_name": "黑体",
+    "language": "en-US",
+    "color": "蓝色",
+    "user_name": "Louis Lau",
+    "ai_picture": false,
+    "report": false,
+    "custom_data": {
+      "title": "SL&A Hong Kong Limited - Design Firm Brochure Deck",
+      "sub_title": "Company Profile & Capability Overview",
+      "author": "Louis Lau",
+      "catalogs": [
+        {
+          "catalog": "Agenda",
+          "sub_catalog": [
+            "Complete Table of Contents"
+          ]
+        },
+        {
+          "catalog": "Company Overview",
+          "sub_catalog": [
+            "Company Background, Timeline, Positioning & Scale"
+          ]
+        },
+        {
+          "catalog": "Our Services",
+          "sub_catalog": [
+            "Integrated Design + Design & Build Service Scope"
+          ]
+        },
+        {
+          "catalog": "Design Expertise",
+          "sub_catalog": [
+            "Project Types, Design Styles & Technical Capability"
+          ]
+        },
+        {
+          "catalog": "Regional Experience & Clients",
+          "sub_catalog": [
+            "Regional Footprint and Representative Clients"
+          ]
+        },
+        {
+          "catalog": "Selected Projects",
+          "sub_catalog": [
+            "Featured Project References"
+          ]
+        },
+        {
+          "catalog": "Awards & Recognition",
+          "sub_catalog": [
+            "International Awards and Industry Recognition"
+          ]
+        },
+        {
+          "catalog": "Team & Leadership",
+          "sub_catalog": [
+            "Core Design and Project Leadership Team"
+          ]
+        },
+        {
+          "catalog": "Design & Build Capability",
+          "sub_catalog": [
+            "Project Scale, Delivery Capability, Parallel Capacity"
+          ]
+        },
+        {
+          "catalog": "Compliance & Quality",
+          "sub_catalog": [
+            "Safety, Insurance, Quality and Compliance Commitments"
+          ]
+        },
+        {
+          "catalog": "Contact",
+          "sub_catalog": [
+            "Primary Contact and Company Address"
+          ]
+        }
+      ],
+      "contents": [
+        {
+          "catalog_index": 0,
+          "sub_catalog_index": 0,
+          "content": [
+            "1. Company Overview",
+            "2. Our Services",
+            "3. Design Expertise",
+            "4. Regional Experience & Clients",
+            "5. Selected Projects",
+            "6. Awards & Recognition",
+            "7. Team & Leadership",
+            "8. Design & Build Capability"
+          ]
+        },
+        {
+          "catalog_index": 1,
+          "sub_catalog_index": 0,
+          "content": [
+            "Established in 2015 and headquartered in Hong Kong.",
+            "Registered capital of HKD 2, 000, 000 with a team of 250 professionals.",
+            "An Asia-focused international design firm specializing in Interior Design, Design & Build, Hospitality Design, Architectural Design, Sustainable Design, and Workspace Strategy.",
+            "F, Sea Bird House, 22-28 Wyndham Street, Central, Hong Kong."
+          ],
+          "picture": [
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769394866934-2c6cd2afdce82d1b7379667ef8e6f246__orig__MmM2Y2QyYWZkY2U4MmQxYjczNzk2NjdlZjhlNmYyNDYuanBlZw.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NDg2NjkzNC0yYzZjZDJhZmRjZTgyZDFiNzM3OTY2N2VmOGU2ZjI0Nl9fb3JpZ19fTW1NMlkyUXlZV1prWTJVNE1tUXhZamN6TnprMk5qZGxaamhsTm1ZeU5EWXVhbkJsWncuanBlZyIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.uRn3EExI-wLz0eeoomdrGawbKpQ8b-CoZDJiLKFp-B0",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395313258-1459a66d6c4d33d9e054db2294440d19__orig__MTQ1OWE2NmQ2YzRkMzNkOWUwNTRkYjIyOTQ0NDBkMTkud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMzI1OC0xNDU5YTY2ZDZjNGQzM2Q5ZTA1NGRiMjI5NDQ0MGQxOV9fb3JpZ19fTVRRMU9XRTJObVEyWXpSa016TmtPV1V3TlRSa1lqSXlPVFEwTkRCa01Ua3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.kFEFlacsRxTSt6E28mpQqmUgqRGfVI7gMKxv3exHCcs",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395313699-0fdd7003aa32acd8f078ad35a9181558__orig__MGZkZDcwMDNhYTMyYWNkOGYwNzhhZDM1YTkxODE1NTgud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMzY5OS0wZmRkNzAwM2FhMzJhY2Q4ZjA3OGFkMzVhOTE4MTU1OF9fb3JpZ19fTUdaa1pEY3dNRE5oWVRNeVlXTmtPR1l3TnpoaFpETTFZVGt4T0RFMU5UZ3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.jANzSl0isfRJb8vaOzOpSRV9PR9JBAQwGen0tqWiWnw"
+          ]
+        },
+        {
+          "catalog_index": 2,
+          "sub_catalog_index": 0,
+          "content": [
+            "Comprehensive service scope confirmed from submitted data.",
+            "Design & Build services are available.",
+            "Project delivery language is refined for presentation while preserving original facts."
+          ],
+          "picture": [
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769494055540-Screenshot_2026-01-26_4.43.17_PM__orig__U2NyZWVuc2hvdCAyMDI2LTAxLTI2IDQuNDMuMTcgUE0ucG5n.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5NDA1NTU0MC1TY3JlZW5zaG90XzIwMjYtMDEtMjZfNC40My4xN19QTV9fb3JpZ19fVTJOeVpXVnVjMmh2ZENBeU1ESTJMVEF4TFRJMklEUXVORE11TVRjZ1VFMHVjRzVuLnBuZyIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.ahEkWOcGWhPto5NYb06s75cBxmcXWQdSbxWEGyJDXoM",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395312213-49ba48c88f3fa1b7131646b5c127999a__orig__NDliYTQ4Yzg4ZjNmYTFiNzEzMTY0NmI1YzEyNzk5OWEud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMjIxMy00OWJhNDhjODhmM2ZhMWI3MTMxNjQ2YjVjMTI3OTk5YV9fb3JpZ19fTkRsaVlUUTRZemc0WmpObVlURmlOekV6TVRZME5tSTFZekV5TnprNU9XRXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.FAiIvvIk5dhrJUqgcciDZoPEMzkHiETeCkXWrCskSyY",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395312636-aef9260e8e95781f74ead4af1059fd38__orig__YWVmOTI2MGU4ZTk1NzgxZjc0ZWFkNGFmMTA1OWZkMzgud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMjYzNi1hZWY5MjYwZThlOTU3ODFmNzRlYWQ0YWYxMDU5ZmQzOF9fb3JpZ19fWVdWbU9USTJNR1U0WlRrMU56Z3haamMwWldGa05HRm1NVEExT1daa016Z3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.FfZIRI4R9yevCe-x_333VIGdxUiExi4jIc6_teEmRl4"
+          ]
+        },
+        {
+          "catalog_index": 3,
+          "sub_catalog_index": 0,
+          "content": [
+            "Primary project types include Office, Hotel, and Medical.",
+            "Design styles include Modern Minimalist and Modern Light Luxury Style.",
+            "Main software stack includes SketchUp and AutoCAD.",
+            "BIM capability is not available."
+          ],
+          "picture": [
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395245386-95158108227ccd2803797639068380f2__orig__OTUxNTgxMDgyMjdjY2QyODAzNzk3NjM5MDY4MzgwZjIud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTI0NTM4Ni05NTE1ODEwODIyN2NjZDI4MDM3OTc2MzkwNjgzODBmMl9fb3JpZ19fT1RVeE5UZ3hNRGd5TWpkalkyUXlPREF6TnprM05qTTVNRFk0TXpnd1pqSXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.hU0Iy6dUx_PsUgCi1Mc2B_2OO0bHz6Mcf02vrEFjJU8",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395309797-e1c3cba97428d0c805c36e05feadd070__orig__ZTFjM2NiYTk3NDI4ZDBjODA1YzM2ZTA1ZmVhZGQwNzAud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMwOTc5Ny1lMWMzY2JhOTc0MjhkMGM4MDVjMzZlMDVmZWFkZDA3MF9fb3JpZ19fWlRGak0yTmlZVGszTkRJNFpEQmpPREExWXpNMlpUQTFabVZoWkdRd056QXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.kb9osvHje-JyYM_xcYqvpGsm-lC4kZoc4R8ll1nBGPs",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395311006-ca7b884eac280e162c7f2662c5f5ac76__orig__Y2E3Yjg4NGVhYzI4MGUxNjJjN2YyNjYyYzVmNWFjNzYud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMTAwNi1jYTdiODg0ZWFjMjgwZTE2MmM3ZjI2NjJjNWY1YWM3Nl9fb3JpZ19fWTJFM1lqZzROR1ZoWXpJNE1HVXhOakpqTjJZeU5qWXlZelZtTldGak56WXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.s56LvLXuIiX_AQ6u5ObYljgolzwse9D90HG01hEReSY"
+          ]
+        },
+        {
+          "catalog_index": 4,
+          "sub_catalog_index": 0,
+          "content": [
+            "Regional footprint is focused in Hong Kong.",
+            "Representative client includes Pfizer Hong Kong.",
+            "These references are sourced from submitted supplier records."
+          ],
+          "picture": [
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395311770-9877aef10de6eefe268f034820983f05__orig__OTg3N2FlZjEwZGU2ZWVmZTI2OGYwMzQ4MjA5ODNmMDUud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMTc3MC05ODc3YWVmMTBkZTZlZWZlMjY4ZjAzNDgyMDk4M2YwNV9fb3JpZ19fT1RnM04yRmxaakV3WkdVMlpXVm1aVEkyT0dZd016UTRNakE1T0RObU1EVXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.T-4znaJWSDOlTgvNBwUxHxZ_WcIW-9Gd-1B8LcgUk5o",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395312952-8a680cf9518dbf1e219994e805a28528__orig__OGE2ODBjZjk1MThkYmYxZTIxOTk5NGU4MDVhMjg1Mjgud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMjk1Mi04YTY4MGNmOTUxOGRiZjFlMjE5OTk0ZTgwNWEyODUyOF9fb3JpZ19fT0dFMk9EQmpaamsxTVRoa1ltWXhaVEl4T1RrNU5HVTRNRFZoTWpnMU1qZ3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.X3EvIx8XqELpf1D_5BHKsuCJN3XGJvO5sd1drhrQEfQ",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395776325-Screenshot_2026-01-26_10.49.25_AM__orig__U2NyZWVuc2hvdCAyMDI2LTAxLTI2IDEwLjQ5LjI1IEFNLnBuZw.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTc3NjMyNS1TY3JlZW5zaG90XzIwMjYtMDEtMjZfMTAuNDkuMjVfQU1fX29yaWdfX1UyTnlaV1Z1YzJodmRDQXlNREkyTFRBeExUSTJJREV3TGpRNUxqSTFJRUZOTG5CdVp3LnBuZyIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.8vhvOBDH7ZtZnFC07p8ffOnl8X0ntn0QqRaG0vooUTM"
+          ]
+        },
+        {
+          "catalog_index": 5,
+          "sub_catalog_index": 0,
+          "content": [
+            "Featured project: Pfizer Inc.",
+            "Project year: 2022, area: 15, 004 sqft.",
+            "Project type: Office."
+          ],
+          "picture": [
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493186218-Screenshot_2026-01-26_10.51.27_AM__orig__U2NyZWVuc2hvdCAyMDI2LTAxLTI2IDEwLjUxLjI3IEFNLnBuZw.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzE4NjIxOC1TY3JlZW5zaG90XzIwMjYtMDEtMjZfMTAuNTEuMjdfQU1fX29yaWdfX1UyTnlaV1Z1YzJodmRDQXlNREkyTFRBeExUSTJJREV3TGpVeExqSTNJRUZOTG5CdVp3LnBuZyIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.gaXzxcfiFSc3MTmMGxdbDyAbeweZcsPEpah0sC9224k",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493531396-6ebc2b6c69aafb9f3dea56e3f24024a9_1__orig__NmViYzJiNmM2OWFhZmI5ZjNkZWE1NmUzZjI0MDI0YTkgKDEpLndlYnA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzUzMTM5Ni02ZWJjMmI2YzY5YWFmYjlmM2RlYTU2ZTNmMjQwMjRhOV8xX19vcmlnX19ObVZpWXpKaU5tTTJPV0ZoWm1JNVpqTmtaV0UxTm1VelpqSTBNREkwWVRrZ0tERXBMbmRsWW5BLndlYnAiLCJpYXQiOjE3NzA3MDc2NzMsImV4cCI6MTc3MDcxMTI3M30.0QGYBs4TW1RfLOWzxLM5f1RQHACHxyhxr_kDomukj30",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493539131-05c53d17bddc5b71c3c6e3fd42369704__orig__MDVjNTNkMTdiZGRjNWI3MWMzYzZlM2ZkNDIzNjk3MDQud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzUzOTEzMS0wNWM1M2QxN2JkZGM1YjcxYzNjNmUzZmQ0MjM2OTcwNF9fb3JpZ19fTURWak5UTmtNVGRpWkdSak5XSTNNV016WXpabE0yWmtOREl6TmprM01EUXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.rMEhT8lse6mCRc9vDVq3QsoCuDkfzrMwlroKeBO_DVA"
+          ]
+        },
+        {
+          "catalog_index": 6,
+          "sub_catalog_index": 0,
+          "content": [
+            "Award: Muse Design Awards, Gold placement.",
+            "All recognition statements are based on supplier-submitted award data."
+          ],
+          "picture": [
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493539647-562c115b25a78732500dc0a22db25c85__orig__NTYyYzExNWIyNWE3ODczMjUwMGRjMGEyMmRiMjVjODUud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzUzOTY0Ny01NjJjMTE1YjI1YTc4NzMyNTAwZGMwYTIyZGIyNWM4NV9fb3JpZ19fTlRZeVl6RXhOV0l5TldFM09EY3pNalV3TUdSak1HRXlNbVJpTWpWak9EVXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.TgSVp0G7ZrapmDV2xvnTFW-3kmIXi8sscUXQ5so5CTs",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493539897-d05ffed4e6b5bcd0f96209721982a365_1__orig__ZDA1ZmZlZDRlNmI1YmNkMGY5NjIwOTcyMTk4MmEzNjUgKDEpLndlYnA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzUzOTg5Ny1kMDVmZmVkNGU2YjViY2QwZjk2MjA5NzIxOTgyYTM2NV8xX19vcmlnX19aREExWm1abFpEUmxObUkxWW1Oa01HWTVOakl3T1RjeU1UazRNbUV6TmpVZ0tERXBMbmRsWW5BLndlYnAiLCJpYXQiOjE3NzA3MDc2NzMsImV4cCI6MTc3MDcxMTI3M30.9cN4NGVJTOGhXgNecYUNlLSmdw9b-bJDvke39LLh7r4",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493540144-c64d1863eb111bc4f3bba16d6e9ccc7e_1__orig__YzY0ZDE4NjNlYjExMWJjNGYzYmJhMTZkNmU5Y2NjN2UgKDEpLndlYnA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzU0MDE0NC1jNjRkMTg2M2ViMTExYmM0ZjNiYmExNmQ2ZTljY2M3ZV8xX19vcmlnX19ZelkwWkRFNE5qTmxZakV4TVdKak5HWXpZbUpoTVRaa05tVTVZMk5qTjJVZ0tERXBMbmRsWW5BLndlYnAiLCJpYXQiOjE3NzA3MDc2NzMsImV4cCI6MTc3MDcxMTI3M30.OQJx-ctswD1tKWSCF-Qt6QTlVL2V0duHxQGOXuA-9KI"
+          ]
+        },
+        {
+          "catalog_index": 7,
+          "sub_catalog_index": 0,
+          "content": [
+            "Primary leadership includes Jason Wang.",
+            "Declared team scale is 250 professionals.",
+            "Team and leadership wording is polished while preserving submitted personnel facts."
+          ],
+          "picture": [
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493713985-Screenshot_2026-01-27_2.01.45_PM__orig__U2NyZWVuc2hvdCAyMDI2LTAxLTI3IDIuMDEuNDUgUE0ucG5n.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzcxMzk4NS1TY3JlZW5zaG90XzIwMjYtMDEtMjdfMi4wMS40NV9QTV9fb3JpZ19fVTJOeVpXVnVjMmh2ZENBeU1ESTJMVEF4TFRJM0lESXVNREV1TkRVZ1VFMHVjRzVuLnBuZyIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.PvnutbGjuJjilCvP3xYzJ686vdUfSBX5RiUwPcj7zho",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493924031-8853d6e6ce4920798ba7dddd4e218acd__orig__ODg1M2Q2ZTZjZTQ5MjA3OThiYTdkZGRkNGUyMThhY2Qud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzkyNDAzMS04ODUzZDZlNmNlNDkyMDc5OGJhN2RkZGQ0ZTIxOGFjZF9fb3JpZ19fT0RnMU0yUTJaVFpqWlRRNU1qQTNPVGhpWVRka1pHUmtOR1V5TVRoaFkyUXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.Y_dy8I_EaFADZbOc0XkUcQRwRHPkf_veR9fcoj0loyg",
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493924595-de23e1b12380bfbedbaae1f8e5c57207__orig__ZGUyM2UxYjEyMzgwYmZiZWRiYWFlMWY4ZTVjNTcyMDcud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzkyNDU5NS1kZTIzZTFiMTIzODBiZmJlZGJhYWUxZjhlNWM1NzIwN19fb3JpZ19fWkdVeU0yVXhZakV5TXpnd1ltWmlaV1JpWVdGbE1XWTRaVFZqTlRjeU1EY3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.8Zh_A9UnEvY6cTWj32SX2ixHP5KJ0Jf_6HxnD1ujjIE"
+          ]
+        },
+        {
+          "catalog_index": 8,
+          "sub_catalog_index": 0,
+          "content": [
+            "Parallel project capacity: 4 projects.",
+            "Annual delivered area: 100, 000 sqft.",
+            "Average project value: HKD 20, 000, 000."
+          ],
+          "picture": [
+            "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769494265145-Screenshot_2026-01-26_10.49.25_AM__orig__U2NyZWVuc2hvdCAyMDI2LTAxLTI2IDEwLjQ5LjI1IEFNLnBuZw.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5NDI2NTE0NS1TY3JlZW5zaG90XzIwMjYtMDEtMjZfMTAuNDkuMjVfQU1fX29yaWdfX1UyTnlaV1Z1YzJodmRDQXlNREkyTFRBeExUSTJJREV3TGpRNUxqSTFJRUZOTG5CdVp3LnBuZyIsImlhdCI6MTc3MDcwNzY3MywiZXhwIjoxNzcwNzExMjczfQ.IHqAAGgMXrJ2WsSTm7hx6hTG7ZMHK5N2vUmwB4BICP0"
+          ]
+        },
+        {
+          "catalog_index": 9,
+          "sub_catalog_index": 0,
+          "content": [
+            "Safety status: false.",
+            "Insurance: General Liability insurance, provider: AIA.",
+            "Compliance and quality statement: true."
+          ]
+        },
+        {
+          "catalog_index": 10,
+          "sub_catalog_index": 0,
+          "content": [
+            "Primary contact: Louis Lau.",
+            "Contact details: +852 9482 7655; louis.lau@sla-group.com.",
+            "F, Sea Bird House, 22-28 Wyndham Street, Central, Hong Kong.",
+            "Website: www.sla-group.com."
+          ]
+        }
+      ]
+    }
+  },
+  "rewrite_enabled": true,
+  "used_prepared_payload": true
+}

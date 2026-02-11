@@ -8,6 +8,7 @@ Supplier registration and product management portal for ProjectPilot.
 - 電郵註冊採用 OTP（Resend 發送驗證碼）
 - 註冊/編輯資料提交至後端 API；草稿保存於後端
 - 手機號註冊/登入已接入 Twilio Verify（短信 OTP + 密碼登入）
+- 新增 Hidden PPT Agent（队列 + Worker + Cron + 本地渲染 pptxgenjs）
 
 ## Features / 核心功能
 
@@ -27,6 +28,13 @@ Supplier registration and product management portal for ProjectPilot.
 - 供應商概覽
 - 產品目錄搜索與類別篩選
 - 其他供應商名錄（已提交）
+
+### Hidden PPT Agent / 隱藏式 PPT 生成
+- `POST /api/ppt/generate`：建立任務並立即返回 `jobId`
+- `GET /api/ppt/status`：輪詢任務進度與下載連結
+- `POST /api/ppt/worker`：由 Vercel Cron 觸發，後台處理任務
+- 使用 `pptxgenjs` 本地生成 `.pptx`，不依賴第三方 PPT API
+- 使用 OpenAI-compatible LLM（可切換 OpenAI/Kimi/MiniMax 兼容網關）
 
 ## Tech Stack / 技術棧
 
@@ -54,14 +62,14 @@ RESEND_FROM_EMAIL=
 TWILIO_ACCOUNT_SID=
 TWILIO_AUTH_TOKEN=
 TWILIO_VERIFY_SERVICE_SID=
-PPTGEN_USERNAME=
-PPTGEN_PASSWORD=
-PPTGEN_KEY=
-PPTGEN_TEMPLATE_URL=
-# optional, if you want to upload a local template file instead of URL
-PPTGEN_TEMPLATE_FILE=
-# optional, default 4; used when input JSON has no explicit presentation.slides
-PPTGEN_SYNTH_SLIDES=4
+# New PPT provider (Wenike / Yoo-AI)
+PPTGEN_BASE_URL=https://saas.api.yoo-ai.com/apps
+PPTGEN_BEARER_TOKEN=
+# Optional aliases supported in code:
+# WENIKE_PPT_BEARER_TOKEN=
+# YOO_AI_BEARER_TOKEN=
+#
+# Legacy PPTGEN_* template/token vars are disabled in current implementation.
 ```
 
 ### Database & Storage
@@ -70,6 +78,7 @@ Run the SQL in Supabase:
 
 - `supabase/schema.sql` (tables + RLS + storage bucket)
 - `supabase/storage.sql` (storage bucket + policies only, optional if schema already applied)
+- `docs/ppt-agent/schema.sql` (Hidden PPT Agent queue table: `ppt_jobs`)
 
 ## Development / 運行
 
@@ -97,6 +106,9 @@ Open http://localhost:3000
 - `GET /api/suppliers/me` (load current supplier)
 - `GET /api/suppliers/basic` (supplier directory)
 - `POST /api/products` (save material supplier products)
+- `POST /api/ppt/generate`
+- `GET /api/ppt/status?jobId=...`
+- `POST /api/ppt/worker`
 
 ## Data Model / 數據模型（主要表）
 
@@ -124,3 +136,4 @@ Supplier-Portal/
 - 手機號註冊使用 Twilio Verify，需在 Supabase 開啟 Phone 登入
 - 草稿保存在後端帳號下，可跨裝置取用
 - 邀請碼欄位目前未做後端校驗
+- Hidden PPT Agent 详细文档见：`docs/ppt-agent/README.md`

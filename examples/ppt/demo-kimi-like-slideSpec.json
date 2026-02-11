@@ -1,0 +1,206 @@
+{
+  "presentationTitle": "Atlas Design & Build Capability Deck",
+  "styleHint": "corporate",
+  "slides": [
+    {
+      "type": "title",
+      "title": "Atlas Design & Build",
+      "subtitle": "Integrated workplace transformation",
+      "keyMessage": "Deliver high-quality projects with measurable business outcomes.",
+      "density": "low",
+      "tone": "business",
+      "layoutHint": "hero-cover",
+      "bullets": [],
+      "imagePlan": {
+        "mode": "bg",
+        "style": "corporate",
+        "placement": "full-bleed",
+        "overlay": "dark-55",
+        "focalPoint": "center"
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=80"
+      ]
+    },
+    {
+      "type": "agenda",
+      "title": "Agenda",
+      "keyMessage": "Walk through capability, delivery proof, and governance assurance.",
+      "density": "medium",
+      "tone": "business",
+      "layoutHint": "agenda",
+      "bullets": [
+        { "text": "1. Company Overview", "sourceKeys": ["company.name"], "kind": "fact" },
+        { "text": "2. Our Services", "sourceKeys": ["services.0.name"], "kind": "fact" },
+        { "text": "3. Design Expertise", "sourceKeys": ["expertise.0"], "kind": "fact" },
+        { "text": "4. Regional Experience & Clients", "sourceKeys": ["regions.0"], "kind": "fact" },
+        { "text": "5. Selected Projects", "sourceKeys": ["projects.0.name"], "kind": "fact" },
+        { "text": "6. Awards & Recognition", "sourceKeys": ["awards.0"], "kind": "fact" },
+        { "text": "7. Team & Leadership", "sourceKeys": ["team.0.name"], "kind": "fact" },
+        { "text": "8. Compliance & Quality", "sourceKeys": ["compliance.iso"], "kind": "fact" }
+      ]
+    },
+    {
+      "type": "split-image",
+      "title": "Company Overview",
+      "keyMessage": "Operate with a clear regional footprint and stable delivery organization.",
+      "density": "medium",
+      "tone": "business",
+      "layoutHint": "split-image",
+      "bullets": [
+        { "text": "Position headquarters in Singapore and execute across Asia.", "sourceKeys": ["company.headquarters"], "kind": "fact" },
+        { "text": "Sustain 12 years of market operation with repeat-client continuity.", "sourceKeys": ["company.years_in_business"], "kind": "fact" },
+        { "text": "Maintain a 120-person multidisciplinary workforce.", "sourceKeys": ["company.team_size"], "kind": "fact" },
+        { "text": "Strengthen governance through centralized PMO oversight.", "sourceKeys": ["operations.pmo"], "kind": "insight" }
+      ],
+      "images": [
+        "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "imagePlan": {
+        "mode": "inline",
+        "style": "corporate",
+        "placement": "right",
+        "overlay": "null",
+        "focalPoint": "center"
+      }
+    },
+    {
+      "type": "cards",
+      "title": "Our Services",
+      "keyMessage": "Cover strategy, design, and build as one integrated service stack.",
+      "density": "medium",
+      "tone": "business",
+      "layoutHint": "cards",
+      "icons": [
+        { "name": "briefcase", "placement": "card" },
+        { "name": "layout-grid", "placement": "card" },
+        { "name": "building", "placement": "card" }
+      ],
+      "bullets": [
+        { "text": "Define workplace strategy aligned with business targets.", "sourceKeys": ["services.0.scope"], "kind": "fact" },
+        { "text": "Design concept, detail, and technical documentation.", "sourceKeys": ["services.1.scope"], "kind": "fact" },
+        { "text": "Deliver design-and-build execution with cost control.", "sourceKeys": ["services.2.scope"], "kind": "fact" },
+        { "text": "Coordinate move management and post-occupancy tuning.", "sourceKeys": ["services.3.scope"], "kind": "fact" }
+      ]
+    },
+    {
+      "type": "profile",
+      "title": "Team & Leadership",
+      "keyMessage": "Blend design leadership and project control for predictable outcomes.",
+      "density": "medium",
+      "tone": "business",
+      "layoutHint": "profile",
+      "bullets": [
+        { "text": "Lead design direction through a principal architect team.", "sourceKeys": ["team.0.role"], "kind": "fact" },
+        { "text": "Run delivery governance with dedicated PM and QS functions.", "sourceKeys": ["team.1.role"], "kind": "fact" },
+        { "text": "Retain client continuity via account-level delivery leads.", "sourceKeys": ["team.2.role"], "kind": "fact" },
+        { "text": "Expand specialist bench in BIM and MEP coordination.", "sourceKeys": ["team.skills"], "kind": "insight" }
+      ],
+      "images": [
+        "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "imagePlan": {
+        "mode": "inline",
+        "style": "corporate",
+        "placement": "left",
+        "overlay": "null",
+        "focalPoint": "center"
+      }
+    },
+    {
+      "type": "bigNumber",
+      "title": "Design & Build Capability",
+      "keyMessage": "Sustain parallel project delivery without quality trade-offs.",
+      "density": "low",
+      "tone": "business",
+      "layoutHint": "big-number",
+      "number": "2.4M sq ft",
+      "caption": "Total delivered workspace footprint in the last 5 years",
+      "emphasis": {
+        "numbers": [
+          {
+            "value": "2.4M sq ft",
+            "label": "Delivered footprint",
+            "sourceKeys": ["delivery.total_area_sqft"]
+          }
+        ],
+        "phrases": [
+          {
+            "text": "Parallel execution capacity",
+            "sourceKeys": ["delivery.parallel_project_capacity"]
+          }
+        ]
+      },
+      "bullets": [
+        { "text": "Handle up to 18 concurrent projects across Asia.", "sourceKeys": ["delivery.parallel_project_capacity"], "kind": "fact" },
+        { "text": "Maintain average on-time delivery above 93%.", "sourceKeys": ["delivery.on_time_rate"], "kind": "fact" }
+      ]
+    },
+    {
+      "type": "timeline",
+      "title": "Collaborative Delivery Journey",
+      "keyMessage": "Execute through stage-gates that protect timeline, quality, and safety.",
+      "density": "medium",
+      "tone": "business",
+      "layoutHint": "timeline",
+      "bullets": [
+        { "text": "Initiate project brief and baseline success criteria.", "sourceKeys": ["process.0"], "kind": "fact" },
+        { "text": "Validate concept, budget, and milestone controls.", "sourceKeys": ["process.1"], "kind": "fact" },
+        { "text": "Drive procurement and site mobilization readiness.", "sourceKeys": ["process.2"], "kind": "fact" },
+        { "text": "Control execution quality and HSE compliance.", "sourceKeys": ["process.3"], "kind": "fact" },
+        { "text": "Handover and optimize post-occupancy operations.", "sourceKeys": ["process.4"], "kind": "fact" }
+      ]
+    },
+    {
+      "type": "split-image",
+      "title": "Selected Projects",
+      "keyMessage": "Show repeatable outcomes across office and hospitality segments.",
+      "density": "medium",
+      "tone": "business",
+      "layoutHint": "split-image",
+      "bullets": [
+        { "text": "Complete a 180,000 sq ft HQ relocation in 10 months.", "sourceKeys": ["projects.0.area", "projects.0.duration"], "kind": "fact" },
+        { "text": "Renovate a 5-star hotel public area with phased opening.", "sourceKeys": ["projects.1.scope"], "kind": "fact" },
+        { "text": "Reduce defect closure cycle by 27% through QA checkpoints.", "sourceKeys": ["projects.2.quality_improvement"], "kind": "fact" }
+      ],
+      "images": [
+        "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "imagePlan": {
+        "mode": "inline",
+        "style": "corporate",
+        "placement": "right",
+        "overlay": "null",
+        "focalPoint": "center"
+      }
+    },
+    {
+      "type": "text",
+      "title": "Compliance & Quality",
+      "keyMessage": "Operate under controlled safety, insurance, and quality governance.",
+      "density": "medium",
+      "tone": "report",
+      "layoutHint": "text",
+      "bullets": [
+        { "text": "Maintain ISO 9001 and ISO 45001 certified workflows.", "sourceKeys": ["compliance.iso"], "kind": "fact" },
+        { "text": "Sustain comprehensive contractor all-risk insurance coverage.", "sourceKeys": ["compliance.insurance"], "kind": "fact" },
+        { "text": "Record zero major safety incidents in the last 36 months.", "sourceKeys": ["compliance.safety_record"], "kind": "fact" },
+        { "text": "Enhance audit cadence to detect early execution variance.", "sourceKeys": ["compliance.audit_cycle"], "kind": "insight" }
+      ]
+    },
+    {
+      "type": "summary",
+      "title": "Contact",
+      "keyMessage": "Align next-step scoping through a structured discovery workshop.",
+      "density": "low",
+      "tone": "business",
+      "layoutHint": "summary",
+      "bullets": [
+        { "text": "Connect with the Client Director at +65 6123 4567.", "sourceKeys": ["contact.phone"], "kind": "fact" },
+        { "text": "Send project brief to hello@atlasdesignbuild.com.", "sourceKeys": ["contact.email"], "kind": "fact" },
+        { "text": "Visit office at Marina Bay Financial Centre, Singapore.", "sourceKeys": ["contact.address"], "kind": "fact" },
+        { "text": "Schedule a 60-minute discovery session this week.", "sourceKeys": ["contact.call_to_action"], "kind": "insight" }
+      ]
+    }
+  ]
+}

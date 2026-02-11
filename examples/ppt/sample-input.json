@@ -1,0 +1,46 @@
+{
+  "company": {
+    "name": "Northstar Design & Build",
+    "foundedYear": 2016,
+    "hq": "Hong Kong",
+    "teamSize": 86,
+    "website": "https://northstar.example.com"
+  },
+  "services": [
+    "Workplace Interior Design",
+    "Design & Build",
+    "Project Management",
+    "Sustainability Consulting"
+  ],
+  "financials": {
+    "annualRevenueHKD": 128000000,
+    "avgProjectValueHKD": 4200000,
+    "onTimeDeliveryRate": "94%"
+  },
+  "projects": [
+    {
+      "name": "Harbor One HQ",
+      "type": "Office",
+      "year": 2024,
+      "areaSqft": 32000,
+      "city": "Hong Kong"
+    },
+    {
+      "name": "Wellness Point Clinic",
+      "type": "Medical",
+      "year": 2023,
+      "areaSqft": 11000,
+      "city": "Shenzhen"
+    }
+  ],
+  "awards": [
+    "Asia Pacific Interior Excellence 2024",
+    "Green Build Recognition 2023"
+  ],
+  "contact": {
+    "name": "Lena Chow",
+    "title": "Business Director",
+    "email": "lena.chow@northstar.example.com",
+    "phone": "+852 9123 4567"
+  }
+}

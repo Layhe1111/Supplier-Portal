@@ -1,3 +1,10 @@
+// app/api/ppt/generate/route.legacy.commented.ts
+// -----------------------------------------------------------------------------
+// Legacy PPT implementation backup (commented out).
+// To rollback: copy code from this file back to app/api/ppt/generate/route.ts
+// -----------------------------------------------------------------------------
+
+/*
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { basename, join } from 'path';
@@ -368,3 +375,4 @@ export async function POST(request: Request) {
     );
   }
 }
+*/

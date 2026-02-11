@@ -1,0 +1,19 @@
+{
+  "functions": {
+    "app/api/ppt/generate/route.js": {
+      "maxDuration": 60
+    },
+    "app/api/ppt/status/route.js": {
+      "maxDuration": 60
+    },
+    "app/api/ppt/worker/route.js": {
+      "maxDuration": 60
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/ppt/worker",
+      "schedule": "* * * * *"
+    }
+  ]
+}

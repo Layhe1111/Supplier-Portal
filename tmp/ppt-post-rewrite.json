@@ -1,0 +1,288 @@
+{
+  "text": "Generate an English-only professional PPT with the fixed outline. Keep a clean and minimal visual style. Use only supplier-provided image URLs.",
+  "complex": 2,
+  "font_name": "黑体",
+  "language": "en-US",
+  "transition": "1",
+  "color": "蓝色",
+  "user_name": "Louis Lau",
+  "ai_picture": false,
+  "report": false,
+  "custom_data": {
+    "title": "SL&A Hong Kong Limited - Design Firm Brochure Deck",
+    "sub_title": "Company Profile & Capability Overview",
+    "author": "Louis Lau",
+    "catalogs": [
+      {
+        "catalog": "Company Overview",
+        "sub_catalog": [
+          "Company Background, Timeline, Positioning & Scale"
+        ]
+      },
+      {
+        "catalog": "Our Services",
+        "sub_catalog": [
+          "Integrated Design + Design & Build Service Scope"
+        ]
+      },
+      {
+        "catalog": "Design Expertise",
+        "sub_catalog": [
+          "Project Types, Design Styles & Technical Capability"
+        ]
+      },
+      {
+        "catalog": "Regional Experience & Clients",
+        "sub_catalog": [
+          "Regional Footprint and Representative Clients"
+        ]
+      },
+      {
+        "catalog": "Selected Projects",
+        "sub_catalog": [
+          "Featured Project References"
+        ]
+      },
+      {
+        "catalog": "Awards & Recognition",
+        "sub_catalog": [
+          "International Awards and Industry Recognition"
+        ]
+      },
+      {
+        "catalog": "Team & Leadership",
+        "sub_catalog": [
+          "Core Design and Project Leadership Team"
+        ]
+      },
+      {
+        "catalog": "Design & Build Capability",
+        "sub_catalog": [
+          "Project Scale, Delivery Capability, Parallel Capacity"
+        ]
+      },
+      {
+        "catalog": "Compliance & Quality",
+        "sub_catalog": [
+          "Safety, Insurance, Quality and Compliance Commitments"
+        ]
+      },
+      {
+        "catalog": "Contact",
+        "sub_catalog": [
+          "Primary Contact and Company Address"
+        ]
+      }
+    ],
+    "contents": [
+      {
+        "catalog_index": 0,
+        "sub_catalog_index": 0,
+        "content": [
+          {
+            "key": "Company Name",
+            "value": "SL&A Hong Kong Limited"
+          },
+          {
+            "key": "Established",
+            "value": "2015"
+          },
+          {
+            "key": "Registered Capital",
+            "value": "2000000 HKD"
+          },
+          {
+            "key": "Regional Positioning",
+            "value": "Hong Kong 香港"
+          },
+          {
+            "key": "Team Scale",
+            "value": "250"
+          },
+          {
+            "key": "Office Address",
+            "value": "7/F, Sea Bird House, 22-28 Wyndham Street, Central, Hong Kong"
+          }
+        ],
+        "picture": [
+          "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769394866934-2c6cd2afdce82d1b7379667ef8e6f246__orig__MmM2Y2QyYWZkY2U4MmQxYjczNzk2NjdlZjhlNmYyNDYuanBlZw.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NDg2NjkzNC0yYzZjZDJhZmRjZTgyZDFiNzM3OTY2N2VmOGU2ZjI0Nl9fb3JpZ19fTW1NMlkyUXlZV1prWTJVNE1tUXhZamN6TnprMk5qZGxaamhsTm1ZeU5EWXVhbkJsWncuanBlZyIsImlhdCI6MTc3MDQ5MDI5OSwiZXhwIjoxNzcwNDkzODk5fQ.b54Dqw6--l-TDmqPNoZlIjgJhXpa6sTq-AJFIvHJpc0",
+          "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395313258-1459a66d6c4d33d9e054db2294440d19__orig__MTQ1OWE2NmQ2YzRkMzNkOWUwNTRkYjIyOTQ0NDBkMTkud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMzI1OC0xNDU5YTY2ZDZjNGQzM2Q5ZTA1NGRiMjI5NDQ0MGQxOV9fb3JpZ19fTVRRMU9XRTJObVEyWXpSa016TmtPV1V3TlRSa1lqSXlPVFEwTkRCa01Ua3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDQ5MDI5OSwiZXhwIjoxNzcwNDkzODk5fQ.CMURjgFqPgHc1HjFsTgbA9-3OWTxbjjgBfBBjgHOWYY",
+          "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395313699-0fdd7003aa32acd8f078ad35a9181558__orig__MGZkZDcwMDNhYTMyYWNkOGYwNzhhZDM1YTkxODE1NTgud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMzY5OS0wZmRkNzAwM2FhMzJhY2Q4ZjA3OGFkMzVhOTE4MTU1OF9fb3JpZ19fTUdaa1pEY3dNRE5oWVRNeVlXTmtPR1l3TnpoaFpETTFZVGt4T0RFMU5UZ3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDQ5MDI5OSwiZXhwIjoxNzcwNDkzODk5fQ.i5OEuef51ZtOS6-pkLvhedgQARoPeHZl8ruiJZslFoQ"
+        ]
+      },
+      {
+        "catalog_index": 1,
+        "sub_catalog_index": 0,
+        "content": [
+          "Core services include Interior Design, Design & Build, Hospitality Design, Architectural Design, Sustainable Design, and Workspace Strategy.",
+          "Design & Build capability is confirmed as available.",
+          "Service narrative is based strictly on the submitted company description and service fields."
+        ]
+      },
+      {
+        "catalog_index": 2,
+        "sub_catalog_index": 0,
+        "content": [
+          {
+            "key": "Project Types",
+            "value": "Hotel 酒店, Medical 醫療"
+          },
+          {
+            "key": "Design Styles",
+            "value": "現代簡約風 / Modern Minimalist, 現代輕奢風 / Modern Light Luxury Style"
+          },
+          {
+            "key": "Main Software",
+            "value": "SketchUp, AutoCAD"
+          },
+          {
+            "key": "BIM Capability",
+            "value": "No 否"
+          }
+        ]
+      },
+      {
+        "catalog_index": 3,
+        "sub_catalog_index": 0,
+        "content": [
+          "Regional base is located in Hong Kong.",
+          "Representative projects include NVIDIA Beijing and Pfizer Inc.",
+          "Company website is accessible at the provided URL."
+        ]
+      },
+      {
+        "catalog_index": 4,
+        "sub_catalog_index": 0,
+        "content": [
+          {
+            "key": "Project 1: NVIDIA Beijing",
+            "value": "Year: 2021; Area: 28000; Type: Office 辦公"
+          },
+          {
+            "key": "Project 2: Pfizer Inc.",
+            "value": "Year: 2022; Area: 15004; Type: N/A"
+          }
+        ],
+        "picture": [
+          "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395312213-49ba48c88f3fa1b7131646b5c127999a__orig__NDliYTQ4Yzg4ZjNmYTFiNzEzMTY0NmI1YzEyNzk5OWEud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMjIxMy00OWJhNDhjODhmM2ZhMWI3MTMxNjQ2YjVjMTI3OTk5YV9fb3JpZ19fTkRsaVlUUTRZemc0WmpObVlURmlOekV6TVRZME5tSTFZekV5TnprNU9XRXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDQ5MDI5OSwiZXhwIjoxNzcwNDkzODk5fQ.lXcwvazpp8ZmSV2MHXutUzR8L11R8iPeNJcQ6sbkhzM",
+          "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395312636-aef9260e8e95781f74ead4af1059fd38__orig__YWVmOTI2MGU4ZTk1NzgxZjc0ZWFkNGFmMTA1OWZkMzgud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMjYzNi1hZWY5MjYwZThlOTU3ODFmNzRlYWQ0YWYxMDU5ZmQzOF9fb3JpZ19fWVdWbU9USTJNR1U0WlRrMU56Z3haamMwWldGa05HRm1NVEExT1daa016Z3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDQ5MDI5OSwiZXhwIjoxNzcwNDkzODk5fQ.5ABT1Isuhg3JHgGxbCo3HgRtVkYv1n3vxGNBpBpJVds",
+          "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395312952-8a680cf9518dbf1e219994e805a28528__orig__OGE2ODBjZjk1MThkYmYxZTIxOTk5NGU4MDVhMjg1Mjgud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMjk1Mi04YTY4MGNmOTUxOGRiZjFlMjE5OTk0ZTgwNWEyODUyOF9fb3JpZ19fT0dFMk9EQmpaamsxTVRoa1ltWXhaVEl4T1RrNU5HVTRNRFZoTWpnMU1qZ3VkMlZpY0Eud2VicCIsImlhdCI6MTc3MDQ5MDI5OSwiZXhwIjoxNzcwNDkzODk5fQ.1E6XtqeO1AJnlJvP2AD3YHSij_Y8g5bo3muGs2DIpo0"
+        ]
+      },
+      {
+        "catalog_index": 5,
+        "sub_catalog_index": 0,
+        "content": [
+          {
+            "key": "2022 - Muse Design Awards",
+            "value": "Placement: Gold; Project: Pfizer Inc."
+          },
+          {
+            "key": "2023 - Muse Design Awards - Interior Design Office Category",
+            "value": "Placement: Gold; Project: Agoda"
+          }
+        ]
+      },
+      {
+        "catalog_index": 6,
+        "sub_catalog_index": 0,
+        "content": [
+          {
+            "key": "Primary Contact",
+            "value": "Louis Lau"
+          },
+          {
+            "key": "Role",
+            "value": "Project Director"
+          },
+          {
+            "key": "Design Team Size",
+            "value": "250"
+          },
+          {
+            "key": "Jason Wang",
+            "value": "20 years experience"
+          }
+        ],
+        "picture": [
+          "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395776325-Screenshot_2026-01-26_10.49.25_AM__orig__U2NyZWVuc2hvdCAyMDI2LTAxLTI2IDEwLjQ5LjI1IEFNLnBuZw.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTc3NjMyNS1TY3JlZW5zaG90XzIwMjYtMDEtMjZfMTAuNDkuMjVfQU1fX29yaWdfX1UyTnlaV1Z1YzJodmRDQXlNREkyTFRBeExUSTJJREV3TGpRNUxqSTFJRUZOTG5CdVp3LnBuZyIsImlhdCI6MTc3MDQ5MDI5OSwiZXhwIjoxNzcwNDkzODk5fQ.hN9UixaF659x7gpFcqCgV1h_g9pqLrfFSlJgH6q3GOI",
+          "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769493186218-Screenshot_2026-01-26_10.51.27_AM__orig__U2NyZWVuc2hvdCAyMDI2LTAxLTI2IDEwLjUxLjI3IEFNLnBuZw.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5MzE4NjIxOC1TY3JlZW5zaG90XzIwMjYtMDEtMjZfMTAuNTEuMjdfQU1fX29yaWdfX1UyTnlaV1Z1YzJodmRDQXlNREkyTFRBeExUSTJJREV3TGpVeExqSTNJRUZOTG5CdVp3LnBuZyIsImlhdCI6MTc3MDQ5MDI5OSwiZXhwIjoxNzcwNDkzODk5fQ.h9GXehvD0IgARXVCE-_eQBCLjxCjIBLT0v8TQoTPWGE"
+        ]
+      },
+      {
+        "catalog_index": 7,
+        "sub_catalog_index": 0,
+        "content": [
+          {
+            "key": "Design & Build Service",
+            "value": "Yes 是"
+          },
+          {
+            "key": "Annual Delivered Area (sqft)",
+            "value": "100000"
+          },
+          {
+            "key": "Parallel Project Capacity",
+            "value": "4"
+          },
+          {
+            "key": "Average Project Value (HKD)",
+            "value": "20000000"
+          }
+        ],
+        "picture": [
+          "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769494055540-Screenshot_2026-01-26_4.43.17_PM__orig__U2NyZWVuc2hvdCAyMDI2LTAxLTI2IDQuNDMuMTcgUE0ucG5n.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTQ5NDA1NTU0MC1TY3JlZW5zaG90XzIwMjYtMDEtMjZfNC40My4xN19QTV9fb3JpZ19fVTJOeVpXVnVjMmh2ZENBeU1ESTJMVEF4TFRJMklEUXVORE11TVRjZ1VFMHVjRzVuLnBuZyIsImlhdCI6MTc3MDQ5MDI5OSwiZXhwIjoxNzcwNDkzODk5fQ.6ko-cDOdzFRSarB8SusL1JQ73HhRgQH5-W536ZHWU68",
+          "https://wjkjcsxaehvbtlldyfxr.supabase.co/storage/v1/object/sign/supplier-files/c534a96f-42bc-4303-9888-61fc3818ded7/1769395312213-49ba48c88f3fa1b7131646b5c127999a__orig__NDliYTQ4Yzg4ZjNmYTFiNzEzMTY0NmI1YzEyNzk5OWEud2VicA.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80NTljOWQyMy1iZTA5LTRkNmYtOTA0NS02NjliYWViOTRkNGMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzdXBwbGllci1maWxlcy9jNTM0YTk2Zi00MmJjLTQzMDMtOTg4OC02MWZjMzgxOGRlZDcvMTc2OTM5NTMxMjIxMy00OWJhNDhjODhmM2ZhMWI3MTMxNjQ2YjVjMTI3OTk5YV9fb3JpZ19fTkRsaVlUUTRZemc0WmpObVlURmlOekV6TVRZME5tSTFZekV5TnprNU9XRXVkMlZpY0Eud2VicCIsImlhdCI6MTc3MDQ5MDI5OSwiZXhwIjoxNzcwNDkzODk5fQ.lXcwvazpp8ZmSV2MHXutUzR8L11R8iPeNJcQ6sbkhzM"
+        ]
+      },
+      {
+        "catalog_index": 8,
+        "sub_catalog_index": 0,
+        "content": [
+          "Safety staffing includes five reported safety officers.",
+          "General Liability insurance is provided by AIA with an expiry date in 2029.",
+          "No incidents or litigation have been reported in the past three years."
+        ]
+      },
+      {
+        "catalog_index": 9,
+        "sub_catalog_index": 0,
+        "content": [
+          {
+            "key": "Contact Person",
+            "value": "Louis Lau"
+          },
+          {
+            "key": "Position",
+            "value": "Project Director"
+          },
+          {
+            "key": "Phone",
+            "value": "+852 9482 7655"
+          },
+          {
+            "key": "Email",
+            "value": "louis.lau@sla-group.com"
+          },
+          {
+            "key": "Fax",
+            "value": "+852 2347 7677"
+          },
+          {
+            "key": "Address",
+            "value": "7/F, Sea Bird House, 22-28 Wyndham Street, Central, Hong Kong"
+          },
+          {
+            "key": "Website",
+            "value": "https://www.sla-group.com/"
+          }
+        ]
+      }
+    ]
+  },
+  "meta": {
+    "source_summary": {
+      "business_description": "SLA is an Asia-focused international design firm specializing in creating inspiring spaces. They offer a comprehensive range of services including Interior Design, Design & Build, Hospitality Design, Architectural Design, Sustainable Design, and Workspace Strategy. A core strength is their extensive portfolio of work for major global corporations. Their key clients and featured projects span across prominent cities in Asia, such as Adobe in Tokyo, NVIDIA in Beijing, ByteDance (TikTok) and Microsoft in Kuala Lumpur..."
+    }
+  }
+}

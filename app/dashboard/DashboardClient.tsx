@@ -8,6 +8,8 @@ import { supabase } from '@/lib/supabaseClient';
 import { validateOptionalUrl } from '@/lib/urlValidation';
 import { parseProductImportFile } from '@/lib/productImport';
 import { useToast } from '@/components/ToastProvider';
+import { buildDraftPreviewForBrowser } from '@/lib/ppt/factPack';
+import { FIXED_GAMMA_PROMPT } from '@/lib/ppt/fixedPrompt';
 
 const STORAGE_BUCKET = process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET || 'supplier-files';
 const STORAGE_PATH_REGEX = /^[^/]+\/\d{13}-/;
@@ -771,6 +773,8 @@ export default function DashboardClient() {
   const [error, setError] = useState('');
   const [supplierStatus, setSupplierStatus] = useState<'draft' | 'submitted' | null>(null);
   const [isGeneratingPpt, setIsGeneratingPpt] = useState(false);
+  const [isValidatingPpt, setIsValidatingPpt] = useState(false);
+  const [pptJobProgress, setPptJobProgress] = useState<number>(0);
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -950,67 +954,187 @@ export default function DashboardClient() {
     }
   };
 
+  const preparePptPayload = async () => {
+    if (!userData) throw new Error('No supplier data');
+
+    const paths = new Set<string>();
+    collectStoragePaths(userData, paths);
+
+    let payload: unknown = userData;
+    if (paths.size > 0) {
+      const signedMap = new Map<string, string>();
+      await Promise.all(
+        Array.from(paths).map(async (path) => {
+          const { data, error } = await supabase.storage
+            .from(STORAGE_BUCKET)
+            .createSignedUrl(path, 60 * 60);
+          if (!error && data?.signedUrl) {
+            signedMap.set(path, data.signedUrl);
+          }
+        })
+      );
+      payload = replaceStoragePaths(userData, signedMap);
+    }
+
+    const labeledPayload = buildBilingualPayload(payload, supplierStatus);
+    const prunedPayload = pruneEmpty(labeledPayload) || {};
+    console.log('[PPT DEBUG] Original payload (browser)', prunedPayload);
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData.session?.access_token;
+    if (!token) {
+      throw new Error('Please sign in first / 請先登入');
+    }
+
+    return { token, prunedPayload };
+  };
+
+  const handleValidatePpt = async () => {
+    if (!userData) return;
+    if (userData.supplierType === 'basic') return;
+    if (isGeneratingPpt || isValidatingPpt) return;
+
+    try {
+      setIsValidatingPpt(true);
+      const { prunedPayload } = await preparePptPayload();
+      const fixedPrompt = FIXED_GAMMA_PROMPT;
+      console.log('[PPT DEBUG] Prompt (browser)', fixedPrompt);
+      console.log('[PPT DEBUG] Input JSON (browser)', prunedPayload);
+      const preview = buildDraftPreviewForBrowser(prunedPayload, fixedPrompt);
+      console.log('[PPT DEBUG] Fixed Outline (browser)', preview.fixedOutline);
+      console.log('[PPT DEBUG] Final Outline Preview (browser)', preview.finalOutline);
+      console.log('[PPT DEBUG] Skipped Sections Preview (browser)', preview.skippedSections);
+      console.log('[PPT DEBUG] Image Assignments Preview (browser)', preview.imageAssignments);
+      toast.success('已在浏览器控制台打印 prompt + 输入 JSON');
+    } catch (err) {
+      console.error('Failed to validate PPT payload:', err);
+      setError(
+        err instanceof Error ? err.message : 'Offline PPT validation failed / 離線校驗失敗'
+      );
+    } finally {
+      setIsValidatingPpt(false);
+    }
+  };
+
+  const sleep = (ms: number) =>
+    new Promise<void>((resolve) => {
+      setTimeout(resolve, ms);
+    });
+
   const handleGeneratePpt = async () => {
     if (!userData) return;
     if (userData.supplierType === 'basic') return;
-    if (isGeneratingPpt) return;
+    if (isGeneratingPpt || isValidatingPpt) return;
 
     try {
       setIsGeneratingPpt(true);
-      const paths = new Set<string>();
-      collectStoragePaths(userData, paths);
+      setPptJobProgress(0);
+      const { token, prunedPayload } = await preparePptPayload();
+      const fixedPrompt = FIXED_GAMMA_PROMPT;
 
-      let payload: unknown = userData;
-      if (paths.size > 0) {
-        const signedMap = new Map<string, string>();
-        await Promise.all(
-          Array.from(paths).map(async (path) => {
-            const { data, error } = await supabase.storage
-              .from(STORAGE_BUCKET)
-              .createSignedUrl(path, 60 * 60);
-            if (!error && data?.signedUrl) {
-              signedMap.set(path, data.signedUrl);
-            }
-          })
-        );
-        payload = replaceStoragePaths(userData, signedMap);
+      const enqueueRes = await fetch('/api/ppt/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          prompt: fixedPrompt,
+          dataJson: prunedPayload,
+        }),
+      });
+      const enqueueBody = await enqueueRes.json().catch(() => ({}));
+      if (!enqueueRes.ok) {
+        throw new Error(enqueueBody.error || 'Failed to enqueue PPT job');
       }
 
-      const labeledPayload = buildBilingualPayload(payload, supplierStatus);
-      const prunedPayload = pruneEmpty(labeledPayload) || {};
+      const jobId =
+        typeof enqueueBody.jobId === 'string' && enqueueBody.jobId.trim()
+          ? enqueueBody.jobId.trim()
+          : '';
+      if (!jobId) throw new Error('Missing jobId from /api/ppt/generate');
 
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData.session?.access_token;
-      if (!token) {
-        throw new Error('Please sign in first / 請先登入');
-      }
+      let lastWorkerKickAt = 0;
+      const maybeKickLocalWorker = () => {
+        if (process.env.NODE_ENV !== 'development') return;
+        const now = Date.now();
+        if (now - lastWorkerKickAt < 10_000) return;
+        lastWorkerKickAt = now;
+        fetch('/api/ppt/worker', { method: 'POST', cache: 'no-store' }).catch((kickErr) => {
+          console.warn('[PPT DEBUG] Failed to kick local worker', kickErr);
+        });
+      };
 
-      const controller = new AbortController();
-      const timeoutHandle = setTimeout(() => controller.abort(), 600_000);
-      let res: Response;
-      try {
-        res = await fetch('/api/ppt/generate', {
-          method: 'POST',
+      // Local dev has no Vercel Cron, so we kick worker proactively.
+      maybeKickLocalWorker();
+
+      console.log('[PPT DEBUG] Enqueued jobId', jobId);
+      toast.success('PPT任务已创建，正在后台生成...');
+
+      const pollTimeoutMs = 20 * 60 * 1000;
+      const pollStartAt = Date.now();
+      let downloadUrl = '';
+
+      while (Date.now() - pollStartAt < pollTimeoutMs) {
+        maybeKickLocalWorker();
+
+        const statusRes = await fetch(`/api/ppt/status?jobId=${encodeURIComponent(jobId)}`, {
+          method: 'GET',
           headers: {
-            'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ data: prunedPayload }),
-          signal: controller.signal,
+          cache: 'no-store',
         });
-      } finally {
-        clearTimeout(timeoutHandle);
+        const statusBody = await statusRes.json().catch(() => ({}));
+        if (!statusRes.ok) {
+          throw new Error(statusBody.error || 'Failed to query PPT job status');
+        }
+
+        const status = typeof statusBody.status === 'string' ? statusBody.status : '';
+        const progress =
+          typeof statusBody.progress === 'number' && Number.isFinite(statusBody.progress)
+            ? statusBody.progress
+            : 0;
+        setPptJobProgress(progress);
+
+        console.log('[PPT DEBUG] Job status', { jobId, status, progress, statusBody });
+
+        if (status === 'failed') {
+          throw new Error(statusBody.error || 'PPT job failed');
+        }
+        if (status === 'done') {
+          if (statusBody?.debug) {
+            console.log('[PPT DEBUG] Final Outline (browser)', statusBody.debug.finalOutline || []);
+            console.log(
+              '[PPT DEBUG] Skipped Sections (browser)',
+              statusBody.debug.skippedSections || []
+            );
+            console.log(
+              '[PPT DEBUG] Final Image Assignments (browser)',
+              statusBody.debug.imageAssignments || []
+            );
+          }
+          downloadUrl =
+            typeof statusBody.downloadUrl === 'string' ? statusBody.downloadUrl.trim() : '';
+          if (!downloadUrl) {
+            throw new Error('PPT job finished but downloadUrl is missing');
+          }
+          break;
+        }
+
+        await sleep(3000);
       }
 
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.error || 'Failed to generate PPT');
+      if (!downloadUrl) {
+        throw new Error('PPT generation timed out while polling status');
       }
 
-      const blob = await res.blob();
-      const contentDisposition = res.headers.get('content-disposition') || '';
-      const match = contentDisposition.match(/filename="?([^";]+)"?/i);
-      const filename = match?.[1] || 'supplier-report.pptx';
+      const fileRes = await fetch(downloadUrl, { cache: 'no-store' });
+      if (!fileRes.ok) {
+        throw new Error(`Failed to download PPT from signed URL (${fileRes.status})`);
+      }
+      const blob = await fileRes.blob();
+      const filename = `supplier-report-${Date.now()}.pptx`;
       const objectUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = objectUrl;
@@ -1022,14 +1146,11 @@ export default function DashboardClient() {
 
       toast.success('PPT 已生成並開始下載');
     } catch (err) {
-      if (err instanceof Error && err.name === 'AbortError') {
-        setError('生成超时，请重试 / Request timed out, please retry');
-        return;
-      }
       console.error('Failed to generate PPT:', err);
       setError(err instanceof Error ? err.message : 'Failed to generate PPT / 生成PPT失敗');
     } finally {
       setIsGeneratingPpt(false);
+      setPptJobProgress(0);
     }
   };
 
@@ -1099,14 +1220,24 @@ export default function DashboardClient() {
              userData &&
              userData.supplierType !== 'basic' &&
              supplierStatus === 'submitted' && (
-              <button
-                type="button"
-                onClick={handleGeneratePpt}
-                disabled={isGeneratingPpt}
-                className="px-4 py-2 bg-blue-600 text-white text-sm font-light hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 transition-colors"
-              >
-                {isGeneratingPpt ? '生成中...' : '生成PPT'}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleValidatePpt}
+                  disabled={isGeneratingPpt || isValidatingPpt}
+                  className="px-4 py-2 bg-gray-700 text-white text-sm font-light hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400 transition-colors"
+                >
+                  {isValidatingPpt ? '校验中...' : '离线校验'}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleGeneratePpt}
+                  disabled={isGeneratingPpt || isValidatingPpt}
+                  className="px-4 py-2 bg-blue-600 text-white text-sm font-light hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 transition-colors"
+                >
+                  {isGeneratingPpt ? `生成中...${pptJobProgress}%` : '生成PPT'}
+                </button>
+              </div>
             )}
           </div>
           <p className="mb-4 text-sm text-gray-600">
